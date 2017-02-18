@@ -1,0 +1,3 @@
+[submodule "dep/json"]
+	path = thirdparty/json
+	url = git@github.com:nlohmann/json.git
