@@ -35,17 +35,14 @@ find_package(LUG REQUIRED window system)
 
 include_directories(${LUG_INCLUDE_DIR})
 
-if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/include")
+if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src")
   message(FATAL_ERROR "call \"git submodule update --init --recursive\"")
 endif()
 
 
 set(LUGBENCH_DEP "")
 
-add_subdirectory("dep/json")
-
-
-include_directories(thirparty/json/include)
+include_directories(thirdparty/json/src/)
 
 
 if(LUG_OS_ANDROID)
@@ -62,5 +59,5 @@ if(LUG_OS_ANDROID)
     )
 else()
     add_executable(${EXECUTABLE_NAME} src/main.cpp)
-    target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} restclient-cpp)
+    target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
 endif()
