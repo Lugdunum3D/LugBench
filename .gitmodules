@@ -1,3 +1,6 @@
 [submodule "thirdparty/json"]
 	path = thirdparty/json
 	url = git@github.com:nlohmann/json.git
+[submodule "ext/lugdunum"]
+	path = ext/lugdunum
+	url = git@github.com:Lugdunum3D/Lugdunum.git

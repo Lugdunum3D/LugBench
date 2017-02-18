@@ -11,11 +11,38 @@ project(benchmark)
 # define the executable
 set(EXECUTABLE_NAME "benchmark")
 
+if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src"
+    OR NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum/src")
+  message(FATAL_ERROR "call \"git submodule update --init --recursive\"")
+endif()
+
+# include json.hpp (header-only lib)
+include_directories(thirdparty/json/src/)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-include("${CMAKE_SOURCE_DIR}/cmake/Config.cmake")
+# find Lugdunum and link with it
+find_package(LUG COMPONENTS core graphics system window math)
+if(NOT LUG_FOUND)
+  message(STATUS "Lugdunum was not found. Building it instead")
 
-if(LUG_COMPILER_MSVC)
+  # build lugdunum libraries
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum" "ext_build/lugdunum")
+  # set the same variabel name as findLug
+  set(LUG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum/include)
+  # path to genereated libs
+  link_directories(${CMAKE_CURRENT_BINARY_DIR}/ext_build/lugdunum/lib)
+
+  set(LUG_LIBRARIES "")
+  list(APPEND LUG_LIBRARIES lug-window)
+  list(APPEND LUG_LIBRARIES lug-system)
+endif()
+  
+
+include_directories(${LUG_INCLUDE_DIR})
+
+
+if(MSVC)
     if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
         string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     else()
@@ -23,29 +50,13 @@ if(LUG_COMPILER_MSVC)
     endif()
 
     list(APPEND CMAKE_CXX_FLAGS "/WX")
-elseif(LUG_COMPILER_GCC OR LUG_COMPILER_CLANG)
+else()
     list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++14")
 endif()
 
 string(REPLACE ";" " " "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
 
-
-# find Lugdunum and link with it
-find_package(LUG REQUIRED window system)
-
-include_directories(${LUG_INCLUDE_DIR})
-
-if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src")
-  message(FATAL_ERROR "call \"git submodule update --init --recursive\"")
-endif()
-
-
-set(LUGBENCH_DEP "")
-
-include_directories(thirdparty/json/src/)
-
-
-if(LUG_OS_ANDROID)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     add_library(${EXECUTABLE_NAME}
                 SHARED
                 src/main.cpp
@@ -55,7 +66,6 @@ if(LUG_OS_ANDROID)
                           log
                           android
                           ${LUG_LIBRARIES
-						  restclient-cpp}
     )
 else()
     add_executable(${EXECUTABLE_NAME} src/main.cpp)

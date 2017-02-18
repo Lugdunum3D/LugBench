@@ -1,11 +1,29 @@
 #include "json.hpp"
 #include <iostream>
 #include <fstream>
+#include <lug/Window/Window.hpp>
 
 using json = nlohmann::json;
 
 int main(int, const char*[]) {
 
+  auto window = lug::Window::Window::create(800, 600, "Default Window", \
+					    lug::Window::Style::Default);
+
+
+  if (!window) {
+    return 1;
+  }
+  // While window is open execute the following
+  while (window->isOpen()) {
+    lug::Window::Event event;
+    while (window->pollEvent(event)) {
+      if (event.type == lug::Window::EventType::CLOSE) {
+	window->close();
+      }
+    }
+  }
+  
   // create an empty structure (null)
   json j;
 

@@ -11,6 +11,14 @@
 #
 # You can't enforce a specific version yet.
 #
+# By default, the dynamic libraries of Lugdunum will be found. To find the static ones instead,
+# you must set the LUG_STATIC_LIBRARIES variable to TRUE before calling find_package(LUG ...).
+#
+# In case of static linking, the LUG_STATIC macro will also be defined by this script.
+# example:
+#   set(LUG_STATIC_LIBRARIES TRUE)
+#   find_package(LUG COMPONENTS system)
+#
 # If Lugdunum is not installed in a standard path, you can use the LUG_ROOT CMake (or environment) variable
 # to tell CMake where Lugdunum is.
 #
@@ -26,12 +34,18 @@
 # - LUG_LIBRARIES:    the list of all libraries corresponding to the required modules
 # - LUG_FOUND:        true if all the required modules are found
 # - LUG_INCLUDE_DIR:  the path where Lugdunum headers are located (the directory containing the lug/Config.hpp file)
+# - LUG_RESOURCES_DIR: the path where Lugdunum resources are located
 #
 # example:
 #   find_package(LUG COMPONENTS system window graphics REQUIRED)
 #   include_directories(${LUG_INCLUDE_DIR})
 #   add_executable(myapp ...)
 #   target_link_libraries(myapp ${LUG_LIBRARIES})
+
+# define the LUG_STATIC macro if static build was chosen
+if(LUG_STATIC_LIBRARIES)
+    add_definitions(-DLUG_STATIC)
+endif()
 
 # define the list of search paths for headers and libraries
 set(FIND_LUG_PATHS
@@ -45,10 +59,26 @@ set(FIND_LUG_PATHS
     /opt
 )
 
+# define the list of search paths for miscs
+set(FIND_LUG_MICS_PATHS
+    ${LUG_ROOT}
+    $ENV{LUG_ROOT}
+    $ENV{ANDROID_NDK}/sources/lugdunum
+    ${ANDROID_NDK}/sources/lugdunum
+    /usr/local/share/lug
+)
+
 # find the LUG include directory
 find_path(LUG_INCLUDE_DIR lug/Config.hpp
           PATH_SUFFIXES include
           PATHS ${FIND_LUG_PATHS}
+          CMAKE_FIND_ROOT_PATH_BOTH
+)
+
+# find the LUG resources directory
+find_path(LUG_RESOURCES_DIR shaders
+          PATH_SUFFIXES resources
+          PATHS ${FIND_LUG_MICS_PATHS}
           CMAKE_FIND_ROOT_PATH_BOTH
 )
 
@@ -84,6 +114,22 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
                 CMAKE_FIND_ROOT_PATH_BOTH
         )
     else()
+        # static release library
+        find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE
+                     NAMES ${FIND_LUG_COMPONENT_NAME}-s
+                     PATH_SUFFIXES lib64 lib/${ANDROID_ABI}
+                     PATHS ${FIND_LUG_PATHS}
+                     CMAKE_FIND_ROOT_PATH_BOTH
+        )
+
+        # static debug library
+        find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG
+                     NAMES ${FIND_LUG_COMPONENT_NAME}-s-d
+                     PATH_SUFFIXES lib64 lib/${ANDROID_ABI}
+                     PATHS ${FIND_LUG_PATHS}
+                     CMAKE_FIND_ROOT_PATH_BOTH
+        )
+
         # dynamic release library
         find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE
                      NAMES ${FIND_LUG_COMPONENT_NAME}
@@ -102,12 +148,22 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
     endif()
 
     # choose the entries that fit the requested link type
-    if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE)
-        set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE})
-    endif()
+    if(LUG_STATIC_LIBRARIES)
+        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE)
+            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE})
+        endif()
 
-    if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG)
-        set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG})
+        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG)
+            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG})
+        endif()
+    else()
+        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE)
+            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE})
+        endif()
+
+        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG)
+            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG})
+        endif()
     endif()
 
     if (LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG OR LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE)
@@ -144,6 +200,8 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
     MARK_AS_ADVANCED(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG
+                     LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE
+                     LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG
     )
@@ -160,6 +218,7 @@ endforeach()
 if (LUG_FOUND)
     message(STATUS "Found Lugdunum headers in ${LUG_INCLUDE_DIR}")
     message(STATUS "Found Lugdunum libraries in ${LUG_LIBRARIES}")
+    message(STATUS "Found Lugdunum resources in ${LUG_RESOURCES_DIR}")
 else()
     # include directory or library not found
     set(FIND_LUG_ERROR "Could NOT find Lugdunum (missing: ${FIND_LUG_MISSING})")
