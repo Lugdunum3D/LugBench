@@ -84,7 +84,7 @@ find_path(LUG_RESOURCES_DIR shaders
 
 set(LUG_FOUND TRUE) # will be set to false if one of the required modules is not found
 
-if(LUG_OS_ANDROID)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     # this will append `lug-main` to the components to find if we are on WINDOWS or ANDROID
     # lug-main provides a wrapper for the main functions of Android and Windows to provide
     # an uniform int main(int ac, char *[]av) across platforms

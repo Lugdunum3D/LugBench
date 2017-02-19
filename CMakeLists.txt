@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-#�determine the build type
+# determine the build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
@@ -8,7 +8,7 @@ endif()
 # project name
 project(lugbench)
 
-#�define the executable
+# define the executable
 set(EXECUTABLE_NAME "lugbench")
 
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src"
@@ -21,7 +21,6 @@ include_directories(thirdparty/json/src/)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-set(LUG_OS_ANDROID True)
 # find Lugdunum and link with it
 find_package(LUG COMPONENTS core graphics system window math)
 if(NOT LUG_FOUND)
