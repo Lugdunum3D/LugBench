@@ -19,4 +19,6 @@ public:
     void onEvent(const lug::Window::Event& event) override final;
     void onFrame(const lug::System::Time& elapsedTime) override final;
 
+private:
+  std::unique_ptr<lug::Graphics::Scene> _scene;
 };

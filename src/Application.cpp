@@ -71,11 +71,11 @@ Application::Application() : lug::Core::Application::Application{{"hello", {0, 1
 }
 
 Application::~Application() {
-    // TODO: Remove this when the ResourceManager is done
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+
     for (auto& queue: vkRender->getQueues()) {
-        queue.waitIdle();
+      queue.waitIdle();
     }
 }
 
@@ -83,7 +83,14 @@ bool Application::init(int argc, char* argv[]) {
     if (!lug::Core::Application::init(argc, argv)) {
         return false;
     }
-    _scene = _graphics.createScene();
+
+    // query vulkan info 
+    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+    lug::Graphics::Vulkan::InstanceInfo info = vkRender->getInstanceInfo();
+    for (auto tmp : info.extensions)
+      std::cout << tmp.extensionName << std::endl;
+
     return true;
 }
 

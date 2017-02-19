@@ -41,6 +41,10 @@ endif()
   
 
 include_directories(${LUG_INCLUDE_DIR})
+include_directories(include)
+
+find_package(Vulkan)
+include_directories(${VULKAN_INCLUDE_DIR})
 
 
 if(MSVC)
@@ -57,6 +61,17 @@ endif()
 
 string(REPLACE ";" " " "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
 
+
+# include macros
+include(${PROJECT_SOURCE_DIR}/cmake/Macros.cmake)
+
+set(SHADERS
+  shader.vert
+  shader-directional.frag
+  shader-point.frag
+  shader-spot.frag)
+
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     add_library(${EXECUTABLE_NAME}
                 SHARED
@@ -70,5 +85,9 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     )
 else()
     add_executable(${EXECUTABLE_NAME} include/Application.hpp src/Application.cpp src/main.cpp)
+    compile_shaders(${EXECUTABLE_NAME} ${SHADERS})
     target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
 endif()
+
+# install models
+file(COPY ${LUG_RESOURCES_DIR}/models DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
