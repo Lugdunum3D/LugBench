@@ -2,13 +2,17 @@
 #include <iostream>
 #include <fstream>
 #include <lug/Window/Window.hpp>
+#include <lug/System/Logger.hpp>
+#include <lug/System/Logger/OstreamHandler.hpp>
+#include <lug/System/Logger/LogCatHandler.hpp>
 
 using json = nlohmann::json;
 
 int main(int, const char*[]) {
 
-  auto window = lug::Window::Window::create(800, 600, "Default Window", \
-					    lug::Window::Style::Default);
+    lug::System::Logger::logger.addHandler(lug::System::makeHandler<lug::System::LogCatHandler>("logcat"));
+  auto window = lug::Window::Window::create({800, 600, "Default Window", \
+					    lug::Window::Style::Default});
 
 
   if (!window) {
@@ -43,7 +47,7 @@ int main(int, const char*[]) {
   j["answer"]["everything"] = 42;
 
   // add an array that is stored as std::vector (using an initializer list)
-  j["list"] = { 1, 0, 2 };
+  j["list"] = { 1, 0, 2 }; 
 
   // add another object (using an initializer list of pairs)
   j["object"] = { {"currency", "USD"}, {"value", 42.99} };
@@ -64,7 +68,10 @@ int main(int, const char*[]) {
       }}
   };
 
-  std::cout << j.dump(4) << std::endl;
+
+    lug::System::Logger::logger.info(j.dump(4));
+
+
   // write prettified JSON to another file
   std::ofstream o("pretty.json");
   o << std::setw(4) << j << std::endl;

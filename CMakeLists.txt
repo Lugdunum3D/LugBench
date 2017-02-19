@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.1)
 
-# determine the build type
+#ï¿½determine the build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
 # project name
-project(benchmark)
+project(lugbench)
 
-# define the executable
-set(EXECUTABLE_NAME "benchmark")
+#ï¿½define the executable
+set(EXECUTABLE_NAME "lugbench")
 
 if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src"
     OR NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum/src")
@@ -21,6 +21,7 @@ include_directories(thirdparty/json/src/)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
+set(LUG_OS_ANDROID True)
 # find Lugdunum and link with it
 find_package(LUG COMPONENTS core graphics system window math)
 if(NOT LUG_FOUND)
@@ -65,7 +66,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     target_link_libraries(${EXECUTABLE_NAME}
                           log
                           android
-                          ${LUG_LIBRARIES
+                          ${LUG_LIBRARIES}
     )
 else()
     add_executable(${EXECUTABLE_NAME} src/main.cpp)
