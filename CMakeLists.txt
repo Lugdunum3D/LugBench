@@ -26,6 +26,7 @@ find_package(LUG COMPONENTS core graphics system window math)
 if(NOT LUG_FOUND)
   message(STATUS "Lugdunum was not found. Building it instead")
 
+
   # build lugdunum libraries
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum" "ext_build/lugdunum")
   # set the same variabel name as findLug
@@ -59,7 +60,7 @@ string(REPLACE ";" " " "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
     add_library(${EXECUTABLE_NAME}
                 SHARED
-                src/main.cpp
+                include/Application.hpp src/Application.cpp src/main.cpp
     )
 
     target_link_libraries(${EXECUTABLE_NAME}
@@ -68,6 +69,6 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
                           ${LUG_LIBRARIES}
     )
 else()
-    add_executable(${EXECUTABLE_NAME} src/main.cpp)
+    add_executable(${EXECUTABLE_NAME} include/Application.hpp src/Application.cpp src/main.cpp)
     target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
 endif()
