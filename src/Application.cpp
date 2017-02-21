@@ -1,6 +1,7 @@
 #include <ctime>
 #include <sstream>
 #include "Application.hpp"
+#include <VulkanInfoProvider.hpp>
 
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
@@ -88,11 +89,13 @@ bool Application::init(int argc, char* argv[]) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     lug::Graphics::Vulkan::InstanceInfo info = vkRender->getInstanceInfo();
-    for (auto tmp : info.extensions)
-      std::cout << tmp.extensionName << std::endl;
+   
+    VulkanInfoProvider jsonProvider = VulkanInfoProvider(info);
 
-    return true;
-}
+    auto json = jsonProvider.getJSONVulkAnInfo();
+    std::cout << json << std::endl;
+
+}   
 
 void Application::onEvent(const lug::Window::Event& event) {
     if (event.type == lug::Window::EventType::CLOSE) {

@@ -56,13 +56,13 @@ include_directories(${VULKAN_INCLUDE_DIR})
 
 
 if(MSVC)
-    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-        string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    else()
-        list(APPEND CMAKE_CXX_FLAGS "/W4")
-    endif()
-
-    list(APPEND CMAKE_CXX_FLAGS "/WX")
+  #  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  #     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  #  else()
+  #      list(APPEND CMAKE_CXX_FLAGS "/W4")
+  #  endif()
+  #
+  #  list(APPEND CMAKE_CXX_FLAGS "/WX")
 else()
     list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++14")
 endif()
