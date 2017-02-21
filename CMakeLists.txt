@@ -92,7 +92,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
                           ${LUG_LIBRARIES}
     )
 else()
-    add_executable(${EXECUTABLE_NAME} include/Application.hpp src/Application.cpp src/main.cpp)
+    add_executable(${EXECUTABLE_NAME} include/Application.hpp src/Application.cpp include/VulkanInfoProvider.hpp src/VulkanInfoProvider.cpp src/main.cpp)
     compile_shaders(${EXECUTABLE_NAME} ${SHADERS})
     target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
 endif()
