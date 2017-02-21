@@ -84,17 +84,21 @@ bool Application::init(int argc, char* argv[]) {
     if (!lug::Core::Application::init(argc, argv)) {
         return false;
     }
-
-    // query vulkan info 
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-    lug::Graphics::Vulkan::InstanceInfo info = vkRender->getInstanceInfo();
-   
-    VulkanInfoProvider jsonProvider = VulkanInfoProvider(info);
+    lug::Graphics::Vulkan::InstanceInfo instanceInfo = vkRender->getInstanceInfo();
+    lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
 
-    auto json = jsonProvider.getJSONVulkAnInfo();
-    std::cout << json << std::endl;
+    nlohmann::json json;
+    json["properties"] = {
+        {"apiVersion", physicalDeviceInfo->properties.apiVersion}
+    };
 
+
+    std::cout << json.dump(4) << std::endl;
+
+
+    return (true);
 }   
 
 void Application::onEvent(const lug::Window::Event& event) {

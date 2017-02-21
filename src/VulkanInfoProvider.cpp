@@ -11,10 +11,12 @@ VulkanInfoProvider::~VulkanInfoProvider()
 const  nlohmann::json& VulkanInfoProvider::getJSONVulkAnInfo() {
     
     nlohmann::json json;
+
     
-    for (auto extension : info.extensions) {
-        json[extension.extensionName] = extension.specVersion;
-    }
+    // for (auto extension : info.extensions) {
+    //     json[extension.extensionName] = extension.specVersion;
+    // }
+
 
     return json;
 }
