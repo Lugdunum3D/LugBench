@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <rest>
 
 #define PutFormData = std::map<string,string>
 
@@ -17,7 +16,7 @@ public:
         putVulkanInfo
     };
 
-    asoni::Handle getHandle(Route route);
+    //asoni::Handle getHandle(Route route);
     
 private:
     std::string baseUrlString;

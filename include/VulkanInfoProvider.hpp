@@ -9,15 +9,8 @@ public:
     VulkanInfoProvider();
     ~VulkanInfoProvider();
 
-    func getVulkAnInfoFrom()
+    void getVulkAnInfoFrom();
 private:
 
 };
 
-VulkanInfoProvider::VulkanInfoProvider()
-{
-}
-
-VulkanInfoProvider::~VulkanInfoProvider()
-{
-}
