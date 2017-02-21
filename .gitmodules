@@ -4,3 +4,6 @@
 [submodule "ext/lugdunum"]
 	path = ext/lugdunum
 	url = git@github.com:Lugdunum3D/Lugdunum.git
+[submodule "thirdparty/restless"]
+	path = thirdparty/restless
+	url = https://github.com/anuragsoni/restless.git
