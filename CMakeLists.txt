@@ -19,6 +19,14 @@ endif()
 # include json.hpp (header-only lib)
 include_directories(thirdparty/json/src/)
 
+set(RESTLESS_INCLUDE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/restless/include)
+
+# add restless 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/restless" "thirdparty_build/restless")
+
+include_directories(${RESTLESS_INCLUDE_DIR})
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/thirdparty_build/restless/lib)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # find Lugdunum and link with it
