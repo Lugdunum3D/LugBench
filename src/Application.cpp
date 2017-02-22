@@ -88,6 +88,8 @@ bool Application::init(int argc, char* argv[]) {
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     lug::Graphics::Vulkan::InstanceInfo instanceInfo = vkRender->getInstanceInfo();
     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+    
+   
 
     nlohmann::json json;
     json["properties"] = {
@@ -286,6 +288,41 @@ bool Application::init(int argc, char* argv[]) {
     };
 
 
+    for (auto extension : physicalDeviceInfo->extensions)
+        json["extension"].push_back(
+            {
+                { "extensionName", extension.extensionName },
+                { "specVersion", extension.specVersion },
+            }
+        );
+    
+    for (auto layer : instanceInfo.layers)
+        json["layers"].push_back(
+    {
+        { "layerName", layer.layerName },
+        { "specVersion", layer.specVersion },
+        {"implementationVersion", layer.implementationVersion},
+        {"description", layer.description}
+    }
+    );
+
+    size_t i = 0;
+
+    for (auto format : physicalDeviceInfo->formatProperties)
+    {   
+        json["formats"].push_back(
+        {
+            { format.first,{
+                    { "linearTilingFeatures", format.second.linearTilingFeatures},
+                    { "optimalTilingFeatures", format.second.optimalTilingFeatures },
+                    { "bufferFeatures", format.second.bufferFeatures},
+                }
+            } 
+        }
+        );
+    }
+  
+        
 
     std::cout << json.dump(4) << std::endl;
 
