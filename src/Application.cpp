@@ -84,140 +84,145 @@ bool Application::init(int argc, char* argv[]) {
     if (!lug::Core::Application::init(argc, argv)) {
         return false;
     }
+
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     lug::Graphics::Vulkan::InstanceInfo instanceInfo = vkRender->getInstanceInfo();
     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    
-   
 
     nlohmann::json json;
+
     json["properties"] = {
-        {"apiVersion", physicalDeviceInfo->properties.apiVersion},
-        {"driverVersion", physicalDeviceInfo->properties.driverVersion},
+        {"apiVersion", {
+            {"major", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.apiVersion).major},
+            {"minor", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.apiVersion).minor},
+            {"patch", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.apiVersion).patch}
+        }},
+        {"driverVersion", {
+            {"major", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.driverVersion).major},
+            {"minor", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.driverVersion).minor},
+            {"patch", lug::Graphics::Vulkan::Version::fromInt(physicalDeviceInfo->properties.driverVersion).patch}
+        }},
         {"vendorID", physicalDeviceInfo->properties.vendorID},
         {"deviceID", physicalDeviceInfo->properties.deviceID},
         {"deviceType", lug::Graphics::Vulkan::enumToStr(physicalDeviceInfo->properties.deviceType)},
         {"deviceName", physicalDeviceInfo->properties.deviceName},
         {"pipelineCacheUUID", std::vector<uint8_t>(std::begin(physicalDeviceInfo->properties.pipelineCacheUUID), std::end(physicalDeviceInfo->properties.pipelineCacheUUID))},
-            {"limits", {
-                {"maxImageDimension1D",physicalDeviceInfo->properties.limits.maxImageDimension1D},
-                {"maxImageDimension2D" , physicalDeviceInfo->properties.limits.maxImageDimension2D },
-                {"maxImageDimension3D" , physicalDeviceInfo->properties.limits.maxImageDimension3D },
-                {"maxImageDimensionCube" , physicalDeviceInfo->properties.limits.maxImageDimensionCube},
-                {"maxImageArrayLayers" ,  physicalDeviceInfo->properties.limits.maxImageArrayLayers },
-                {"maxTexelBufferElements" , physicalDeviceInfo->properties.limits.maxTexelBufferElements },
-                {"maxUniformBufferRange" , physicalDeviceInfo->properties.limits.maxUniformBufferRange },
-                { "maxStorageBufferRange" , physicalDeviceInfo->properties.limits.maxStorageBufferRange },
-                {"maxPushConstantsSize" , physicalDeviceInfo->properties.limits.maxPushConstantsSize },
-                {"maxMemoryAllocationCount" ,physicalDeviceInfo->properties.limits.maxMemoryAllocationCount },
-                {"maxSamplerAllocationCount" , physicalDeviceInfo->properties.limits.maxSamplerAllocationCount },
-                {"bufferImageGranularity" , physicalDeviceInfo->properties.limits.bufferImageGranularity },
-                {"sparseAddressSpaceSize" , physicalDeviceInfo->properties.limits.sparseAddressSpaceSize },
-                {"maxBoundDescriptorSets" , physicalDeviceInfo->properties.limits.maxBoundDescriptorSets },
-                {"maxPerStageDescriptorSamplers" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorSamplers },
-                {"maxPerStageDescriptorUniformBuffers" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorUniformBuffers },
-                {"maxPerStageDescriptorStorageBuffers" ,physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageBuffers },
-                {"maxPerStageDescriptorSampledImages" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorSampledImages },
-                {"maxPerStageDescriptorStorageImages" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageImages },
-                {"maxPerStageDescriptorInputAttachments" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorInputAttachments },
-                {"maxPerStageResources" , physicalDeviceInfo->properties.limits.maxPerStageResources },
-                {"maxDescriptorSetSamplers" , physicalDeviceInfo->properties.limits.maxDescriptorSetSamplers },
-                {"maxDescriptorSetUniformBuffers" ,physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffers },
-                {"maxDescriptorSetUniformBuffersDynamic" ,physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffersDynamic },
-                {"maxDescriptorSetStorageBuffers" ,physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffers },
-                {"maxDescriptorSetStorageBuffersDynamic" , physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffersDynamic },
-                {"maxDescriptorSetSampledImages" ,physicalDeviceInfo->properties.limits.maxDescriptorSetSampledImages },
-                {"maxDescriptorSetStorageImages" , physicalDeviceInfo->properties.limits.maxDescriptorSetStorageImages },
-                {"maxDescriptorSetInputAttachments" ,physicalDeviceInfo->properties.limits.maxDescriptorSetInputAttachments },
-                {"maxVertexInputAttributes" , physicalDeviceInfo->properties.limits.maxVertexInputAttributes },
-                {"maxVertexInputBindings" , physicalDeviceInfo->properties.limits.maxVertexInputBindings },
-                {"maxVertexInputAttributeOffset" , physicalDeviceInfo->properties.limits.maxVertexInputAttributeOffset },
-                {"maxVertexInputBindingStride" , physicalDeviceInfo->properties.limits.maxVertexInputBindingStride },
-                {"maxVertexOutputComponents" , physicalDeviceInfo->properties.limits.maxVertexOutputComponents },
-                {"maxTessellationGenerationLevel" , physicalDeviceInfo->properties.limits.maxTessellationGenerationLevel },
-                {"maxTessellationPatchSize" , physicalDeviceInfo->properties.limits.maxTessellationPatchSize },
-                {"maxTessellationControlPerVertexInputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexInputComponents },
-                {"maxTessellationControlPerVertexOutputComponents" ,physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexOutputComponents },
-                {"maxTessellationControlPerPatchOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlPerPatchOutputComponents },
-                {"maxTessellationControlTotalOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlTotalOutputComponents },
-                {"maxTessellationEvaluationInputComponents" , physicalDeviceInfo->properties.limits.maxTessellationEvaluationInputComponents },
-                {"maxTessellationEvaluationOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationEvaluationOutputComponents },
-                {"maxGeometryShaderInvocations" , physicalDeviceInfo->properties.limits.maxGeometryShaderInvocations },
-                {"maxGeometryInputComponents" , physicalDeviceInfo->properties.limits.maxGeometryInputComponents },
-                {"maxGeometryOutputComponents" , physicalDeviceInfo->properties.limits.maxGeometryOutputComponents },
-                {"maxGeometryOutputVertices" , physicalDeviceInfo->properties.limits.maxGeometryOutputVertices },
-                {"maxGeometryTotalOutputComponents" , physicalDeviceInfo->properties.limits.maxGeometryTotalOutputComponents },
-                {"maxFragmentInputComponents" , physicalDeviceInfo->properties.limits.maxFragmentInputComponents },
-                {"maxFragmentOutputAttachments" , physicalDeviceInfo->properties.limits.maxFragmentOutputAttachments },
-                {"maxFragmentDualSrcAttachments" , physicalDeviceInfo->properties.limits.maxFragmentDualSrcAttachments },
-                {"maxFragmentCombinedOutputResources" , physicalDeviceInfo->properties.limits.maxFragmentCombinedOutputResources },
-                {"maxComputeSharedMemorySize" , physicalDeviceInfo->properties.limits.maxComputeSharedMemorySize },
-                {"maxComputeWorkGroupCount" , physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount },
-                {"maxComputeWorkGroupInvocations" , physicalDeviceInfo->properties.limits.maxComputeWorkGroupInvocations },
-                {"maxComputeWorkGroupSize" ,physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize },
-                {"subPixelPrecisionBits" , physicalDeviceInfo->properties.limits.subPixelPrecisionBits },
-                {"subTexelPrecisionBits" ,physicalDeviceInfo->properties.limits.subTexelPrecisionBits },
-                {"mipmapPrecisionBits" , physicalDeviceInfo->properties.limits.mipmapPrecisionBits },
-                {"maxDrawIndexedIndexValue" ,physicalDeviceInfo->properties.limits.maxDrawIndexedIndexValue },
-                {"maxDrawIndirectCount" , physicalDeviceInfo->properties.limits.maxDrawIndirectCount },
-                {"maxSamplerLodBias" , physicalDeviceInfo->properties.limits.maxSamplerLodBias },
-                {"maxSamplerAnisotropy" , physicalDeviceInfo->properties.limits.maxSamplerAnisotropy },
-                {"maxViewports" , physicalDeviceInfo->properties.limits.maxViewports },
-                {"maxViewportDimensions" ,physicalDeviceInfo->properties.limits.maxViewportDimensions },
-                {"viewportBoundsRange" , physicalDeviceInfo->properties.limits.viewportBoundsRange },
-                {"viewportSubPixelBits" , physicalDeviceInfo->properties.limits.viewportSubPixelBits },
-                {"minMemoryMapAlignment" ,physicalDeviceInfo->properties.limits.minMemoryMapAlignment },
-                {"minTexelBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minTexelBufferOffsetAlignment },
-                {"minUniformBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minUniformBufferOffsetAlignment },
-                {"minStorageBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minStorageBufferOffsetAlignment },
-                {"minTexelOffset" , physicalDeviceInfo->properties.limits.minTexelOffset },
-                {"maxTexelOffset" , physicalDeviceInfo->properties.limits.maxTexelOffset },
-                {"minTexelGatherOffset" ,physicalDeviceInfo->properties.limits.minTexelGatherOffset },
-                {"maxTexelGatherOffset" ,physicalDeviceInfo->properties.limits.maxTexelGatherOffset },
-                {"minInterpolationOffset" ,physicalDeviceInfo->properties.limits.minInterpolationOffset },
-                {"maxInterpolationOffset" , physicalDeviceInfo->properties.limits.maxInterpolationOffset },
-                {"subPixelInterpolationOffsetBits" , physicalDeviceInfo->properties.limits.subPixelInterpolationOffsetBits },
-                {"maxFramebufferWidth" ,physicalDeviceInfo->properties.limits.maxFramebufferWidth },
-                {"maxFramebufferHeight" , physicalDeviceInfo->properties.limits.maxFramebufferHeight },
-                {"maxFramebufferLayers" , physicalDeviceInfo->properties.limits.maxFramebufferLayers },
-                {"framebufferColorSampleCounts" , physicalDeviceInfo->properties.limits.framebufferColorSampleCounts },
-                {"framebufferDepthSampleCounts" , physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts },
-                {"framebufferStencilSampleCounts" , physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts },
-                {"framebufferNoAttachmentsSampleCounts" , physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts },
-                {"maxColorAttachments" , physicalDeviceInfo->properties.limits.maxColorAttachments },
-                {"sampledImageColorSampleCounts" , physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts },
-                {"sampledImageIntegerSampleCounts" ,physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts },
-                {"sampledImageDepthSampleCounts" , physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts },
-                {"sampledImageStencilSampleCounts" ,physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts },
-                {"storageImageSampleCounts" , physicalDeviceInfo->properties.limits.storageImageSampleCounts },
-                {"maxSampleMaskWords" , physicalDeviceInfo->properties.limits.maxSampleMaskWords },
-                {"timestampComputeAndGraphics" ,physicalDeviceInfo->properties.limits.timestampComputeAndGraphics },
-                {"timestampPeriod" , physicalDeviceInfo->properties.limits.timestampPeriod },
-                {"maxClipDistances" , physicalDeviceInfo->properties.limits.maxClipDistances },
-                {"maxCullDistances" , physicalDeviceInfo->properties.limits.maxCullDistances },
-                {"maxCombinedClipAndCullDistances" , physicalDeviceInfo->properties.limits.maxCombinedClipAndCullDistances },
-                {"discreteQueuePriorities" , physicalDeviceInfo->properties.limits.discreteQueuePriorities },
-                {"pointSizeRange" ,physicalDeviceInfo->properties.limits.pointSizeRange },
-                {"lineWidthRange" ,physicalDeviceInfo->properties.limits.lineWidthRange },
-                {"pointSizeGranularity" ,physicalDeviceInfo->properties.limits.pointSizeGranularity },
-                {"lineWidthGranularity" ,physicalDeviceInfo->properties.limits.lineWidthGranularity },
-                {"strictLines" , physicalDeviceInfo->properties.limits.strictLines },
-                {"standardSampleLocations" , physicalDeviceInfo->properties.limits.standardSampleLocations },
-                {"optimalBufferCopyOffsetAlignment" , physicalDeviceInfo->properties.limits.optimalBufferCopyOffsetAlignment },
-                {"optimalBufferCopyRowPitchAlignment" , physicalDeviceInfo->properties.limits.optimalBufferCopyRowPitchAlignment },
-                {"nonCoherentAtomSize" , physicalDeviceInfo->properties.limits.nonCoherentAtomSize}
-            }
-        },
-        {"sparseProperties",
-            {
-                {"residencyStandard2DBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape)},
-                {"residencyStandard2DMultisampleBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape)},
-                {"residencyStandard3DBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape)},
-                {"residencyAlignedMipSize", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize)},
-                {"residencyNonResidentStrict", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict)},
-            }
-        },
+        {"limits", {
+            {"maxImageDimension1D",physicalDeviceInfo->properties.limits.maxImageDimension1D},
+            {"maxImageDimension2D" , physicalDeviceInfo->properties.limits.maxImageDimension2D},
+            {"maxImageDimension3D" , physicalDeviceInfo->properties.limits.maxImageDimension3D},
+            {"maxImageDimensionCube" , physicalDeviceInfo->properties.limits.maxImageDimensionCube},
+            {"maxImageArrayLayers" ,  physicalDeviceInfo->properties.limits.maxImageArrayLayers},
+            {"maxTexelBufferElements" , physicalDeviceInfo->properties.limits.maxTexelBufferElements},
+            {"maxUniformBufferRange" , physicalDeviceInfo->properties.limits.maxUniformBufferRange},
+            {"maxStorageBufferRange" , physicalDeviceInfo->properties.limits.maxStorageBufferRange},
+            {"maxPushConstantsSize" , physicalDeviceInfo->properties.limits.maxPushConstantsSize},
+            {"maxMemoryAllocationCount" ,physicalDeviceInfo->properties.limits.maxMemoryAllocationCount},
+            {"maxSamplerAllocationCount" , physicalDeviceInfo->properties.limits.maxSamplerAllocationCount},
+            {"bufferImageGranularity" , physicalDeviceInfo->properties.limits.bufferImageGranularity},
+            {"sparseAddressSpaceSize" , physicalDeviceInfo->properties.limits.sparseAddressSpaceSize},
+            {"maxBoundDescriptorSets" , physicalDeviceInfo->properties.limits.maxBoundDescriptorSets},
+            {"maxPerStageDescriptorSamplers" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorSamplers},
+            {"maxPerStageDescriptorUniformBuffers" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorUniformBuffers},
+            {"maxPerStageDescriptorStorageBuffers" ,physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageBuffers},
+            {"maxPerStageDescriptorSampledImages" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorSampledImages},
+            {"maxPerStageDescriptorStorageImages" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageImages},
+            {"maxPerStageDescriptorInputAttachments" , physicalDeviceInfo->properties.limits.maxPerStageDescriptorInputAttachments},
+            {"maxPerStageResources" , physicalDeviceInfo->properties.limits.maxPerStageResources},
+            {"maxDescriptorSetSamplers" , physicalDeviceInfo->properties.limits.maxDescriptorSetSamplers},
+            {"maxDescriptorSetUniformBuffers" ,physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffers},
+            {"maxDescriptorSetUniformBuffersDynamic" ,physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffersDynamic},
+            {"maxDescriptorSetStorageBuffers" ,physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffers},
+            {"maxDescriptorSetStorageBuffersDynamic" , physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffersDynamic},
+            {"maxDescriptorSetSampledImages" ,physicalDeviceInfo->properties.limits.maxDescriptorSetSampledImages},
+            {"maxDescriptorSetStorageImages" , physicalDeviceInfo->properties.limits.maxDescriptorSetStorageImages},
+            {"maxDescriptorSetInputAttachments" ,physicalDeviceInfo->properties.limits.maxDescriptorSetInputAttachments},
+            {"maxVertexInputAttributes" , physicalDeviceInfo->properties.limits.maxVertexInputAttributes},
+            {"maxVertexInputBindings" , physicalDeviceInfo->properties.limits.maxVertexInputBindings},
+            {"maxVertexInputAttributeOffset" , physicalDeviceInfo->properties.limits.maxVertexInputAttributeOffset},
+            {"maxVertexInputBindingStride" , physicalDeviceInfo->properties.limits.maxVertexInputBindingStride},
+            {"maxVertexOutputComponents" , physicalDeviceInfo->properties.limits.maxVertexOutputComponents},
+            {"maxTessellationGenerationLevel" , physicalDeviceInfo->properties.limits.maxTessellationGenerationLevel},
+            {"maxTessellationPatchSize" , physicalDeviceInfo->properties.limits.maxTessellationPatchSize},
+            {"maxTessellationControlPerVertexInputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexInputComponents},
+            {"maxTessellationControlPerVertexOutputComponents" ,physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexOutputComponents},
+            {"maxTessellationControlPerPatchOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlPerPatchOutputComponents},
+            {"maxTessellationControlTotalOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationControlTotalOutputComponents},
+            {"maxTessellationEvaluationInputComponents" , physicalDeviceInfo->properties.limits.maxTessellationEvaluationInputComponents},
+            {"maxTessellationEvaluationOutputComponents" , physicalDeviceInfo->properties.limits.maxTessellationEvaluationOutputComponents},
+            {"maxGeometryShaderInvocations" , physicalDeviceInfo->properties.limits.maxGeometryShaderInvocations},
+            {"maxGeometryInputComponents" , physicalDeviceInfo->properties.limits.maxGeometryInputComponents},
+            {"maxGeometryOutputComponents" , physicalDeviceInfo->properties.limits.maxGeometryOutputComponents},
+            {"maxGeometryOutputVertices" , physicalDeviceInfo->properties.limits.maxGeometryOutputVertices},
+            {"maxGeometryTotalOutputComponents" , physicalDeviceInfo->properties.limits.maxGeometryTotalOutputComponents},
+            {"maxFragmentInputComponents" , physicalDeviceInfo->properties.limits.maxFragmentInputComponents},
+            {"maxFragmentOutputAttachments" , physicalDeviceInfo->properties.limits.maxFragmentOutputAttachments},
+            {"maxFragmentDualSrcAttachments" , physicalDeviceInfo->properties.limits.maxFragmentDualSrcAttachments},
+            {"maxFragmentCombinedOutputResources" , physicalDeviceInfo->properties.limits.maxFragmentCombinedOutputResources},
+            {"maxComputeSharedMemorySize" , physicalDeviceInfo->properties.limits.maxComputeSharedMemorySize},
+            {"maxComputeWorkGroupCount" , physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount},
+            {"maxComputeWorkGroupInvocations" , physicalDeviceInfo->properties.limits.maxComputeWorkGroupInvocations},
+            {"maxComputeWorkGroupSize" ,physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize},
+            {"subPixelPrecisionBits" , physicalDeviceInfo->properties.limits.subPixelPrecisionBits},
+            {"subTexelPrecisionBits" ,physicalDeviceInfo->properties.limits.subTexelPrecisionBits},
+            {"mipmapPrecisionBits" , physicalDeviceInfo->properties.limits.mipmapPrecisionBits},
+            {"maxDrawIndexedIndexValue" ,physicalDeviceInfo->properties.limits.maxDrawIndexedIndexValue},
+            {"maxDrawIndirectCount" , physicalDeviceInfo->properties.limits.maxDrawIndirectCount},
+            {"maxSamplerLodBias" , physicalDeviceInfo->properties.limits.maxSamplerLodBias},
+            {"maxSamplerAnisotropy" , physicalDeviceInfo->properties.limits.maxSamplerAnisotropy},
+            {"maxViewports" , physicalDeviceInfo->properties.limits.maxViewports},
+            {"maxViewportDimensions" ,physicalDeviceInfo->properties.limits.maxViewportDimensions},
+            {"viewportBoundsRange" , physicalDeviceInfo->properties.limits.viewportBoundsRange},
+            {"viewportSubPixelBits" , physicalDeviceInfo->properties.limits.viewportSubPixelBits},
+            {"minMemoryMapAlignment" ,physicalDeviceInfo->properties.limits.minMemoryMapAlignment},
+            {"minTexelBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minTexelBufferOffsetAlignment},
+            {"minUniformBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minUniformBufferOffsetAlignment},
+            {"minStorageBufferOffsetAlignment" ,physicalDeviceInfo->properties.limits.minStorageBufferOffsetAlignment},
+            {"minTexelOffset" , physicalDeviceInfo->properties.limits.minTexelOffset},
+            {"maxTexelOffset" , physicalDeviceInfo->properties.limits.maxTexelOffset},
+            {"minTexelGatherOffset" ,physicalDeviceInfo->properties.limits.minTexelGatherOffset},
+            {"maxTexelGatherOffset" ,physicalDeviceInfo->properties.limits.maxTexelGatherOffset},
+            {"minInterpolationOffset" ,physicalDeviceInfo->properties.limits.minInterpolationOffset},
+            {"maxInterpolationOffset" , physicalDeviceInfo->properties.limits.maxInterpolationOffset},
+            {"subPixelInterpolationOffsetBits" , physicalDeviceInfo->properties.limits.subPixelInterpolationOffsetBits},
+            {"maxFramebufferWidth" ,physicalDeviceInfo->properties.limits.maxFramebufferWidth},
+            {"maxFramebufferHeight" , physicalDeviceInfo->properties.limits.maxFramebufferHeight},
+            {"maxFramebufferLayers" , physicalDeviceInfo->properties.limits.maxFramebufferLayers},
+            {"framebufferColorSampleCounts" , physicalDeviceInfo->properties.limits.framebufferColorSampleCounts},
+            {"framebufferDepthSampleCounts" , physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts},
+            {"framebufferStencilSampleCounts" , physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts},
+            {"framebufferNoAttachmentsSampleCounts" , physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts},
+            {"maxColorAttachments" , physicalDeviceInfo->properties.limits.maxColorAttachments},
+            {"sampledImageColorSampleCounts" , physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts},
+            {"sampledImageIntegerSampleCounts" ,physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts},
+            {"sampledImageDepthSampleCounts" , physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts},
+            {"sampledImageStencilSampleCounts" ,physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts},
+            {"storageImageSampleCounts" , physicalDeviceInfo->properties.limits.storageImageSampleCounts},
+            {"maxSampleMaskWords" , physicalDeviceInfo->properties.limits.maxSampleMaskWords},
+            {"timestampComputeAndGraphics" ,physicalDeviceInfo->properties.limits.timestampComputeAndGraphics},
+            {"timestampPeriod" , physicalDeviceInfo->properties.limits.timestampPeriod},
+            {"maxClipDistances" , physicalDeviceInfo->properties.limits.maxClipDistances},
+            {"maxCullDistances" , physicalDeviceInfo->properties.limits.maxCullDistances},
+            {"maxCombinedClipAndCullDistances" , physicalDeviceInfo->properties.limits.maxCombinedClipAndCullDistances},
+            {"discreteQueuePriorities" , physicalDeviceInfo->properties.limits.discreteQueuePriorities},
+            {"pointSizeRange" ,physicalDeviceInfo->properties.limits.pointSizeRange},
+            {"lineWidthRange" ,physicalDeviceInfo->properties.limits.lineWidthRange},
+            {"pointSizeGranularity" ,physicalDeviceInfo->properties.limits.pointSizeGranularity},
+            {"lineWidthGranularity" ,physicalDeviceInfo->properties.limits.lineWidthGranularity},
+            {"strictLines" , physicalDeviceInfo->properties.limits.strictLines},
+            {"standardSampleLocations" , physicalDeviceInfo->properties.limits.standardSampleLocations},
+            {"optimalBufferCopyOffsetAlignment" , physicalDeviceInfo->properties.limits.optimalBufferCopyOffsetAlignment},
+            {"optimalBufferCopyRowPitchAlignment" , physicalDeviceInfo->properties.limits.optimalBufferCopyRowPitchAlignment},
+            {"nonCoherentAtomSize" , physicalDeviceInfo->properties.limits.nonCoherentAtomSize}
+        }},
+        {"sparseProperties", {
+            {"residencyStandard2DBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape)},
+            {"residencyStandard2DMultisampleBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape)},
+            {"residencyStandard3DBlockShape", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape)},
+            {"residencyAlignedMipSize", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize)},
+            {"residencyNonResidentStrict", static_cast<bool>(physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict)},
+        }}
     };
 
     json["features"] = {
@@ -283,8 +288,7 @@ bool Application::init(int argc, char* argv[]) {
         {"memoryHeapCount", physicalDeviceInfo->memoryProperties.memoryHeapCount}
     };
 
-    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryTypeCount; i++)
-    {
+    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
         json["memory"]["memoryTypes"].push_back(
             {
                 {"propertyFlags", lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
@@ -293,8 +297,7 @@ bool Application::init(int argc, char* argv[]) {
         );
     }
 
-    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryHeapCount; i++)
-    {
+    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
         json["memory"]["memoryHeaps"].push_back(
             {
                 {"size", physicalDeviceInfo->memoryProperties.memoryHeaps[i].size},
@@ -303,61 +306,59 @@ bool Application::init(int argc, char* argv[]) {
         );
     }
 
-
-    for (auto tmp : physicalDeviceInfo->queueFamilies)
-    {
+    for (auto tmp : physicalDeviceInfo->queueFamilies) {
         json["queues"].push_back ({
             {"queueFlags", lug::Graphics::Vulkan::VkQueueFlagsToStr(tmp.queueFlags)},
             {"queueCount", tmp.queueCount},
             {"timestampValidBits", tmp.timestampValidBits},
-            {"minImageTransferGranularity",
-                { 
-                    {"width", tmp.minImageTransferGranularity.width},
-                    {"height", tmp.minImageTransferGranularity.height},
-                    {"depth",tmp.minImageTransferGranularity.depth}
-                }
-            }
+            {"minImageTransferGranularity", {
+                {"width", tmp.minImageTransferGranularity.width},
+                {"height", tmp.minImageTransferGranularity.height},
+                {"depth",tmp.minImageTransferGranularity.depth}
+            }}
         });
     }
 
-
-
-
-    for (auto extension : physicalDeviceInfo->extensions)
+    for (auto extension : physicalDeviceInfo->extensions) {
         json["extension"].push_back(
             {
-                { "extensionName", extension.extensionName },
-                { "specVersion", extension.specVersion },
+                {"extensionName", extension.extensionName},
+                {"specVersion", {
+                    {"major", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).major},
+                    {"minor", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).minor},
+                    {"patch", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).patch}
+                }},
             }
         );
-    
-    for (auto layer : instanceInfo.layers)
-        json["layers"].push_back(
-    {
-        { "layerName", layer.layerName },
-        { "specVersion", layer.specVersion },
-        {"implementationVersion", layer.implementationVersion},
-        {"description", layer.description}
     }
-    );
 
-    for (auto format : physicalDeviceInfo->formatProperties)
-    {   
+    // We don't want instance layers for the moment because they aren't GPU specific
+    /*for (auto layer : instanceInfo.layers) {
+        json["layers"].push_back(
+            {
+                {"layerName", layer.layerName},
+                {"specVersion", layer.specVersion},
+                {"implementationVersion", layer.implementationVersion},
+                {"description", layer.description}
+            }
+        );
+    }*/
+
+    for (auto format : physicalDeviceInfo->formatProperties) {
         json["formats"].push_back(
-        {
-            lug::Graphics::Vulkan::enumToStr(format.first), {
-                    { "linearTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
-                    { "optimalTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures) },
-                    { "bufferFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
+            {
+                lug::Graphics::Vulkan::enumToStr(format.first),
+                {
+                    {"linearTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
+                    {"optimalTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures)},
+                    {"bufferFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
                 }
-        }
+            }
         );
     }
-  
-        
+
 
     std::cout << json.dump(4) << std::endl;
-
 
     return (true);
 }
