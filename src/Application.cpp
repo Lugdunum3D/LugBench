@@ -299,7 +299,7 @@ bool Application::init(int argc, char* argv[]) {
         json["memory"]["memoryHeaps"].push_back(
             {
                 {"size", physicalDeviceInfo->memoryProperties.memoryHeaps[i].size},
-                //{"flags", lug::Graphics::Vulkan::VkMemoryHeapFlagsToStr(physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
+                {"flags", lug::Graphics::Vulkan::VkMemoryHeapFlagsToStr(physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
             }
         );
     }
