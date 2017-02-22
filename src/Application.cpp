@@ -207,7 +207,82 @@ bool Application::init(int argc, char* argv[]) {
                 {"optimalBufferCopyRowPitchAlignment" , physicalDeviceInfo->properties.limits.optimalBufferCopyRowPitchAlignment },
                 {"nonCoherentAtomSize" , physicalDeviceInfo->properties.limits.nonCoherentAtomSize}
             }
-        }
+        },
+        {"sparseProperties",
+            {
+                {"residencyStandard2DBlockShape", physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape},
+                {"residencyStandard2DMultisampleBlockShape", physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape},
+                {"residencyStandard3DBlockShape", physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape},
+                {"residencyAlignedMipSize", physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize},
+                {"residencyNonResidentStrict", physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict},
+            }
+        },
+    };
+
+    json["features"] = {
+        {"robustBufferAccess", physicalDeviceInfo->features.robustBufferAccess},
+        {"fullDrawIndexUint32", physicalDeviceInfo->features.fullDrawIndexUint32},
+        {"imageCubeArray", physicalDeviceInfo->features.imageCubeArray},
+        {"independentBlend", physicalDeviceInfo->features.independentBlend},
+        {"geometryShader", physicalDeviceInfo->features.geometryShader},
+        {"tessellationShader", physicalDeviceInfo->features.tessellationShader},
+        {"sampleRateShading", physicalDeviceInfo->features.sampleRateShading},
+        {"dualSrcBlend", physicalDeviceInfo->features.dualSrcBlend},
+        {"logicOp", physicalDeviceInfo->features.logicOp},
+        {"multiDrawIndirect", physicalDeviceInfo->features.multiDrawIndirect},
+
+        {"drawIndirectFirstInstance", physicalDeviceInfo->features.drawIndirectFirstInstance},
+        {"depthClamp", physicalDeviceInfo->features.depthClamp},
+        {"depthBiasClamp", physicalDeviceInfo->features.depthBiasClamp},
+        {"fillModeNonSolid", physicalDeviceInfo->features.fillModeNonSolid},
+        {"depthBounds", physicalDeviceInfo->features.depthBounds},
+        {"wideLines", physicalDeviceInfo->features.wideLines},
+        {"largePoints", physicalDeviceInfo->features.largePoints},
+        {"alphaToOne", physicalDeviceInfo->features.alphaToOne},
+        {"multiViewport", physicalDeviceInfo->features.multiViewport},
+        {"samplerAnisotropy", physicalDeviceInfo->features.samplerAnisotropy},
+        {"textureCompressionETC2", physicalDeviceInfo->features.textureCompressionETC2},
+        {"textureCompressionASTC_LDR", physicalDeviceInfo->features.textureCompressionASTC_LDR},
+        {"textureCompressionBC", physicalDeviceInfo->features.textureCompressionBC},
+        {"occlusionQueryPrecise", physicalDeviceInfo->features.occlusionQueryPrecise},
+        {"pipelineStatisticsQuery", physicalDeviceInfo->features.pipelineStatisticsQuery},
+
+        {"vertexPipelineStoresAndAtomics", physicalDeviceInfo->features.vertexPipelineStoresAndAtomics},
+        {"fragmentStoresAndAtomics", physicalDeviceInfo->features.fragmentStoresAndAtomics},
+        {"shaderTessellationAndGeometryPointSize", physicalDeviceInfo->features.shaderTessellationAndGeometryPointSize},
+        {"shaderImageGatherExtended", physicalDeviceInfo->features.shaderImageGatherExtended},
+        {"shaderStorageImageExtendedFormats", physicalDeviceInfo->features.shaderStorageImageExtendedFormats},
+        {"shaderStorageImageMultisample", physicalDeviceInfo->features.shaderStorageImageMultisample},
+        {"shaderStorageImageReadWithoutFormat", physicalDeviceInfo->features.shaderStorageImageReadWithoutFormat},
+        {"shaderStorageImageWriteWithoutFormat", physicalDeviceInfo->features.shaderStorageImageWriteWithoutFormat},
+
+
+        {"shaderUniformBufferArrayDynamicIndexing", physicalDeviceInfo->features.shaderUniformBufferArrayDynamicIndexing},
+        {"shaderSampledImageArrayDynamicIndexing", physicalDeviceInfo->features.shaderSampledImageArrayDynamicIndexing},
+        {"shaderStorageBufferArrayDynamicIndexing", physicalDeviceInfo->features.shaderStorageBufferArrayDynamicIndexing},
+        {"shaderStorageImageArrayDynamicIndexing", physicalDeviceInfo->features.shaderStorageImageArrayDynamicIndexing},
+        {"shaderClipDistance", physicalDeviceInfo->features.shaderClipDistance},
+        {"shaderCullDistance", physicalDeviceInfo->features.shaderCullDistance},
+        {"shaderFloat64", physicalDeviceInfo->features.shaderFloat64},
+        {"shaderInt64", physicalDeviceInfo->features.shaderInt64},
+        {"shaderInt16", physicalDeviceInfo->features.shaderInt16},
+        {"shaderResourceResidency", physicalDeviceInfo->features.shaderResourceResidency},
+        {"shaderResourceMinLod", physicalDeviceInfo->features.shaderResourceMinLod},
+        {"sparseBinding", physicalDeviceInfo->features.sparseBinding},
+
+        {"sparseResidencyBuffer", physicalDeviceInfo->features.sparseResidencyBuffer},
+        {"sparseResidencyImage2D", physicalDeviceInfo->features.sparseResidencyImage2D},
+        {"sparseResidencyImage3D", physicalDeviceInfo->features.sparseResidencyImage3D},
+        {"sparseResidency2Samples", physicalDeviceInfo->features.sparseResidency2Samples},
+        {"sparseResidency4Samples", physicalDeviceInfo->features.sparseResidency4Samples},
+        {"sparseResidency8Samples", physicalDeviceInfo->features.sparseResidency8Samples},
+        {"sparseResidency16Samples", physicalDeviceInfo->features.sparseResidency16Samples},
+        {"sparseResidencyAliased", physicalDeviceInfo->features.sparseResidencyAliased},
+        {"variableMultisampleRate", physicalDeviceInfo->features.variableMultisampleRate},
+        {"inheritedQueries", physicalDeviceInfo->features.inheritedQueries},
+
+
+
     };
 
 
