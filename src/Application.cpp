@@ -346,12 +346,11 @@ bool Application::init(int argc, char* argv[]) {
     {   
         json["formats"].push_back(
         {
-            { format.first,{
+            format.first,{
                     { "linearTilingFeatures", format.second.linearTilingFeatures},
                     { "optimalTilingFeatures", format.second.optimalTilingFeatures },
                     { "bufferFeatures", format.second.bufferFeatures},
                 }
-            } 
         }
         );
     }
