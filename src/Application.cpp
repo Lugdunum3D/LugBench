@@ -323,11 +323,41 @@ bool Application::init(int argc, char* argv[]) {
                     {"linearTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
                     {"optimalTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures)},
                     {"bufferFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
-                }
+                }   
             }
         );
     }
 
+//    for (auto surface : physicalDeviceInfo->swapChain)
+  //  {
+        json["zSwapChainInfo"].push_back(
+            {
+                {"minImageCount", physicalDeviceInfo->swapChain.capabilities.minImageCount},
+                {"maxImageCount", physicalDeviceInfo->swapChain.capabilities.maxImageCount},
+                {"currentExtent",
+                    {
+                        {"width", physicalDeviceInfo->swapChain.capabilities.currentExtent.width},
+                        {"height", physicalDeviceInfo->swapChain.capabilities.currentExtent.height}
+                    }
+                },
+                {"minImageExtent",
+                    {
+                        {"width", physicalDeviceInfo->swapChain.capabilities.minImageExtent.width},
+                        {"height", physicalDeviceInfo->swapChain.capabilities.minImageExtent.height}
+                    }
+                },
+                {"maxImageExtent",
+                    {
+                        {"width", physicalDeviceInfo->swapChain.capabilities.maxImageExtent.width},
+                        {"height", physicalDeviceInfo->swapChain.capabilities.maxImageExtent.height}
+                    }
+                },
+
+                {"maxImageArrayLayers", physicalDeviceInfo->swapChain.capabilities.maxImageArrayLayers},
+
+            }
+        );
+    //
 
     std::cout << json.dump(4) << std::endl;
 
