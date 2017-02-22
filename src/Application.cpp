@@ -91,9 +91,15 @@ bool Application::init(int argc, char* argv[]) {
 
     nlohmann::json json;
     json["properties"] = {
-        {"apiVersion", physicalDeviceInfo->properties.apiVersion}
+        {"apiVersion", physicalDeviceInfo->properties.apiVersion},
+        {"driverVersion", physicalDeviceInfo->properties.driverVersion},
+        {"vendorID", physicalDeviceInfo->properties.vendorID},
+        {"deviceID", physicalDeviceInfo->properties.deviceID},
+        {"deviceType", physicalDeviceInfo->properties.deviceType},
+        {"deviceName", physicalDeviceInfo->properties.deviceName},
+//        {"pipelineCacheUUID", std::vector<uint8_t>(physicalDeviceInfo->properties.pipelineCacheUUID, physicalDeviceInfo->properties.pipelineCacheUUID + sizeof(physicalDeviceInfo->properties.pipelineCacheUUID) / sizeof(physicalDeviceInfo->properties.pipelineCacheUUID[0]))},
+        {"pipelineCacheUUID", std::vector<uint8_t>(std::begin(physicalDeviceInfo->properties.pipelineCacheUUID), std::end(physicalDeviceInfo->properties.pipelineCacheUUID))},
     };
-
 
     std::cout << json.dump(4) << std::endl;
 
