@@ -345,10 +345,10 @@ bool Application::init(int argc, char* argv[]) {
     {   
         json["formats"].push_back(
         {
-            format.first,{
-                    { "linearTilingFeatures", format.second.linearTilingFeatures},
-                    { "optimalTilingFeatures", format.second.optimalTilingFeatures },
-                    { "bufferFeatures", format.second.bufferFeatures},
+            lug::Graphics::Vulkan::enumToStr(format.first), {
+                    { "linearTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
+                    { "optimalTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures) },
+                    { "bufferFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
                 }
         }
         );
