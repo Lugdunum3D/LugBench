@@ -288,11 +288,40 @@ bool Application::init(int argc, char* argv[]) {
     {
         json["memory"]["memoryTypes"].push_back(
             {
+                {"propertyFlags", lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
                 {"heapIndex", physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex},
-                {"VkMemoryPropertyFlags", lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
             }
         );
     }
+
+    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryHeapCount; i++)
+    {
+        json["memory"]["memoryHeaps"].push_back(
+            {
+                {"size", physicalDeviceInfo->memoryProperties.memoryHeaps[i].size},
+                //{"flags", lug::Graphics::Vulkan::VkMemoryHeapFlagsToStr(physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
+            }
+        );
+    }
+
+
+    for (auto tmp : physicalDeviceInfo->queueFamilies)
+    {
+        json["queues"].push_back ({
+            {"queueFlags", lug::Graphics::Vulkan::VkQueueFlagsToStr(tmp.queueFlags)},
+            {"queueCount", tmp.queueCount},
+            {"timestampValidBits", tmp.timestampValidBits},
+            {"minImageTransferGranularity",
+                { 
+                    {"width", tmp.minImageTransferGranularity.width},
+                    {"height", tmp.minImageTransferGranularity.height},
+                    {"depth",tmp.minImageTransferGranularity.depth}
+                }
+            }
+        });
+    }
+
+
 
 
     for (auto extension : physicalDeviceInfo->extensions)
@@ -312,8 +341,6 @@ bool Application::init(int argc, char* argv[]) {
         {"description", layer.description}
     }
     );
-
-    size_t i = 0;
 
     for (auto format : physicalDeviceInfo->formatProperties)
     {   
