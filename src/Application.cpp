@@ -19,36 +19,7 @@ Application::Application() : lug::Core::Application::Application{ {"hello", {0, 
             },
 
             {                                           // extent
-                0.5f,                                   // width
-                1.0f                                    // height
-            },
-
-            0.0f,                                       // minDepth
-            1.0f                                        // maxDepth
-        },
-        {                                               // scissor
-            {                                           // offset
-                0.0f,                                   // x
-                0.0f                                    // y
-            },
-            {                                           // extent
                 1.0f,                                   // width
-                1.0f                                    // height
-            }
-        },
-        nullptr                                         // camera
-    });
-
-    getRenderWindowInfo().renderViewsInitInfo.push_back({
-        lug::Graphics::RenderTechnique::Type::Forward,  // renderTechniqueType
-        {                                               // viewport
-            {                                           // offset
-                0.5f,                                   // x
-                0.0f                                    // y
-            },
-
-            {                                           // extent
-                0.5f,                                   // width
                 1.0f                                    // height
             },
 
