@@ -121,7 +121,6 @@ bool Application::init(int argc, char* argv[]) {
         {"dualSrcBlend", physicalDeviceInfo->features.dualSrcBlend},
         {"logicOp", physicalDeviceInfo->features.logicOp},
         {"multiDrawIndirect", physicalDeviceInfo->features.multiDrawIndirect},
-
         {"drawIndirectFirstInstance", physicalDeviceInfo->features.drawIndirectFirstInstance},
         {"depthClamp", physicalDeviceInfo->features.depthClamp},
         {"depthBiasClamp", physicalDeviceInfo->features.depthBiasClamp},
@@ -137,7 +136,6 @@ bool Application::init(int argc, char* argv[]) {
         {"textureCompressionBC", physicalDeviceInfo->features.textureCompressionBC},
         {"occlusionQueryPrecise", physicalDeviceInfo->features.occlusionQueryPrecise},
         {"pipelineStatisticsQuery", physicalDeviceInfo->features.pipelineStatisticsQuery},
-
         {"vertexPipelineStoresAndAtomics", physicalDeviceInfo->features.vertexPipelineStoresAndAtomics},
         {"fragmentStoresAndAtomics", physicalDeviceInfo->features.fragmentStoresAndAtomics},
         {"shaderTessellationAndGeometryPointSize", physicalDeviceInfo->features.shaderTessellationAndGeometryPointSize},
@@ -146,8 +144,6 @@ bool Application::init(int argc, char* argv[]) {
         {"shaderStorageImageMultisample", physicalDeviceInfo->features.shaderStorageImageMultisample},
         {"shaderStorageImageReadWithoutFormat", physicalDeviceInfo->features.shaderStorageImageReadWithoutFormat},
         {"shaderStorageImageWriteWithoutFormat", physicalDeviceInfo->features.shaderStorageImageWriteWithoutFormat},
-
-
         {"shaderUniformBufferArrayDynamicIndexing", physicalDeviceInfo->features.shaderUniformBufferArrayDynamicIndexing},
         {"shaderSampledImageArrayDynamicIndexing", physicalDeviceInfo->features.shaderSampledImageArrayDynamicIndexing},
         {"shaderStorageBufferArrayDynamicIndexing", physicalDeviceInfo->features.shaderStorageBufferArrayDynamicIndexing},
@@ -160,7 +156,6 @@ bool Application::init(int argc, char* argv[]) {
         {"shaderResourceResidency", physicalDeviceInfo->features.shaderResourceResidency},
         {"shaderResourceMinLod", physicalDeviceInfo->features.shaderResourceMinLod},
         {"sparseBinding", physicalDeviceInfo->features.sparseBinding},
-
         {"sparseResidencyBuffer", physicalDeviceInfo->features.sparseResidencyBuffer},
         {"sparseResidencyImage2D", physicalDeviceInfo->features.sparseResidencyImage2D},
         {"sparseResidencyImage3D", physicalDeviceInfo->features.sparseResidencyImage3D},
@@ -171,10 +166,33 @@ bool Application::init(int argc, char* argv[]) {
         {"sparseResidencyAliased", physicalDeviceInfo->features.sparseResidencyAliased},
         {"variableMultisampleRate", physicalDeviceInfo->features.variableMultisampleRate},
         {"inheritedQueries", physicalDeviceInfo->features.inheritedQueries},
-
-
     };
 
+    json["memory"] = {
+        {"memoryTypeCount", physicalDeviceInfo->memoryProperties.memoryTypeCount},
+        // {"memoryTypes", nlohmann::json::array()},
+         // {"memoryTypes", std::vector<VkMemoryType>(std::begin(physicalDeviceInfo->memoryProperties.memoryTypes),
+         //                                         std::end(physicalDeviceInfo->memoryProperties.memoryTypes))},
+
+        {"memoryHeapCount", physicalDeviceInfo->memoryProperties.memoryHeapCount}
+        //memoryHeaps
+    };
+
+    for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryTypeCount; i++)
+    {
+        // std::vector<const char *> plop = lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(tmp.propertyFlags);
+        // for (auto p : plop)
+        //     std::cout << p << std::endl;
+        // std::cout << "=======" << std::endl;
+        json["memory"]["memoryTypes"].push_back(
+            {
+                {"heapIndex", physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex},
+                {"VkMemoryPropertyFlags", lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
+            }
+        );
+    }
+
+    // std::vector<VkMemoryType> plop(1);
     std::cout << json.dump(4) << std::endl;
 
 
