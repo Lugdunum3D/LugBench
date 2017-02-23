@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <lug/System/Logger.hpp>
+#include <lug/System/Logger/Logger.hpp>
 #include <lug/System/Logger/OstreamHandler.hpp>
 
 #include <lug/Window/Window.hpp>
@@ -14,7 +14,7 @@
 
 //int main(int argc, const char* argv[]) {
 int main(int argc, char* argv[]) {
-    lug::System::Logger::logger.addHandler(lug::System::makeHandler<lug::System::StdoutHandler>("stdout"));
+    LUG_LOG.addHandler(lug::System::Logger::makeHandler<lug::System::Logger::StdoutHandler>("stdout"));
 
     Application app;
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // query vulkan info 
+    // query vulkan info
     return 0;
 
     //    return app.run() ? 0 : 1;
