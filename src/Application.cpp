@@ -5,6 +5,7 @@
 
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
+#include <lug/Graphics/Vulkan/RTTI/Enum.hpp>
 
 Application::Application() : lug::Core::Application::Application{ {"hello", {0, 1, 0}} } {
     std::srand((uint32_t)std::time(0));
@@ -76,7 +77,7 @@ bool Application::init(int argc, char* argv[]) {
         }},
         {"vendorID", physicalDeviceInfo->properties.vendorID},
         {"deviceID", physicalDeviceInfo->properties.deviceID},
-        {"deviceType", lug::Graphics::Vulkan::enumToStr(physicalDeviceInfo->properties.deviceType)},
+        {"deviceType", lug::Graphics::Vulkan::RTTI::toStr(physicalDeviceInfo->properties.deviceType)},
         {"deviceName", physicalDeviceInfo->properties.deviceName},
         {"pipelineCacheUUID", std::vector<uint8_t>(std::begin(physicalDeviceInfo->properties.pipelineCacheUUID), std::end(physicalDeviceInfo->properties.pipelineCacheUUID))},
         {"limits", {
@@ -262,7 +263,7 @@ bool Application::init(int argc, char* argv[]) {
     for (size_t i = 0; i < physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
         json["memory"]["memoryTypes"].push_back(
             {
-                {"propertyFlags", lug::Graphics::Vulkan::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
+                {"propertyFlags", lug::Graphics::Vulkan::RTTI::VkMemoryPropertyFlagsToStr(physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
                 {"heapIndex", physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex},
             }
         );
@@ -272,14 +273,14 @@ bool Application::init(int argc, char* argv[]) {
         json["memory"]["memoryHeaps"].push_back(
             {
                 {"size", physicalDeviceInfo->memoryProperties.memoryHeaps[i].size},
-                {"flags", lug::Graphics::Vulkan::VkMemoryHeapFlagsToStr(physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
+                {"flags", lug::Graphics::Vulkan::RTTI::VkMemoryHeapFlagsToStr(physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
             }
         );
     }
 
     for (auto tmp : physicalDeviceInfo->queueFamilies) {
         json["queues"].push_back ({
-            {"queueFlags", lug::Graphics::Vulkan::VkQueueFlagsToStr(tmp.queueFlags)},
+            {"queueFlags", lug::Graphics::Vulkan::RTTI::VkQueueFlagsToStr(tmp.queueFlags)},
             {"queueCount", tmp.queueCount},
             {"timestampValidBits", tmp.timestampValidBits},
             {"minImageTransferGranularity", {
@@ -318,12 +319,12 @@ bool Application::init(int argc, char* argv[]) {
     for (auto format : physicalDeviceInfo->formatProperties) {
         json["formats"].push_back(
             {
-                lug::Graphics::Vulkan::enumToStr(format.first),
+                lug::Graphics::Vulkan::RTTI::toStr(format.first),
                 {
-                    {"linearTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
-                    {"optimalTilingFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures)},
-                    {"bufferFeatures", lug::Graphics::Vulkan::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
-                }   
+                    {"linearTilingFeatures", lug::Graphics::Vulkan::RTTI::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
+                    {"optimalTilingFeatures", lug::Graphics::Vulkan::RTTI::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures)},
+                    {"bufferFeatures", lug::Graphics::Vulkan::RTTI::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
+                }
             }
         );
     }
