@@ -11,14 +11,6 @@
 #
 # You can't enforce a specific version yet.
 #
-# By default, the dynamic libraries of Lugdunum will be found. To find the static ones instead,
-# you must set the LUG_STATIC_LIBRARIES variable to TRUE before calling find_package(LUG ...).
-#
-# In case of static linking, the LUG_STATIC macro will also be defined by this script.
-# example:
-#   set(LUG_STATIC_LIBRARIES TRUE)
-#   find_package(LUG COMPONENTS system)
-#
 # If Lugdunum is not installed in a standard path, you can use the LUG_ROOT CMake (or environment) variable
 # to tell CMake where Lugdunum is.
 #
@@ -42,11 +34,6 @@
 #   add_executable(myapp ...)
 #   target_link_libraries(myapp ${LUG_LIBRARIES})
 
-# define the LUG_STATIC macro if static build was chosen
-if(LUG_STATIC_LIBRARIES)
-    add_definitions(-DLUG_STATIC)
-endif()
-
 # define the list of search paths for headers and libraries
 set(FIND_LUG_PATHS
     ${LUG_ROOT}
@@ -60,31 +47,37 @@ set(FIND_LUG_PATHS
 )
 
 # define the list of search paths for miscs
-set(FIND_LUG_MICS_PATHS
-    ${LUG_ROOT}
-    $ENV{LUG_ROOT}
-    $ENV{ANDROID_NDK}/sources/lugdunum
-    ${ANDROID_NDK}/sources/lugdunum
-    /usr/local/share/lug
+set(FIND_LUG_MISCS_PATHS
+    .
+    share/lug
 )
 
-# find the LUG include directory
-find_path(LUG_INCLUDE_DIR lug/Config.hpp
-          PATH_SUFFIXES include
-          PATHS ${FIND_LUG_PATHS}
-          CMAKE_FIND_ROOT_PATH_BOTH
+find_path(LUG_ROOT_DIR include/lug/Config.hpp
+               PATHS ${FIND_LUG_PATHS}
+               CMAKE_FIND_ROOT_PATH_BOTH
 )
 
-# find the LUG resources directory
-find_path(LUG_RESOURCES_DIR shaders
-          PATH_SUFFIXES resources
-          PATHS ${FIND_LUG_MICS_PATHS}
-          CMAKE_FIND_ROOT_PATH_BOTH
-)
+if(LUG_ROOT_DIR)
+    set(LUG_INCLUDE_DIR ${LUG_ROOT_DIR}/include)
+
+    find_path(LUG_MISC_DIR resources/shaders
+                PATH_SUFFIXES ${FIND_LUG_MISCS_PATHS}
+                PATHS ${LUG_ROOT_DIR}
+                CMAKE_FIND_ROOT_PATH_BOTH
+    )
+
+    if(LUG_MISC_DIR)
+        set(LUG_RESOURCES_DIR ${LUG_MISC_DIR}/resources)
+    endif()
+endif()
 
 set(LUG_FOUND TRUE) # will be set to false if one of the required modules is not found
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+if(NOT LUG_INCLUDE_DIR)
+    set(LUG_FOUND FALSE)
+endif()
+
+if(LUG_OS_ANDROID)
     # this will append `lug-main` to the components to find if we are on WINDOWS or ANDROID
     # lug-main provides a wrapper for the main functions of Android and Windows to provide
     # an uniform int main(int ac, char *[]av) across platforms
@@ -114,22 +107,6 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
                 CMAKE_FIND_ROOT_PATH_BOTH
         )
     else()
-        # static release library
-        find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE
-                     NAMES ${FIND_LUG_COMPONENT_NAME}-s
-                     PATH_SUFFIXES lib64 lib/${ANDROID_ABI}
-                     PATHS ${FIND_LUG_PATHS}
-                     CMAKE_FIND_ROOT_PATH_BOTH
-        )
-
-        # static debug library
-        find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG
-                     NAMES ${FIND_LUG_COMPONENT_NAME}-s-d
-                     PATH_SUFFIXES lib64 lib/${ANDROID_ABI}
-                     PATHS ${FIND_LUG_PATHS}
-                     CMAKE_FIND_ROOT_PATH_BOTH
-        )
-
         # dynamic release library
         find_library(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE
                      NAMES ${FIND_LUG_COMPONENT_NAME}
@@ -148,22 +125,12 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
     endif()
 
     # choose the entries that fit the requested link type
-    if(LUG_STATIC_LIBRARIES)
-        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE)
-            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE})
-        endif()
+    if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE)
+        set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE})
+    endif()
 
-        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG)
-            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG})
-        endif()
-    else()
-        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE)
-            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE})
-        endif()
-
-        if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG)
-            set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG})
-        endif()
+    if(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG)
+        set(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG ${LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG})
     endif()
 
     if (LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG OR LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE)
@@ -200,8 +167,6 @@ foreach(FIND_LUG_COMPONENT ${LUG_FIND_COMPONENTS})
     MARK_AS_ADVANCED(LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_RELEASE
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DEBUG
-                     LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_RELEASE
-                     LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_STATIC_DEBUG
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_RELEASE
                      LUG_${FIND_LUG_COMPONENT_UPPER}_LIBRARY_DYNAMIC_DEBUG
     )

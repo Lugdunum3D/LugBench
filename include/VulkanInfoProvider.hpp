@@ -2,7 +2,7 @@
 
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
-#include <json.hpp>
+#include <json/json.hpp>
 
 class VulkanInfoProvider
 {
@@ -14,6 +14,6 @@ public:
 
     const  nlohmann::json &getJSONVulkAnInfo();
 private:
-    
+
 };
 

@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.1)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+
+# use macros
+include(${CMAKE_SOURCE_DIR}/cmake/Macros.cmake)
+
 # determine the build type
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+lug_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
+
+if(ANDROID)
+    populate_android_infos()
 endif()
 
 # project name
@@ -11,91 +18,89 @@ project(lugbench)
 # define the executable
 set(EXECUTABLE_NAME "lugbench")
 
-if (NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/src"
-    OR NOT IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum/src")
-  message(FATAL_ERROR "call \"git submodule update --init --recursive\"")
-endif()
+# use config
+include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
-# include json.hpp (header-only lib)
-include_directories(thirdparty/json/src/)
-
-set(RESTLESS_INCLUDE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/restless/include)
-
-# add restless 
-#add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/restless" "thirdparty_build/restless")
-#
-#include_directories(${RESTLESS_INCLUDE_DIR})
-#link_directories(${CMAKE_CURRENT_BINARY_DIR}/thirdparty_build/restless/lib)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
-
-# find Lugdunum and link with it
-find_package(LUG COMPONENTS core graphics system window math)
-if(NOT LUG_FOUND)
-  message(STATUS "Lugdunum was not found. Building it instead")
-
-
-  # build lugdunum libraries
-  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum" "ext_build/lugdunum")
-  # set the same variabel name as findLug
-  set(LUG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/lugdunum/include)
-  # path to genereated libs
-  link_directories(${CMAKE_CURRENT_BINARY_DIR}/ext_build/lugdunum/lib)
-
-  set(LUG_LIBRARIES "")
-  list(APPEND LUG_LIBRARIES lug-window)
-  list(APPEND LUG_LIBRARIES lug-system)
-endif()
-  
-
-include_directories(${LUG_INCLUDE_DIR})
-include_directories(include)
-
-find_package(Vulkan)
+# find vulkan
+find_package(Vulkan REQUIRED)
 include_directories(${VULKAN_INCLUDE_DIR})
 
+# find fmt
+find_package(Fmt)
 
-if(MSVC)
-  #  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-  #     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  #  else()
-  #      list(APPEND CMAKE_CXX_FLAGS "/W4")
-  #  endif()
-  #
-  #  list(APPEND CMAKE_CXX_FLAGS "/WX")
-else()
-    list(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++14")
+if (NOT FMT_INCLUDE_DIR)
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/fmt")
+        message(FATAL_ERROR "Can't find fmt, call `git submodule update --recursive`")
+    endif()
+
+    set(FMT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fmt/include)
+    message(STATUS "Found Fmt: ${FMT_INCLUDE_DIR}")
 endif()
 
-string(REPLACE ";" " " "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
+include_directories(${FMT_INCLUDE_DIR})
 
+# find json (it's not a well known library, so just find it in thirdparty)
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/json")
+    message(FATAL_ERROR "Can't find json, call `git submodule update --recursive`")
+endif()
 
-# include macros
-include(${PROJECT_SOURCE_DIR}/cmake/Macros.cmake)
+set(JSON_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/json/include)
+message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
+include_directories(${JSON_INCLUDE_DIR})
+
+# find Lugdunum
+find_package(LUG REQUIRED core graphics system window math)
+include_directories(${LUG_INCLUDE_DIR})
+
+set(SRC
+    src/Application.cpp
+    src/main.cpp
+)
+
+set(INC
+    include/Application.hpp
+)
+
+# List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS
-  shader.vert
-  shader-directional.frag
-  shader-point.frag
-  shader-spot.frag)
+    shader.vert
+    shader-directional.frag
+    shader-point.frag
+    shader-spot.frag
+)
 
+# List of resources in the directory ${LUG_RESOURCES_DIR}
+set(LUG_RESOURCES
+    # Nothing for the moment
+)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
-    add_library(${EXECUTABLE_NAME}
-                SHARED
-                include/Application.hpp src/Application.cpp src/main.cpp
-    )
+# List of resources in the directory ${CMAKE_SOURCE_DIR}/resources
+set(OTHER_RESOURCES
+    # Nothing for the moment
+)
 
-    target_link_libraries(${EXECUTABLE_NAME}
-                          log
-                          android
-                          ${LUG_LIBRARIES}
-    )
+# create target
+if(LUG_OS_ANDROID)
+    add_library(${EXECUTABLE_NAME} SHARED ${SRC} ${INC})
+
+    set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/${EXECUTABLE_NAME})
+    set(ANDROID_PROJECT_ASSETS ${ANDROID_PROJECT_PATH}/src/main/assets)
+    set(ANDROID_PROJECT_SHADERS ${ANDROID_PROJECT_PATH}/src/main/shaders)
 else()
-    add_executable(${EXECUTABLE_NAME} include/Application.hpp src/Application.cpp  src/main.cpp)
-    compile_shaders(${EXECUTABLE_NAME} ${SHADERS})
-    target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
+    add_executable(${EXECUTABLE_NAME} ${SRC} ${INC})
 endif()
 
-# install models
-file(COPY ${LUG_RESOURCES_DIR}/models DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(include)
+lug_add_compile_options(${EXECUTABLE_NAME})
+
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
+
+# copy / build shaders
+add_shaders(${EXECUTABLE_NAME} ${SHADERS})
+
+# copy lugdunum resources
+add_resources(${EXECUTABLE_NAME} lug_resources ${LUG_RESOURCES_DIR} ${LUG_RESOURCES})
+
+# copy resources
+add_resources(${EXECUTABLE_NAME} sample_resources "${CMAKE_SOURCE_DIR}/resources" ${OTHER_RESOURCES})
