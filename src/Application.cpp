@@ -39,8 +39,6 @@ Application::Application() : lug::Core::Application::Application{ {"hello", {0, 
         },
         nullptr                                             // camera
     });
-
-    getGraphicsInfo().rendererInitInfo.useDiscreteGPU = false;
 }
 
 Application::~Application() {
@@ -53,13 +51,32 @@ Application::~Application() {
 }
 
 bool Application::init(int argc, char* argv[]) {
-    if (!lug::Core::Application::init(argc, argv)) {
+    if (!lug::Core::Application::beginInit(argc, argv)) {
         return false;
     }
 
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-    lug::Graphics::Vulkan::InstanceInfo instanceInfo = vkRender->getInstanceInfo();
+
+    for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
+        if (!initDevice(&choosedDevice)) {
+            LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
+        }
+    }
+
+    return true;
+}
+
+bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice) {
+    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+
+    vkRender->getPreferencies().device = choosedDevice;
+
+    if (!lug::Core::Application::finishInit()) {
+        return false;
+    }
+
     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
 
     nlohmann::json json;
@@ -304,18 +321,6 @@ bool Application::init(int argc, char* argv[]) {
         );
     }
 
-    // We don't want instance layers for the moment because they aren't GPU specific
-    /*for (auto layer : instanceInfo.layers) {
-        json["layers"].push_back(
-            {
-                {"layerName", layer.layerName},
-                {"specVersion", layer.specVersion},
-                {"implementationVersion", layer.implementationVersion},
-                {"description", layer.description}
-            }
-        );
-    }*/
-
     for (auto format : physicalDeviceInfo->formatProperties) {
         json["formats"].push_back(
             {
@@ -329,32 +334,32 @@ bool Application::init(int argc, char* argv[]) {
         );
     }
 
-//    for (auto surface : physicalDeviceInfo->swapChain)
+//    for (auto surface : physicalDeviceInfo->swapchain)
   //  {
         json["zSwapChainInfo"].push_back(
             {
-                {"minImageCount", physicalDeviceInfo->swapChain.capabilities.minImageCount},
-                {"maxImageCount", physicalDeviceInfo->swapChain.capabilities.maxImageCount},
+                {"minImageCount", physicalDeviceInfo->swapchain.capabilities.minImageCount},
+                {"maxImageCount", physicalDeviceInfo->swapchain.capabilities.maxImageCount},
                 {"currentExtent",
                     {
-                        {"width", physicalDeviceInfo->swapChain.capabilities.currentExtent.width},
-                        {"height", physicalDeviceInfo->swapChain.capabilities.currentExtent.height}
+                        {"width", physicalDeviceInfo->swapchain.capabilities.currentExtent.width},
+                        {"height", physicalDeviceInfo->swapchain.capabilities.currentExtent.height}
                     }
                 },
                 {"minImageExtent",
                     {
-                        {"width", physicalDeviceInfo->swapChain.capabilities.minImageExtent.width},
-                        {"height", physicalDeviceInfo->swapChain.capabilities.minImageExtent.height}
+                        {"width", physicalDeviceInfo->swapchain.capabilities.minImageExtent.width},
+                        {"height", physicalDeviceInfo->swapchain.capabilities.minImageExtent.height}
                     }
                 },
                 {"maxImageExtent",
                     {
-                        {"width", physicalDeviceInfo->swapChain.capabilities.maxImageExtent.width},
-                        {"height", physicalDeviceInfo->swapChain.capabilities.maxImageExtent.height}
+                        {"width", physicalDeviceInfo->swapchain.capabilities.maxImageExtent.width},
+                        {"height", physicalDeviceInfo->swapchain.capabilities.maxImageExtent.height}
                     }
                 },
 
-                {"maxImageArrayLayers", physicalDeviceInfo->swapChain.capabilities.maxImageArrayLayers},
+                {"maxImageArrayLayers", physicalDeviceInfo->swapchain.capabilities.maxImageArrayLayers},
 
             }
         );

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lug/Core/Application.hpp>
+#include <lug/Graphics/Vulkan/Vulkan.hpp>
 
 class Application : public lug::Core::Application {
 public:
@@ -20,5 +21,8 @@ public:
     void onFrame(const lug::System::Time& elapsedTime) override final;
 
 private:
-  std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
+    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);
+
+private:
+    std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
 };
