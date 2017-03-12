@@ -71,7 +71,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-    vkRender->getPreferencies().device = choosedDevice;
+    vkRender->getPreferences().device = choosedDevice;
 
     if (!lug::Core::Application::finishInit()) {
         return false;
