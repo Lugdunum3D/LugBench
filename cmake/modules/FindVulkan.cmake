@@ -4,21 +4,26 @@
 # VULKAN_LIBRARY
 # VULKAN_FOUND
 
-if (WIN32)
+if (WIN32
+
     find_path(VULKAN_INCLUDE_DIR NAMES vulkan/vulkan.h HINTS
         "$ENV{VULKAN_SDK}/Include"
-        "$ENV{VK_SDK_PATH}/Include")
+        "$ENV{VK_SDK_PATH}/Include"
+		"C:/Windows/System32")
     if (CMAKE_CL_64)
         find_library(VULKAN_LIBRARY NAMES vulkan-1 HINTS
             "$ENV{VULKAN_SDK}/Bin"
-            "$ENV{VK_SDK_PATH}/Bin")
+            "$ENV{VK_SDK_PATH}/Bin"
+			"C:/Windows/System32")
         find_library(VULKAN_STATIC_LIBRARY NAMES vkstatic.1 HINTS
             "$ENV{VULKAN_SDK}/Bin"
-            "$ENV{VK_SDK_PATH}/Bin")
+            "$ENV{VK_SDK_PATH}/Bin"
+			"C:/Windows/System32")
     else()
         find_library(VULKAN_LIBRARY NAMES vulkan-1 HINTS
             "$ENV{VULKAN_SDK}/Bin32"
-            "$ENV{VK_SDK_PATH}/Bin32")
+            "$ENV{VK_SDK_PATH}/Bin32"
+			"C:/Windows/System32")
     endif()
 elseif (APPLE)
     find_library(VULKAN_LIBRARY MoltenVK)
@@ -35,6 +40,9 @@ else()
 endif()
 
 include(FindPackageHandleStandardArgs)
+message(STATUS "VULKAN_LIBRARY =${VULKAN_LIBRARY}")
+message(STATUS "VULKAN_INCLUDE_DIR =${VULKAN_INCLUDE_DIR}")
+message(STATUS "WINDOWS_SYSTEN_PATH =${WINDOWS_SYSTEN_PATH}")
 find_package_handle_standard_args(Vulkan DEFAULT_MSG VULKAN_LIBRARY VULKAN_INCLUDE_DIR)
 
 mark_as_advanced(VULKAN_INCLUDE_DIR VULKAN_LIBRARY VULKAN_STATIC_LIBRARY)
