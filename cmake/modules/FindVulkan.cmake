@@ -10,7 +10,7 @@ if (WIN32)
         "$ENV{VULKAN_SDK}/Include"
         "$ENV{VK_SDK_PATH}/Include")
     if (CMAKE_CL_64)
-        find_library(VULKAN_LIBRARY NAMES vulkan-1HINTS
+        find_library(VULKAN_LIBRARY NAMES vulkan-1 HINTS
             "$ENV{VULKAN_SDK}/lib"
             "$ENV{VK_SDK_PATH}/lib")
         find_library(VULKAN_STATIC_LIBRARY NAMES vkstatic.1 HINTS
@@ -36,10 +36,6 @@ else()
 endif()
 
 include(FindPackageHandleStandardArgs)
-message(STATUS "VULKAN_LIBRARY =${VULKAN_LIBRARY}")
-message(STATUS "VULKAN_INCLUDE_DIR =${VULKAN_INCLUDE_DIR}")
-message(STATUS "WINDOWS_SYSTEN_PATH =${WINDOWS_SYSTEN_PATH}")
-message("CMAKE_FIND_LIBRARY_SUFFIXES:  ${CMAKE_FIND_LIBRARY_SUFFIXES}")
 find_package_handle_standard_args(Vulkan DEFAULT_MSG VULKAN_LIBRARY VULKAN_INCLUDE_DIR)
 
 mark_as_advanced(VULKAN_INCLUDE_DIR VULKAN_LIBRARY VULKAN_STATIC_LIBRARY)
