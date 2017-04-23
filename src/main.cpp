@@ -1,4 +1,7 @@
+#pragma warning(push)  
+#pragma warning(disable : 4003)
 #include <json/json.hpp>
+#pragma warning(pop)
 
 #include <iostream>
 #include <fstream>

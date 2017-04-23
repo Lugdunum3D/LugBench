@@ -5,20 +5,21 @@
 # VULKAN_FOUND
 
 if (WIN32)
+
     find_path(VULKAN_INCLUDE_DIR NAMES vulkan/vulkan.h HINTS
         "$ENV{VULKAN_SDK}/Include"
         "$ENV{VK_SDK_PATH}/Include")
     if (CMAKE_CL_64)
         find_library(VULKAN_LIBRARY NAMES vulkan-1 HINTS
-            "$ENV{VULKAN_SDK}/Bin"
-            "$ENV{VK_SDK_PATH}/Bin")
+            "$ENV{VULKAN_SDK}/lib"
+            "$ENV{VK_SDK_PATH}/lib")
         find_library(VULKAN_STATIC_LIBRARY NAMES vkstatic.1 HINTS
-            "$ENV{VULKAN_SDK}/Bin"
-            "$ENV{VK_SDK_PATH}/Bin")
+            "$ENV{VULKAN_SDK}/lib"
+            "$ENV{VK_SDK_PATH}/lib")
     else()
         find_library(VULKAN_LIBRARY NAMES vulkan-1 HINTS
-            "$ENV{VULKAN_SDK}/Bin32"
-            "$ENV{VK_SDK_PATH}/Bin32")
+            "$ENV{VULKAN_SDK}/lib32"
+            "$ENV{VK_SDK_PATH}/lib32")
     endif()
 elseif (APPLE)
     find_library(VULKAN_LIBRARY MoltenVK)
