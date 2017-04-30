@@ -22,7 +22,10 @@ set(EXECUTABLE_NAME "lugbench")
 include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
 # find vulkan
-find_package(Vulkan REQUIRED)
+find_package(Vulkan)
+if (NOT VULKAN_INCLUDE_DIR)
+    message(FATAL_ERROR "Can't find vulkan headers")
+endif()
 include_directories(${VULKAN_INCLUDE_DIR})
 
 # find fmt
