@@ -371,7 +371,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
 }
 
 void Application::onEvent(const lug::Window::Event& event) {
-    if (event.type == lug::Window::EventType::CLOSE) {
+    if (event.type == lug::Window::Event::Type::Close) {
         close();
     }
 }
