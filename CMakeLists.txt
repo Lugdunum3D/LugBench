@@ -73,7 +73,19 @@ if(NOT LUG_OS_ANDROID)
     include_directories(${RESTCLIENT_INCLUDE_DIR})
 
     # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
-    find_package(CURL REQUIRED)
+    find_package(CURL)
+    if (NOT CURL_FOUND AND LUG_OS_WINDOWS)
+        if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/curl")
+            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+        endif()
+
+        set(CURL_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/curl/windows)
+        find_package(CURL REQUIRED)
+    elif(NOT CURL_FOUND)
+        message(FATAL_ERROR "Can't find curl")
+    endif()
+
+    include_directories(${CURL_INCLUDE_DIR})
     list(APPEND RESTCLIENT_LIBRARIES ${CURL_LIBRARIES})
 endif()
 
