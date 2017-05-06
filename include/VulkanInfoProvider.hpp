@@ -1,22 +1,33 @@
 #pragma once
 
+#include <lug/Config.hpp>
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
-#pragma warning(push)  
-#pragma warning(disable : 4003)
+
+#if defined(LUG_SYSTEM_WINDOWS)
+    #pragma warning(push)
+    #pragma warning(disable : 4003)
+#endif
 #include <json/json.hpp>
-#pragma warning(pop)
+#if defined(LUG_SYSTEM_WINDOWS)
+    #pragma warning(pop)
+#endif
 
-class VulkanInfoProvider
-{
+class VulkanInfoProvider {
 public:
-    VulkanInfoProvider(lug::Graphics::Vulkan::InstanceInfo infos);
-    ~VulkanInfoProvider();
+    VulkanInfoProvider(lug::Graphics::Vulkan::InstanceInfo& instanceInfo);
 
-    lug::Graphics::Vulkan::InstanceInfo infos;
+    VulkanInfoProvider(const VulkanInfoProvider&) = delete;
+    VulkanInfoProvider(VulkanInfoProvider&&) = delete;
 
-    const  nlohmann::json &getJSONVulkAnInfo();
+    VulkanInfoProvider& operator=(const VulkanInfoProvider&) = delete;
+    VulkanInfoProvider& operator=(VulkanInfoProvider&&) = delete;
+
+    ~VulkanInfoProvider() = default;
+
+    nlohmann::json getJSONVulkanInfo();
+
 private:
-
+    lug::Graphics::Vulkan::InstanceInfo& _instanceInfo;
 };
 

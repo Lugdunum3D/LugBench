@@ -73,7 +73,19 @@ if(NOT LUG_OS_ANDROID)
     include_directories(${RESTCLIENT_INCLUDE_DIR})
 
     # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
-    find_package(CURL REQUIRED)
+    find_package(CURL)
+    if (NOT CURL_FOUND AND LUG_OS_WINDOWS)
+        if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/curl")
+            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+        endif()
+
+        set(CURL_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/curl/windows)
+        find_package(CURL REQUIRED)
+    elseif(NOT CURL_FOUND)
+        message(FATAL_ERROR "Can't find curl")
+    endif()
+
+    include_directories(${CURL_INCLUDE_DIR})
     list(APPEND RESTCLIENT_LIBRARIES ${CURL_LIBRARIES})
 endif()
 
@@ -84,10 +96,14 @@ include_directories(${LUG_INCLUDE_DIR})
 set(SRC
     src/Application.cpp
     src/main.cpp
+    src/Router.cpp
+    src/VulkanInfoProvider.cpp
 )
 
 set(INC
     include/Application.hpp
+    include/Router.hpp
+    include/VulkanInfoProvider.hpp
 )
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
@@ -136,3 +152,13 @@ add_resources(${EXECUTABLE_NAME} lug_resources ${LUG_RESOURCES_DIR} ${LUG_RESOUR
 
 # copy resources
 add_resources(${EXECUTABLE_NAME} sample_resources "${CMAKE_SOURCE_DIR}/resources" ${OTHER_RESOURCES})
+
+# add api uri
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api-dev.herokuapp.com")
+else()
+    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api.herokuapp.com")
+endif()
+
+lug_set_option(LUGBENCH_API_URI ${DEFAULT_LUGBENCH_API_URI} STRING "URI of the Lugbench API")
+add_definitions(/DLUGBENCH_API_URI="${LUGBENCH_API_URI}")

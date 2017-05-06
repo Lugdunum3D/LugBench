@@ -1,25 +1,28 @@
 #pragma once
+
 #include <string>
+#include <map>
 
-#define PutFormData = std::map<string,string>
+using PutFormData = std::map<std::string, std::string>;
 
-class Router
-{
+class Router {
 public:
-    Router();
-    ~Router();
+    Router() = default;
 
-    enum Route
-    {
+    Router(const Router&) = delete;
+    Router(Router&&) = delete;
+
+    Router& operator=(const Router&) = delete;
+    Router& operator=(Router&&) = delete;
+
+    ~Router() = default;
+
+    enum class Route : uint8_t {
         getAllVulkanInfo,
         getVulkanInfoWithId,
         putVulkanInfo
     };
 
-    //asoni::Handle getHandle(Route route);
-    
-private:
-    std::string baseUrlString;
-
+public:
+    static constexpr const char* baseAPIUri = LUGBENCH_API_URI;
 };
-
