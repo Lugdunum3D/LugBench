@@ -1,7 +1,13 @@
-#pragma warning(push)  
-#pragma warning(disable : 4003)
+#include <lug/Config.hpp>
+
+#if defined(LUG_SYSTEM_WINDOWS)
+    #pragma warning(push)
+    #pragma warning(disable : 4003)
+#endif
 #include <json/json.hpp>
-#pragma warning(pop)
+#if defined(LUG_SYSTEM_WINDOWS)
+    #pragma warning(pop)
+#endif
 
 #include <iostream>
 #include <fstream>
