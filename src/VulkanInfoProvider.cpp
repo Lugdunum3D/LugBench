@@ -1,22 +1,11 @@
+#include "VulkanInfoProvider.hpp"
 
-#include "VulkaninfoProvider.hpp"
+VulkanInfoProvider::VulkanInfoProvider(lug::Graphics::Vulkan::InstanceInfo& instanceInfo) : _instanceInfo(instanceInfo) {}
 
-VulkanInfoProvider::VulkanInfoProvider(lug::Graphics::Vulkan::InstanceInfo infos) : infos(infos)
-{
-}
-
-VulkanInfoProvider::~VulkanInfoProvider()
-{
-}
-const  nlohmann::json& VulkanInfoProvider::getJSONVulkAnInfo() {
-
+nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
     nlohmann::json json;
 
-
-    // for (auto extension : info.extensions) {
-    //     json[extension.extensionName] = extension.specVersion;
-    // }
-
+    (void)_instanceInfo;
 
     return json;
 }
