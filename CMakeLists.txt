@@ -81,7 +81,7 @@ if(NOT LUG_OS_ANDROID)
 
         set(CURL_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/curl/windows)
         find_package(CURL REQUIRED)
-    elif(NOT CURL_FOUND)
+    elseif(NOT CURL_FOUND)
         message(FATAL_ERROR "Can't find curl")
     endif()
 

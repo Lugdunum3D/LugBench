@@ -26,4 +26,3 @@ public:
 public:
     static constexpr const char* baseAPIUri = LUGBENCH_API_URI;
 };
-
