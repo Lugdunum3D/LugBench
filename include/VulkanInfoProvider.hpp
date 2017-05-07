@@ -3,6 +3,7 @@
 #include <lug/Config.hpp>
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
+#include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 
 #if defined(LUG_SYSTEM_WINDOWS)
     #pragma warning(push)
@@ -15,7 +16,7 @@
 
 class VulkanInfoProvider {
 public:
-    VulkanInfoProvider(lug::Graphics::Vulkan::InstanceInfo& instanceInfo);
+    VulkanInfoProvider(lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo);
 
     VulkanInfoProvider(const VulkanInfoProvider&) = delete;
     VulkanInfoProvider(VulkanInfoProvider&&) = delete;
@@ -28,6 +29,6 @@ public:
     nlohmann::json getJSONVulkanInfo();
 
 private:
-    lug::Graphics::Vulkan::InstanceInfo& _instanceInfo;
+    lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 };
 
