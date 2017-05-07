@@ -10,7 +10,6 @@ public:
     Router() = default;
 
     Router(const Router&) = delete;
-    Router(Router&&) = delete;
 
     Router& operator=(const Router&) = delete;
     Router& operator=(Router&&) = delete;
@@ -25,5 +24,8 @@ public:
 
 public:
     static constexpr const char* baseAPIUri = LUGBENCH_API_URI;
+	static constexpr const char* apiVersion = LUGBENCH_API_VERSION;
+
+	std::string getUrlString(Route route, uint16_t id);
 };
 
