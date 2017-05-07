@@ -162,3 +162,8 @@ endif()
 
 lug_set_option(LUGBENCH_API_URI ${DEFAULT_LUGBENCH_API_URI} STRING "URI of the Lugbench API")
 add_definitions(/DLUGBENCH_API_URI="${LUGBENCH_API_URI}")
+
+#add api VERSION
+set(DEFAULT_LUGBENCH_API_VERSION "api/v1")
+lug_set_option(LUGBENCH_API_VERSION ${DEFAULT_LUGBENCH_API_VERSION} STRING "Version of the Lugbench API")
+add_definitions(/DLUGBENCH_API_VERSION="${LUGBENCH_API_VERSION}")

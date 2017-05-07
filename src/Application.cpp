@@ -6,6 +6,8 @@
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
+#include "restclient-cpp\restclient.h"
+#include "Router.hpp"
 
 Application::Application() : lug::Core::Application::Application{ {"hello", {0, 1, 0}} } {
     std::srand((uint32_t)std::time(0));
@@ -54,15 +56,18 @@ bool Application::init(int argc, char* argv[]) {
     if (!lug::Core::Application::beginInit(argc, argv)) {
         return false;
     }
+	Router rout;
+	std::string test = rout.getUrlString(Router::Route::getAllVulkanInfo, 0);
 
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-    for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
+	auto& choosedDevice = vkRender->getPhysicalDeviceInfos().front();
+ /*   for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {*/
         if (!initDevice(&choosedDevice)) {
             LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
         }
-    }
+ /*   }*/
 
     return true;
 }
@@ -78,8 +83,11 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
     }
 
     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+	RestClient::Response r = RestClient::get("http://url.com");
 
     nlohmann::json json;
+
+	
 
     json["properties"] = {
         {"apiVersion", {
