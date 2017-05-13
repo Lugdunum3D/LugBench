@@ -4,8 +4,12 @@ VulkanInfoProvider::VulkanInfoProvider(lug::Graphics::Vulkan::PhysicalDeviceInfo
     queryVulkanInfo();
 }
 
-
-VulkanInfoProvider::queryVulkanInfo() {
+// needed only for Visual Studio 2015
+#if defined(LUG_SYSTEM_WINDOWS)
+#pragma warning(push)
+#pragma warning(disable : 4800)
+#endif
+void VulkanInfoProvider::queryVulkanInfo() {
     _json["properties"] = {
         { "apiVersion",
             {
@@ -273,31 +277,34 @@ VulkanInfoProvider::queryVulkanInfo() {
         );
     }
 
-    for (auto surface : _physicalDeviceInfo->swapchain) {
-        _json["SwapChainInfo"].push_back(
-        {
-            { "minImageCount", _physicalDeviceInfo->swapchain.capabilities.minImageCount },
-            { "maxImageCount", _physicalDeviceInfo->swapchain.capabilities.maxImageCount },
-            { "currentExtent",
-                {
-                    { "width", _physicalDeviceInfo->swapchain.capabilities.currentExtent.width },
-                    { "height", _physicalDeviceInfo->swapchain.capabilities.currentExtent.height }
-                }
-            },
-           { "minImageExtent",
-               {
-                   { "width", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.width },
-                   { "height", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.height }
-               }
-            },
-            { "maxImageExtent",
-                {
-                    { "width", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.width },
-                    { "height", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.height }
-                }
-            },
-            { "maxImageArrayLayers", _physicalDeviceInfo->swapchain.capabilities.maxImageArrayLayers },
-        }
-        );
+    _json["SwapChainInfo"].push_back(
+    {
+        { "minImageCount", _physicalDeviceInfo->swapchain.capabilities.minImageCount },
+        { "maxImageCount", _physicalDeviceInfo->swapchain.capabilities.maxImageCount },
+        { "currentExtent",
+            {
+                { "width", _physicalDeviceInfo->swapchain.capabilities.currentExtent.width },
+                { "height", _physicalDeviceInfo->swapchain.capabilities.currentExtent.height }
+            }
+        },
+       { "minImageExtent",
+           {
+               { "width", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.width },
+               { "height", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.height }
+           }
+        },
+        { "maxImageExtent",
+            {
+                { "width", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.width },
+                { "height", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.height }
+            }
+        },
+        { "maxImageArrayLayers", _physicalDeviceInfo->swapchain.capabilities.maxImageArrayLayers },
     }
+	// present mode
+	// format
+    );
 }
+#if defined(LUG_SYSTEM_WINDOWS)
+#pragma warning(pop)
+#endif

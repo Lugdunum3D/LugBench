@@ -26,7 +26,7 @@ public:
 
     ~VulkanInfoProvider() = default;
 
-    nlohmann::json& getJSONVulkanInfo() const;
+    const nlohmann::json& getJSONVulkanInfo() const;
 
 private:
     void queryVulkanInfo();
@@ -35,4 +35,4 @@ private:
     nlohmann::json _json;
 };
 
-#include <VulkanInfoProvider.inl>
+#include "VulkanInfoProvider.inl"
