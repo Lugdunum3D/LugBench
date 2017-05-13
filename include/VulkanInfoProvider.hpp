@@ -26,9 +26,13 @@ public:
 
     ~VulkanInfoProvider() = default;
 
-    nlohmann::json getJSONVulkanInfo();
+    nlohmann::json& getJSONVulkanInfo() const;
 
 private:
+    void queryVulkanInfo();
+
     lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
+    nlohmann::json _json;
 };
 
+#include <VulkanInfoProvider.inl>
