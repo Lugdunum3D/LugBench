@@ -21,3 +21,4 @@ std::string Router::getUrlString(Route route, uint16_t id = 0)
 	}
 	return URLString;
 }
+

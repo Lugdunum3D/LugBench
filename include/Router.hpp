@@ -28,4 +28,3 @@ public:
 
 	std::string getUrlString(Route route, uint16_t id);
 };
-
