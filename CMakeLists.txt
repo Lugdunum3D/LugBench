@@ -98,12 +98,14 @@ set(SRC
     src/main.cpp
     src/Router.cpp
     src/VulkanInfoProvider.cpp
+	src/GPURequestor.cpp
 )
 
 set(INC
     include/Application.hpp
     include/Router.hpp
     include/VulkanInfoProvider.hpp
+	include/GPURequestor.hpp
 )
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader

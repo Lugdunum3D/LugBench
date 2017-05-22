@@ -7,6 +7,7 @@
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include "restclient-cpp\restclient.h"
 #include "Router.hpp"
+#include "GPURequestor.hpp"
 
 Application::Application() : lug::Core::Application::Application{ {"hello", {0, 1, 0}} } {
     std::srand((uint32_t)std::time(0));
@@ -85,7 +86,14 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
 
 	VulkanInfoProvider vulkanInfoProvder(physicalDeviceInfo);
 	nlohmann::json json  = vulkanInfoProvder.getJSONVulkanInfo();
-	std::cout << json.dump(4) << std::endl;
+	
+	Router rout;
+	RestClient::Response r = RestClient::put(rout.getUrlString(Router::Route::putVulkanInfo, 0), "text/json", json.dump(0));
+
+	std::cout << r.code << std::endl;
+	//std::cout << json.dump(4) << std::endl;
+
+
 	//	
 //
 //    json["properties"] = {
