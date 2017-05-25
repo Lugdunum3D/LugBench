@@ -17,7 +17,6 @@ public:
 	GPURequestor() = default;
 	
 	GPURequestor(const GPURequestor&) = delete;
-	GPURequestor(GPURequestor&&) = delete;
 
 	GPURequestor& operator=(const GPURequestor&) = delete;
 	GPURequestor& operator=(const GPURequestor&&) = delete;
@@ -27,5 +26,5 @@ public:
 	void putVulkanInfo(nlohmann::json vulkanInfosJson);
 
 private:
-	RestClient::Connection baseConnection;
+	Router rout;
 };

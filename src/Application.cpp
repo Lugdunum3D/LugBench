@@ -86,10 +86,8 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
 	VulkanInfoProvider vulkanInfoProvder(physicalDeviceInfo);
 	nlohmann::json json  = vulkanInfoProvder.getJSONVulkanInfo();
 	
-	Router rout;
-	RestClient::Response r = RestClient::put(rout.getUrlString(Router::Route::putVulkanInfo, 0), "text/json", json.dump(0));
-
-	std::cout << r.code << std::endl;
+	GPURequestor req;
+	req.putVulkanInfo(json);
 	//std::cout << json.dump(4) << std::endl;
 
 

@@ -289,7 +289,5 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
 	);
 	//
 
-	std::cout << json.dump(4) << std::endl;
-
     return json;
 }
