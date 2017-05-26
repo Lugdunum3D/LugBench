@@ -1,11 +1,8 @@
 #include "GPURequestor.hpp"
 
-
-
-
 int GPURequestor::putVulkanInfo(nlohmann::json vulkanInfosJson) {
-	
-	RestClient::Response r = RestClient::put(rout.getUrlString(Router::Route::putVulkanInfo, 0), "text/json", vulkanInfosJson.dump(0));
+	std::cout << vulkanInfosJson.dump() << std::endl;
+	RestClient::Response r = RestClient::put(rout.getUrlString(Router::Route::putVulkanInfo, 0), "application/json;charset=utf-8", vulkanInfosJson.dump(0));
 	return r.code;
 }
 
@@ -15,7 +12,7 @@ JSONResponse GPURequestor::getAllVulkanInfo()
 
 }
 
-JSONResponse GPURequestor::getVulkanInfoWithID(int id)
+JSONResponse GPURequestor::getVulkanInfoWithID(uint16_t id)
 {
 	return	getRequestResponse(rout.getUrlString(Router::Route::getVulkanInfoWithId, id));
 }
@@ -29,5 +26,5 @@ JSONResponse GPURequestor::getRequestResponse(std::string request)
 	{
 		json = nlohmann::json(r.body);
 	}
-	return (r.code, json);
+	return std::make_tuple(r.code, json);
 }

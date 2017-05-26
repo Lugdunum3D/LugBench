@@ -11,8 +11,9 @@
     #pragma warning(pop)
 #endif
 
-using JSONResponse = std::map<int, nlohmann::json>;
+using JSONResponse = std::tuple<int, nlohmann::json>;
 using ResponseCode = int;
+
 class GPURequestor {
 public:
 	GPURequestor() = default;
@@ -26,7 +27,7 @@ public:
 	
 	ResponseCode putVulkanInfo(nlohmann::json vulkanInfosJson);
 	JSONResponse getAllVulkanInfo();
-	JSONResponse getVulkanInfoWithID(int id);
+	JSONResponse getVulkanInfoWithID(uint16_t id);
 	
 private:
 	Router rout;

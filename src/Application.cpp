@@ -88,10 +88,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
 	
 	GPURequestor req;
 	req.putVulkanInfo(json);
-	//std::cout << json.dump(4) << std::endl;
-
-
-
+	
     return (true);
 }
 
