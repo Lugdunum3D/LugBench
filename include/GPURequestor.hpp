@@ -11,7 +11,8 @@
     #pragma warning(pop)
 #endif
 
-
+using JSONResponse = std::map<int, nlohmann::json>;
+using ResponseCode = int;
 class GPURequestor {
 public:
 	GPURequestor() = default;
@@ -23,8 +24,13 @@ public:
 
 	~GPURequestor() = default;
 	
-	void putVulkanInfo(nlohmann::json vulkanInfosJson);
-
+	ResponseCode putVulkanInfo(nlohmann::json vulkanInfosJson);
+	JSONResponse getAllVulkanInfo();
+	JSONResponse getVulkanInfoWithID(int id);
+	
 private:
 	Router rout;
+
+private:
+	JSONResponse getRequestResponse(std::string request);
 };
