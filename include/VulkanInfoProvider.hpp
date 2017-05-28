@@ -6,12 +6,12 @@
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 
 #if defined(LUG_SYSTEM_WINDOWS)
-    #pragma warning(push)
-    #pragma warning(disable : 4003)
+#pragma warning(push)
+#pragma warning(disable : 4003)
 #endif
 #include <json/json.hpp>
 #if defined(LUG_SYSTEM_WINDOWS)
-    #pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 class VulkanInfoProvider {

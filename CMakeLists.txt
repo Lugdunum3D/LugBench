@@ -96,16 +96,16 @@ include_directories(${LUG_INCLUDE_DIR})
 set(SRC
     src/Application.cpp
     src/main.cpp
-    src/Router.cpp
+    src/APIClient/Router.cpp
     src/VulkanInfoProvider.cpp
-	src/GPURequestor.cpp
+	src/APIClient/GPURequestor.cpp
 )
 
 set(INC
     include/Application.hpp
-    include/Router.hpp
     include/VulkanInfoProvider.hpp
-	include/GPURequestor.hpp
+    include/APIClient/Router.hpp
+	include/APIClient/GPURequestor.hpp
 )
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
