@@ -49,10 +49,7 @@ Application::Application() : lug::Core::Application::Application{{"hello", {0, 1
 Application::~Application() {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-    for (auto& queue : vkRender->getQueues()) {
-        queue.waitIdle();
-    }
+	vkRender->getDevice().waitIdle();
 }
 
 bool Application::init(int argc, char* argv[]) {

@@ -7,14 +7,14 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
 
     json["properties"] = {
         {"apiVersion", {
-            {"major", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).major},
-            {"minor", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).minor},
-            {"patch", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).patch}
+            {"major", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).major)},
+            {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).minor)},
+            {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).patch)}
         }},
         {"driverVersion", {
-            {"major", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).major},
-            {"minor", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).minor},
-            {"patch", lug::Graphics::Vulkan::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).patch}
+            {"major", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).major)},
+            {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).minor)},
+            {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).patch)}
         }},
         {"vendorID", _physicalDeviceInfo->properties.vendorID},
         {"deviceID", _physicalDeviceInfo->properties.deviceID},
@@ -237,9 +237,9 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
         {
             {"extensionName", extension.extensionName},
             {"specVersion", {
-                {"major", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).major},
-                {"minor", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).minor},
-                {"patch", lug::Graphics::Vulkan::Version::fromInt(extension.specVersion).patch}
+                {"major", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).major)},
+                {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).minor)},
+                {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).patch)}
             }},
         }
         );
