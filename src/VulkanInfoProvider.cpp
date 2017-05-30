@@ -102,16 +102,16 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
             {"maxFramebufferWidth", _physicalDeviceInfo->properties.limits.maxFramebufferWidth},
             {"maxFramebufferHeight", _physicalDeviceInfo->properties.limits.maxFramebufferHeight},
             {"maxFramebufferLayers", _physicalDeviceInfo->properties.limits.maxFramebufferLayers},
-            {"framebufferColorSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.framebufferColorSampleCounts)},
-            {"framebufferDepthSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts)},
-            {"framebufferStencilSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts)},
-            {"framebufferNoAttachmentsSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts)},
+            {"framebufferColorSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.framebufferColorSampleCounts)},
+            {"framebufferDepthSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts)},
+            {"framebufferStencilSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts)},
+            {"framebufferNoAttachmentsSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts)},
             {"maxColorAttachments", _physicalDeviceInfo->properties.limits.maxColorAttachments},
-            {"sampledImageColorSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts)},
-            {"sampledImageIntegerSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts)},
-            {"sampledImageDepthSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts)},
-            {"sampledImageStencilSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts)},
-            {"storageImageSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStr(_physicalDeviceInfo->properties.limits.storageImageSampleCounts)},
+            {"sampledImageColorSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts)},
+            {"sampledImageIntegerSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts)},
+            {"sampledImageDepthSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts)},
+            {"sampledImageStencilSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts)},
+            {"storageImageSampleCounts", lug::Graphics::Vulkan::API::RTTI::VkSampleCountFlagsToStrVec(_physicalDeviceInfo->properties.limits.storageImageSampleCounts)},
             {"maxSampleMaskWords", _physicalDeviceInfo->properties.limits.maxSampleMaskWords},
             {"timestampComputeAndGraphics", static_cast<bool>(_physicalDeviceInfo->properties.limits.timestampComputeAndGraphics)},
             {"timestampPeriod", _physicalDeviceInfo->properties.limits.timestampPeriod},
@@ -204,7 +204,7 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
     for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
         json["memory"]["memoryTypes"].push_back(
         {
-            {"propertyFlags", lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStr(_physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
+            {"propertyFlags", lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags)},
             {"heapIndex", _physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex},
         }
         );
@@ -214,14 +214,14 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
         json["memory"]["memoryHeaps"].push_back(
         {
             {"size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size},
-            {"flags", lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStr(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
+            {"flags", lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags)},
         }
         );
     }
 
     for (auto tmp : _physicalDeviceInfo->queueFamilies) {
         json["queues"].push_back({
-            {"queueFlags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStr(tmp.queueFlags)},
+            {"queueFlags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags)},
             {"queueCount", tmp.queueCount},
             {"timestampValidBits", tmp.timestampValidBits},
             {"minImageTransferGranularity", {
@@ -250,9 +250,9 @@ nlohmann::json VulkanInfoProvider::getJSONVulkanInfo() {
         {
             lug::Graphics::Vulkan::API::RTTI::toStr(format.first),
             {
-                {"linearTilingFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStr(format.second.linearTilingFeatures)},
-                {"optimalTilingFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStr(format.second.optimalTilingFeatures)},
-                {"bufferFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStr(format.second.bufferFeatures)},
+                {"linearTilingFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures)},
+                {"optimalTilingFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures)},
+                {"bufferFeatures", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures)},
             }
         }
         );
