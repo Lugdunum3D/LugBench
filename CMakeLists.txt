@@ -94,18 +94,20 @@ find_package(LUG REQUIRED core graphics system window math)
 include_directories(${LUG_INCLUDE_DIR})
 
 set(SRC
-    src/Application.cpp
-    src/main.cpp
+    src/APIClient/Common.cpp
+    src/APIClient/GPU.cpp
     src/APIClient/Router.cpp
-    src/VulkanInfoProvider.cpp
-	src/APIClient/GPURequestor.cpp
+    src/Application.cpp
+    src/GPUInfoProvider.cpp
+    src/main.cpp
 )
 
 set(INC
-    include/Application.hpp
-    include/VulkanInfoProvider.hpp
+    include/APIClient/Common.hpp
+    include/APIClient/GPU.hpp
     include/APIClient/Router.hpp
-	include/APIClient/GPURequestor.hpp
+    include/Application.hpp
+    include/GPUInfoProvider.hpp
 )
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
@@ -165,7 +167,6 @@ endif()
 lug_set_option(LUGBENCH_API_URI ${DEFAULT_LUGBENCH_API_URI} STRING "URI of the Lugbench API")
 add_definitions(/DLUGBENCH_API_URI="${LUGBENCH_API_URI}")
 
-#add api VERSION
-set(DEFAULT_LUGBENCH_API_VERSION "api/v1")
-lug_set_option(LUGBENCH_API_VERSION ${DEFAULT_LUGBENCH_API_VERSION} STRING "Version of the Lugbench API")
+# add api VERSION
+lug_set_option(LUGBENCH_API_VERSION "1" STRING "Version of the Lugbench API")
 add_definitions(/DLUGBENCH_API_VERSION="${LUGBENCH_API_VERSION}")

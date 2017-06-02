@@ -1,23 +1,14 @@
-#include "APIClient/Router.hpp"
+#include <APIClient/Router.hpp>
 
-constexpr const char* APIClient::Router::baseAPIUri;
-
-std::string APIClient::Router::getUrlString(Route route, uint16_t id = 0) {
-    std::string	URLString;
-
+std::string APIClient::Router::getUrlString(Route route, const std::string& id) {
     switch (route) {
-        case Router::Route::getAllVulkanInfo:
-            URLString = std::string(baseAPIUri) + "/" + std::string(apiVersion) + "/gpus";
-            break;
-        case Router::Route::getVulkanInfoWithId:
-            URLString = std::string(baseAPIUri) + "/" + std::string(apiVersion) + "/gpus" + std::to_string(id);
-            break;
-        case Router::Route::putVulkanInfo:
-            URLString = std::string(baseAPIUri) + "/" + std::string(apiVersion) + "/gpus";
-            break;
+        case Route::getAllGpus:
+            return std::string(baseAPIUri) + "/" + std::string(apiVersionUri) + "/" + std::string(apiVersion) + "/" + "gpus";
+        case Route::getGpu:
+            return std::string(baseAPIUri) + "/" + std::string(apiVersionUri) + "/" + std::string(apiVersion) + "/" + "gpus" + "/" + id;
+        case Route::putGpu:
+            return std::string(baseAPIUri) + "/" + std::string(apiVersionUri) + "/" + std::string(apiVersion) + "/" + "gpus";
+        default:
+            return "";
     }
-
-    (void)id;
-    return URLString;
 }
-

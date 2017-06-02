@@ -1,16 +1,14 @@
+#include <Application.hpp>
+
 #include <ctime>
 #include <sstream>
 
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
-#include "restclient-cpp/restclient.h"
-
-#include "Application.hpp"
-#include "VulkanInfoProvider.hpp"
-#include "APIClient/Router.hpp"
-#include "APIClient/GPURequestor.hpp"
-
+#include <APIClient/GPU.hpp>
+#include <APIClient/Router.hpp>
+#include <GPUInfoProvider.hpp>
 
 Application::Application() : lug::Core::Application::Application{{"hello", {0, 1, 0}}} {
     std::srand((uint32_t)std::time(0));
@@ -29,8 +27,8 @@ Application::Application() : lug::Core::Application::Application{{"hello", {0, 1
                 1.0f                                        // height
             },
 
-        0.0f,                                           // minDepth
-        1.0f                                            // maxDepth
+            0.0f,                                           // minDepth
+            1.0f                                            // maxDepth
         },
         {                                                   // scissor
             {                                               // offset
@@ -49,7 +47,7 @@ Application::Application() : lug::Core::Application::Application{{"hello", {0, 1
 Application::~Application() {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-	vkRender->getDevice().waitIdle();
+    vkRender->getDevice().waitIdle();
 }
 
 bool Application::init(int argc, char* argv[]) {
@@ -60,12 +58,11 @@ bool Application::init(int argc, char* argv[]) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-    auto& choosedDevice = vkRender->getPhysicalDeviceInfos().front();
-    /*   for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {*/
-    if (!initDevice(&choosedDevice)) {
-        LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
+    for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
+        if (!initDevice(&choosedDevice)) {
+            LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
+        }
     }
-    /*   }*/
 
     return true;
 }
@@ -80,13 +77,13 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
         return false;
     }
 
-    lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-
-    VulkanInfoProvider vulkanInfoProvder(physicalDeviceInfo);
-    nlohmann::json json = vulkanInfoProvder.getJSONVulkanInfo();
-
-    APIClient::GPURequestor req;
-    req.putVulkanInfo(json);
+    const lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+    if (physicalDeviceInfo == NULL) {
+        return false;
+    }
+    const nlohmann::json json = GPUInfoProvider::get(*physicalDeviceInfo);
+    LUG_LOG.info("{}", json.dump());
+    APIClient::GPU::put(json);
     return (true);
 }
 
