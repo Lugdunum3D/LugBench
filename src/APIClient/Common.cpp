@@ -1,5 +1,21 @@
 #include <APIClient/Common.hpp>
 
+#include <lug/Config.hpp>
+
+#if defined(LUG_SYSTEM_ANDROID)
+
+APIClient::JSONResponse APIClient::getRequestResponse(const std::string&) {
+    // TODO
+    return {};
+}
+
+APIClient::JSONResponse APIClient::putRequest(const std::string&, const std::string&) {
+    // TODO
+    return {};
+}
+
+#else
+
 #include <restclient-cpp/restclient.h>
 
 APIClient::JSONResponse APIClient::getRequestResponse(const std::string& url) {
@@ -14,3 +30,5 @@ APIClient::JSONResponse APIClient::putRequest(const std::string& url, const std:
     reponseJson = nlohmann::json(r.body);
     return std::make_tuple(r.code, reponseJson);
 }
+
+#endif
