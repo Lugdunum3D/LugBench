@@ -36,8 +36,7 @@ public class LugBenchNativeActivity extends NativeActivity {
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v(TAG, "Failed to send the request");
-                    Log.v(TAG, error.networkResponse.toString());
+                    Log.v(TAG, "Failed to send the request: " + Integer.toString(error.networkResponse.statusCode));
                 }
             }
         ) {
