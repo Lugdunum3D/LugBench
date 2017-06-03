@@ -4,13 +4,40 @@
 
 #if defined(LUG_SYSTEM_ANDROID)
 
+#include <jni.h>
+#include <lug/Window/Android/WindowImplAndroid.hpp>
+#include <lug/System/Logger/Logger.hpp>
+
 APIClient::JSONResponse APIClient::getRequestResponse(const std::string&) {
     // TODO
     return {};
 }
 
-APIClient::JSONResponse APIClient::putRequest(const std::string&, const std::string&) {
-    // TODO
+APIClient::JSONResponse APIClient::putRequest(const std::string& url, const std::string& json) {
+    LUG_LOG.info("url is : {}", url);
+
+    JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
+
+    lug::Window::priv::WindowImpl::activity->vm->AttachCurrentThread(&jni, NULL);
+
+    jclass clazz = jni->GetObjectClass(lug::Window::priv::WindowImpl::activity->clazz);
+    if (clazz == 0) {
+        LUG_LOG.error("FindClass error");
+        return {};
+    }
+    jmethodID javamethod = jni->GetMethodID(clazz, "sendRequest", "(Ljava/lang/String;Ljava/lang/String;)V");
+    if (javamethod == 0) {
+        LUG_LOG.info("GetMethodID error");
+        return {};
+    }
+
+    jstring nativeUrl = jni->NewStringUTF(url.c_str());
+    jstring nativeJson = jni->NewStringUTF(json.c_str());
+
+
+    jni->CallVoidMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod, nativeUrl, nativeJson);
+
+    lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
     return {};
 }
 
