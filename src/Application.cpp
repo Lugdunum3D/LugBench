@@ -82,7 +82,9 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
         return false;
     }
     const nlohmann::json json = GPUInfoProvider::get(*physicalDeviceInfo);
-    LUG_LOG.info("{}", json.dump());
+    #if !defined(LUG_SYSTEM_ANDROID) // TODO(Yoann) FMT has memory corruption on Android with big string
+        LUG_LOG.info("{}", json.dump());
+    #endif
     APIClient::GPU::put(json);
     return (true);
 }
