@@ -116,6 +116,8 @@ set(SHADERS
     shader-directional.frag
     shader-point.frag
     shader-spot.frag
+	gui.vert
+	gui.frag
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}
