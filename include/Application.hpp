@@ -1,7 +1,14 @@
 #pragma once
 
+#include <memory>
+#include <stack>
+
 #include <lug/Core/Application.hpp>
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
+
+#include "AState.hpp"
+
+class AState;
 
 class Application : public lug::Core::Application {
 public:
@@ -20,9 +27,13 @@ public:
     void onEvent(const lug::Window::Event& event) override final;
     void onFrame(const lug::System::Time& elapsedTime) override final;
 
-private:
-    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);
+    bool haveState();
+    bool popState();
+    bool pushState(std::shared_ptr<AState> &state);
+    bool popAndPushState(std::shared_ptr<AState> &state);
 
 private:
-    std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
+    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);    
+    std::stack<std::shared_ptr<AState>> _states;
+
 };

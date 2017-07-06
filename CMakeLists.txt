@@ -100,6 +100,7 @@ set(SRC
     src/Application.cpp
     src/GPUInfoProvider.cpp
     src/main.cpp
+    src/MenuState.cpp
 )
 
 set(INC
@@ -108,7 +109,22 @@ set(INC
     include/APIClient/Router.hpp
     include/Application.hpp
     include/GPUInfoProvider.hpp
+    include/AState.hpp
+    include/MenuState.hpp
 )
+
+# find imgui
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/imgui")
+    message(FATAL_ERROR "Can't find imgui, call `git submodule update --recursive`")
+endif()
+
+set(IMGUI_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/imgui/include)
+message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
+
+set(IMGUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/imgui/src)
+message(STATUS "Found Imgui: ${IMGUI_SOURCE_DIR}")
+
+include_directories(${IMGUI_INCLUDE_DIR})
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS

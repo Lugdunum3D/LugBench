@@ -27,6 +27,8 @@ int main(int argc, char* argv[]) {
     if (!app.init(argc, argv)) {
         return 1;
     }
+    
+    return app.run() ? 0 : 1;
 
     return 0;
 }
