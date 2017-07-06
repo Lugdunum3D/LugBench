@@ -132,8 +132,9 @@ bool Application::haveState() {
 }
 
 bool Application::popState() {
-    if (!_states.top()->onPop())
+    if (!_states.top()->onPop()) {
         return (false);
+    }
     _states.pop();
     if (!_states.empty()) {
         _states.top()->onPlay();
@@ -144,11 +145,13 @@ bool Application::popState() {
 }
 
 bool Application::pushState(std::shared_ptr<AState> &state) {
-    if (!_states.empty())
+    if (!_states.empty()) {
         _states.top()->onPause();
+    }
     _states.push(state);
-    if (!_states.top()->onPush())
+    if (!_states.top()->onPush()) {
         return (false);
+    }
     return (true);
 }
 
