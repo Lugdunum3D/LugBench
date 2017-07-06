@@ -108,7 +108,6 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
 void Application::onEvent(const lug::Window::Event& event) {
 
     if (_states.empty()) {
-        close();
         return;
     }
 
@@ -120,9 +119,6 @@ void Application::onEvent(const lug::Window::Event& event) {
 void Application::onFrame(const lug::System::Time& elapsedTime) {
 
 	if (_states.empty()) {
-        LUG_LOG.info("onFrame state empty");
-		close();
-        LUG_LOG.info("onFrame after close");        
 		return;
 	}
 
@@ -139,8 +135,11 @@ bool Application::popState() {
     if (!_states.top()->onPop())
         return (false);
     _states.pop();
-    if (!_states.empty())
+    if (!_states.empty()) {
         _states.top()->onPlay();
+    } else {
+        close();
+    }
     return (true);
 }
 
