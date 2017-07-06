@@ -234,7 +234,7 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
     }
 
     for (auto extension : physicalDeviceInfo.extensions) {
-        json["extension"].push_back(
+        json["extensions"].push_back(
         {
             {"extensionName", extension.extensionName},
             {"specVersion", {
