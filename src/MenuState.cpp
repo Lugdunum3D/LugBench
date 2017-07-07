@@ -1,7 +1,5 @@
 #include "MenuState.hpp"
 
-#include <imgui.h>
-
 #include <lug/Graphics/Light/Directional.hpp>
 #include <lug/Graphics/Scene/ModelInstance.hpp>
 
@@ -100,10 +98,40 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         renderViews[i]->getCamera()->setPosition({x, 10.0f, y}, lug::Graphics::Node::TransformSpace::World);
         renderViews[i]->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
     }
-    
-    if (ImGui::Button("Start Benchmarking", ImVec2(200, 100))) {
-        LUG_LOG.info("Button Pressed!");
+
+    ImGuiWindowFlags window_flags = 0;
+    if (no_titlebar)  window_flags |= ImGuiWindowFlags_NoTitleBar;
+    if (!no_border)   window_flags |= ImGuiWindowFlags_ShowBorders;
+    if (no_resize)    window_flags |= ImGuiWindowFlags_NoResize;
+    if (no_move)      window_flags |= ImGuiWindowFlags_NoMove;
+    if (no_scrollbar) window_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
+    if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
+    ImGui::Begin("Sample Window", isOpen, window_flags);
+    {
+        ImGui::Checkbox("Titlebar", &no_titlebar);
+        ImGui::Checkbox("Border", &no_border);
+        ImGui::Checkbox("Resize", &no_resize);
+        ImGui::Checkbox("Move", &no_move);
+        ImGui::Checkbox("Scrollbar", &no_scrollbar);
+        ImGui::Checkbox("Collapse", &no_collapse);
+        ImGui::Checkbox("Menu", &no_menu);
     }
+    ImGui::End();
+
+    ImGui::Begin("Main Menu", isOpen, window_flags);
+    {
+        ImGui::SetCursorPos(buttonPos);
+        ImGui::Button("START");
+        ImGui::SliderFloat("Button X Position", &buttonPos.x, -100.f, 100.f, "%.2f");
+        ImGui::SliderFloat("Button Y Position", &buttonPos.y, -100.f, 100.f, "%.2f");
+    }
+    ImGui::End();
+
+
+//    if (ImGui::Button("Start Benchmarking", ImVec2(200, 100))) {
+//        LUG_LOG.info("Button Pressed!");
+//    }
 
 	return true;
 }

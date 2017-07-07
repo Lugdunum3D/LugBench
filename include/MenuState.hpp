@@ -5,6 +5,8 @@
 
 #include <lug/Graphics/Scene/Scene.hpp>
 
+#include <imgui.h>
+
 class MenuState : public AState {
 public:
     MenuState() = delete;
@@ -22,4 +24,17 @@ private:
 
     float _rotation{0.0f};
 
+    // Variables for "Sample Window"
+    bool *isOpen{false};
+
+    bool no_titlebar{false};
+    bool no_border{false};
+    bool no_resize{false};
+    bool no_move{false};
+    bool no_scrollbar{false};
+    bool no_collapse{false};
+    bool no_menu{false};
+    
+    // Variables for "Main Menu"
+    ImVec2 buttonPos{0,0};
 };
