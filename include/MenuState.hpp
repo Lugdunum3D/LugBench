@@ -27,14 +27,11 @@ private:
     // Variables for "Sample Window"
     bool *isOpen{false};
 
-    bool no_titlebar{false};
+    bool no_titlebar{true};
     bool no_border{false};
-    bool no_resize{false};
-    bool no_move{false};
-    bool no_scrollbar{false};
-    bool no_collapse{false};
-    bool no_menu{false};
-    
-    // Variables for "Main Menu"
-    ImVec2 buttonPos{0,0};
+    bool no_resize{true};
+    bool no_move{true};
+    bool no_scrollbar{true};
+    bool no_collapse{true};
+    bool no_menu{true};
 };

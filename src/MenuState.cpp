@@ -121,10 +121,21 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 
     ImGui::Begin("Main Menu", isOpen, window_flags);
     {
+        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+        // Sets the window to be at the bottom of the screen (1/3rd of the height)
+        ImVec2 windowSize{static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f};
+        ImVec2 windowPos = {0, static_cast<float>(window->getHeight() - windowSize.y)};
+        ImGui::SetWindowSize(windowSize);
+        ImGui::SetWindowPos(windowPos);
+
+        // Centers the button and keeps it square at all times
+        ImVec2 buttonSize;
+        if (windowSize.x > windowSize.y) { buttonSize = {(windowSize.y / 2.f), (windowSize.y / 2.f)}; }
+        else { buttonSize = {(windowSize.x / 2.f), (windowSize.x / 2.f)}; }
+        ImVec2 buttonPos{(windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f)};
         ImGui::SetCursorPos(buttonPos);
-        ImGui::Button("START");
-        ImGui::SliderFloat("Button X Position", &buttonPos.x, -100.f, 100.f, "%.2f");
-        ImGui::SliderFloat("Button Y Position", &buttonPos.y, -100.f, 100.f, "%.2f");
+        ImGui::Button("START", buttonSize);
     }
     ImGui::End();
 
