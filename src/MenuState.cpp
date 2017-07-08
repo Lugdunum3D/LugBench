@@ -1,4 +1,5 @@
 #include "MenuState.hpp"
+#include "GUI.hpp"
 
 #include <lug/Graphics/Light/Directional.hpp>
 #include <lug/Graphics/Scene/ModelInstance.hpp>
@@ -108,7 +109,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
 
-    if (display_info_screen == false) {
+    if (display_info_screen == false && display_result_screen == false) {
         if (!no_menu_bar) {
             ImGui::BeginMainMenuBar();
             {
@@ -141,6 +142,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::Checkbox("No Menu", &no_menu);
             ImGui::NewLine();
             ImGui::Checkbox("Show info screen", &display_info_screen);
+            ImGui::Checkbox("Show result screen", &display_result_screen);
         }
         ImGui::End();
 
@@ -193,12 +195,13 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::SetCursorPos(buttonPos);
                 if (ImGui::Button("Results", buttonSize)) {
                     LUG_LOG.debug("Results button pressed");
+                    display_result_screen = !display_result_screen;
                 }
             }
         }
         ImGui::End();
     }
-    else {
+    else if (display_info_screen == true) {
         ImGui::Begin("Info Display", isOpen, window_flags);
         {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
@@ -209,28 +212,45 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowSize(windowSize);
             ImGui::SetWindowPos(windowPos);
 
-            ImGui::TextColored(ImVec4{0, 255, 0, 255}, "Device");
-            ImGui::Indent();
-            {
-                ImGui::Text("Stuart's Super Duper PC");
-            }
-            ImGui::Unindent();
-            ImGui::TextColored(ImVec4{ 0, 255, 0, 255 }, "OS");
-            ImGui::Indent();
-            {
-                ImGui::Text("Windows 10");
-            }
-            ImGui::Unindent();
-            ImGui::TextColored(ImVec4{ 0, 255, 0, 255 }, "Flavour");
-            ImGui::Indent();
-            {
-                ImGui::Text("Salty");
-            }
-            ImGui::Unindent();
+            GUI::displayConfigInfoUI("Device", "Stuart's Super Duper PC");
+            GUI::displayConfigInfoUI("OS", "Windows 10");
+            GUI::displayConfigInfoUI("Flavour", "Salty");
             ImGui::Separator();
             ImGui::NewLine();
             if (ImGui::Button("< RETURN")) {
                 display_info_screen = !display_info_screen;
+            }
+        }
+        ImGui::End();
+    }
+    else if (display_result_screen == true) {
+        ImGui::Begin("Result Display", isOpen, window_flags);
+        {
+            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+            // Sets the window to be at the bottom of the screen (1/3rd of the height)
+            ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+            ImVec2 windowPos = { 0, 0 };
+            ImGui::SetWindowSize(windowSize);
+            ImGui::SetWindowPos(windowPos);
+
+            ImGui::SetCursorPos({50, 10});
+            ImGui::Button("Test", {50, 20});
+            ImGui::SetCursorPos({250, 10});
+            ImGui::Button("Score", {50, 20});
+            ImGui::NewLine();
+
+            for (int i = 0; i < 3; ++i) {
+                ImGui::SetCursorPos({ 60, 20 * static_cast<float>(i + 2)});
+                ImGui::Text("Test");
+                ImGui::SetCursorPos({ 260, 20 * static_cast<float>(i + 2)});
+                ImGui::Text("1337 f/s");
+            }
+
+            ImGui::Separator();
+            ImGui::NewLine();
+            if (ImGui::Button("< RETURN")) {
+                display_result_screen = !display_result_screen;
             }
         }
         ImGui::End();

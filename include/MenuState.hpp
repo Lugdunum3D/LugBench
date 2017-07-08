@@ -24,7 +24,7 @@ private:
 
     float _rotation{0.0f};
 
-    // Variables for "Sample Window"
+    // Variables for "Sample Window" (temporary)
     bool *isOpen{false};
 
     bool no_menu_bar{false};
@@ -37,4 +37,6 @@ private:
     bool no_menu{true};
 
     bool display_info_screen{false};
+    bool display_result_screen{false};
+
 };

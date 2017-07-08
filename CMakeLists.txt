@@ -99,6 +99,7 @@ set(SRC
     src/APIClient/Router.cpp
     src/Application.cpp
     src/GPUInfoProvider.cpp
+    src/GUI.cpp
     src/main.cpp
     src/MenuState.cpp
 )
@@ -109,6 +110,7 @@ set(INC
     include/APIClient/Router.hpp
     include/Application.hpp
     include/GPUInfoProvider.hpp
+    include/GUI.hpp
     include/AState.hpp
     include/MenuState.hpp
 )
