@@ -107,37 +107,135 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_scrollbar) window_flags |= ImGuiWindowFlags_NoScrollbar;
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
-    ImGui::Begin("Sample Window", isOpen, window_flags);
-    {
-        ImGui::Checkbox("Titlebar", &no_titlebar);
-        ImGui::Checkbox("Border", &no_border);
-        ImGui::Checkbox("Resize", &no_resize);
-        ImGui::Checkbox("Move", &no_move);
-        ImGui::Checkbox("Scrollbar", &no_scrollbar);
-        ImGui::Checkbox("Collapse", &no_collapse);
-        ImGui::Checkbox("Menu", &no_menu);
+
+    if (display_info_screen == false) {
+        if (!no_menu_bar) {
+            ImGui::BeginMainMenuBar();
+            {
+                if (ImGui::BeginMenu("Menu1")) {
+                    if (ImGui::MenuItem("Item 1-1")) {
+                        // BLA
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Menu2")) {
+                    if (ImGui::MenuItem("Item 2-1")) {
+                        // BLA
+                    }
+                    ImGui::EndMenu();
+                }
+            }
+            ImGui::EndMainMenuBar();
+        }
+    
+        ImGui::Begin("Sample Window", isOpen, window_flags);
+        {
+            ImGui::Checkbox("No Menu Bar", &no_menu_bar);
+            ImGui::NewLine();
+            ImGui::Checkbox("No Titlebar", &no_titlebar);
+            ImGui::Checkbox("No Border", &no_border);
+            ImGui::Checkbox("No Resize", &no_resize);
+            ImGui::Checkbox("No Move", &no_move);
+            ImGui::Checkbox("No Scrollbar", &no_scrollbar);
+            ImGui::Checkbox("No Collapse", &no_collapse);
+            ImGui::Checkbox("No Menu", &no_menu);
+            ImGui::NewLine();
+            ImGui::Checkbox("Show info screen", &display_info_screen);
+        }
+        ImGui::End();
+
+        ImGui::Begin("Main Menu", isOpen, window_flags);
+        {
+            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+            // Sets the window to be at the bottom of the screen (1/3rd of the height)
+            ImVec2 windowSize{static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f};
+            ImVec2 windowPos = {0, static_cast<float>(window->getHeight() - windowSize.y)};
+            ImGui::SetWindowSize(windowSize);
+            ImGui::SetWindowPos(windowPos);
+
+            ImVec2 centerButtonPos;
+
+            // Start tests button
+            {
+                // Centers the button and keeps it square at all times
+                ImVec2 buttonSize;
+                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 2.f), (windowSize.y / 2.f) }; }
+                else { buttonSize = { (windowSize.x / 2.f), (windowSize.x / 2.f) }; }
+                centerButtonPos = { (windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f) };
+                ImGui::SetCursorPos(centerButtonPos);
+                if (ImGui::Button("START\nTESTS", buttonSize)) {
+                    LUG_LOG.debug("Start button pressed");
+                }
+            }
+
+            // Config button
+            {
+                // Centers the button and keeps it square at all times
+                ImVec2 buttonSize;
+                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
+                else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
+                ImVec2 buttonPos{ centerButtonPos.x - (buttonSize.x * 1.5f), centerButtonPos.y + (buttonSize.y / 4.f) };
+                ImGui::SetCursorPos(buttonPos);
+                if (ImGui::Button("Config\nInfo", buttonSize)) {
+                    LUG_LOG.debug("Config button pressed");
+                    display_info_screen = !display_info_screen;
+                }
+            }
+
+            // Result button
+            {
+                // Centers the button and keeps it square at all times
+                ImVec2 buttonSize;
+                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
+                else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
+                ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y / 4.f) };
+                ImGui::SetCursorPos(buttonPos);
+                if (ImGui::Button("Results", buttonSize)) {
+                    LUG_LOG.debug("Results button pressed");
+                }
+            }
+        }
+        ImGui::End();
     }
-    ImGui::End();
+    else {
+        ImGui::Begin("Info Display", isOpen, window_flags);
+        {
+            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
-    ImGui::Begin("Main Menu", isOpen, window_flags);
-    {
-        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+            // Sets the window to be at the bottom of the screen (1/3rd of the height)
+            ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+            ImVec2 windowPos = {0, 0};
+            ImGui::SetWindowSize(windowSize);
+            ImGui::SetWindowPos(windowPos);
 
-        // Sets the window to be at the bottom of the screen (1/3rd of the height)
-        ImVec2 windowSize{static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f};
-        ImVec2 windowPos = {0, static_cast<float>(window->getHeight() - windowSize.y)};
-        ImGui::SetWindowSize(windowSize);
-        ImGui::SetWindowPos(windowPos);
-
-        // Centers the button and keeps it square at all times
-        ImVec2 buttonSize;
-        if (windowSize.x > windowSize.y) { buttonSize = {(windowSize.y / 2.f), (windowSize.y / 2.f)}; }
-        else { buttonSize = {(windowSize.x / 2.f), (windowSize.x / 2.f)}; }
-        ImVec2 buttonPos{(windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f)};
-        ImGui::SetCursorPos(buttonPos);
-        ImGui::Button("START", buttonSize);
+            ImGui::TextColored(ImVec4{0, 255, 0, 255}, "Device");
+            ImGui::Indent();
+            {
+                ImGui::Text("Stuart's Super Duper PC");
+            }
+            ImGui::Unindent();
+            ImGui::TextColored(ImVec4{ 0, 255, 0, 255 }, "OS");
+            ImGui::Indent();
+            {
+                ImGui::Text("Windows 10");
+            }
+            ImGui::Unindent();
+            ImGui::TextColored(ImVec4{ 0, 255, 0, 255 }, "Flavour");
+            ImGui::Indent();
+            {
+                ImGui::Text("Salty");
+            }
+            ImGui::Unindent();
+            ImGui::Separator();
+            ImGui::NewLine();
+            if (ImGui::Button("< RETURN")) {
+                display_info_screen = !display_info_screen;
+            }
+        }
+        ImGui::End();
     }
-    ImGui::End();
+        
 
 
 //    if (ImGui::Button("Start Benchmarking", ImVec2(200, 100))) {

@@ -27,11 +27,14 @@ private:
     // Variables for "Sample Window"
     bool *isOpen{false};
 
+    bool no_menu_bar{false};
     bool no_titlebar{true};
-    bool no_border{false};
+    bool no_border{true};
     bool no_resize{true};
     bool no_move{true};
     bool no_scrollbar{true};
     bool no_collapse{true};
     bool no_menu{true};
+
+    bool display_info_screen{false};
 };
