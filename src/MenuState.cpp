@@ -10,14 +10,22 @@
 
 #include <lug/System/Time.hpp>
 
-MenuState::MenuState(Application &application) : AState(application) {
+#include "BenchmarkingState.hpp"
 
+MenuState::MenuState(Application &application) : AState(application) {
+}
+
+MenuState::~MenuState() {
+    LUG_LOG.info("MenuState destructor");
+}
+
+bool MenuState::onPush() {
     // Load the model
     {
         // Low Poly by Olexandr Zymohliad
         // is licensed under CC Attribution
         // https://skfb.ly/IXwu
-        _model = _application.getGraphics().createModel("model", "models/LowPoly/Low poly.obj");
+        _model = _application.getGraphics().createModel("model", "models/LowPoly/cello.obj");
 
         if (!_model) {
             throw;
@@ -26,12 +34,6 @@ MenuState::MenuState(Application &application) : AState(application) {
 
     // Create the scene
     _scene = _application.getGraphics().createScene();
-
-    // Add model to scene
-    {
-        std::unique_ptr<lug::Graphics::Scene::ModelInstance> modelInstance = _scene->createModelInstance("model instance", _model.get());
-        _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
-    }
 
     // Add directional light to scene
     {
@@ -44,13 +46,11 @@ MenuState::MenuState(Application &application) : AState(application) {
         _scene->getRoot()->createSceneNode("light node", std::move(light));
     }
 
-    // Create two cameras
-    std::unique_ptr<lug::Graphics::Render::Camera> camera = _application.getGraphics().createCamera("camera");
-    camera->setScene(_scene.get());
+    _application.getCamera()->setScene(_scene.get());
 
     // Add camera to scene
     {
-        std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", camera.get());
+        std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", _application.getCamera().get());
 
         std::unique_ptr<lug::Graphics::Scene::Node> movableCameraNode = _scene->createSceneNode("movable camera node");
 
@@ -65,16 +65,38 @@ MenuState::MenuState(Application &application) : AState(application) {
 
         LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
 
-        renderViews[0]->attachCamera(std::move(camera));
+        renderViews[0]->attachCamera(std::move(_application.getCamera()));
     }
 
+    // Add model to scene
+    {
+        std::unique_ptr<lug::Graphics::Scene::ModelInstance> modelInstance = _scene->createModelInstance("model instance", _model.get());
+        _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
+    }
 
+	return true;
 }
+ 
+bool MenuState::onPop() {
+    LUG_LOG.info("MenuState onPop");
 
-MenuState::~MenuState() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
+
+    auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
+    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+    _application.setCamera(renderViews[0]->detachCamera());
+
+    if (!_application.getCamera()) {
+        LUG_LOG.error("NOPE");
+    } else {
+        LUG_LOG.info("OK");
+    }
+
+   _scene = nullptr;
+
+   return true;
 }
 
 void MenuState::onEvent(const lug::Window::Event& event) {
@@ -94,9 +116,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 
     for (int i = 0; i < 1; ++i) {
         float x = 30.0f * cos(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
-        float y = 30.0f * sin(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
 
-        renderViews[i]->getCamera()->setPosition({x, 10.0f, y}, lug::Graphics::Node::TransformSpace::World);
+        renderViews[i]->getCamera()->setPosition({x, 5.0f, 10.0f}, lug::Graphics::Node::TransformSpace::World);
         renderViews[i]->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
     }
 
@@ -168,6 +189,10 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::SetCursorPos(centerButtonPos);
                 if (ImGui::Button("START\nTESTS", buttonSize)) {
                     LUG_LOG.debug("Start button pressed");
+                    std::shared_ptr<AState> benchmarkingState;
+                    benchmarkingState = std::make_shared<BenchmarkingState>(_application);
+                    _application.popState();
+                    _application.pushState(benchmarkingState);
                 }
             }
 
@@ -255,13 +280,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         }
         ImGui::End();
     }
-        
-
-
-//    if (ImGui::Button("Start Benchmarking", ImVec2(200, 100))) {
-//        LUG_LOG.info("Button Pressed!");
-//    }
-
 	return true;
 }
 

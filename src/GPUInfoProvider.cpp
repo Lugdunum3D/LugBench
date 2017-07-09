@@ -259,7 +259,7 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
         );
     }
 
-    json["SwapChainInfo"].push_back(
+    json["Swapchain"].push_back(
     {
         {"minImageCount", physicalDeviceInfo.swapchain.capabilities.minImageCount},
         {"maxImageCount", physicalDeviceInfo.swapchain.capabilities.maxImageCount},

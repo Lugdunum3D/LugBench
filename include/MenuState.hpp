@@ -15,9 +15,12 @@ public:
 
     void onEvent(const lug::Window::Event& event) override;
     bool onFrame(const lug::System::Time& elapsedTime) override;
+    bool onPop() override;
+    bool onPush() override;
 
 private:
     std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
+
 
     // Temporary store mesh because we don't have resource manager yet
     std::unique_ptr<lug::Graphics::Render::Model> _model;

@@ -12,6 +12,16 @@
 
 #include "AState.hpp"
 #include "MenuState.hpp"
+#include "BenchmarkingState.hpp"
+
+#include <lug/Graphics/Light/Directional.hpp>
+#include <lug/Graphics/Scene/ModelInstance.hpp>
+
+// TODO: Remove this when the ResourceManager is done
+#include <lug/Graphics/Renderer.hpp>
+#include <lug/Graphics/Vulkan/Renderer.hpp>
+
+#include <lug/System/Time.hpp>
 
 Application::Application() : lug::Core::Application::Application{{"hello", {0, 1, 0}}} {
     std::srand((uint32_t)std::time(0));
@@ -72,8 +82,45 @@ bool Application::init(int argc, char* argv[]) {
 			LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
 
 		}
-
 	}
+
+    // // Create the scene
+    // _scene = _graphics.createScene();
+
+    // // Add directional light to scene
+    // {
+    //     std::unique_ptr<lug::Graphics::Light::Light> light = _scene->createLight("light", lug::Graphics::Light::Light::Type::Directional);
+
+    //     // Set the diffuse color to white and the position
+    //     light->setDiffuse({1.0f, 1.0f, 1.0f});
+    //     static_cast<lug::Graphics::Light::Directional*>(light.get())->setDirection({0.0f, -4.0f, 5.0f});
+
+    //     _scene->getRoot()->createSceneNode("light node", std::move(light));
+    // }
+
+    // Create camera
+    _camera = _graphics.createCamera("camera");
+//    camera->setScene(_scene.get());
+
+    // // Add camera to scene
+    // {
+    //     std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", camera.get());
+
+    //     std::unique_ptr<lug::Graphics::Scene::Node> movableCameraNode = _scene->createSceneNode("movable camera node");
+
+    //     movableCameraNode->attachMovableObject(std::move(movableCamera));
+
+    //     _scene->getRoot()->attachChild(std::move(movableCameraNode));
+    // }
+
+    // // Attach cameras to RenderView
+    // {
+    //     auto& renderViews = _graphics.getRenderer()->getWindow()->getRenderViews();
+
+    //     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+    //     renderViews[0]->attachCamera(std::move(camera));
+    // }
 	
     std::shared_ptr<AState> menuState;
 
@@ -138,9 +185,10 @@ bool Application::popState() {
     _states.pop();
     if (!_states.empty()) {
         _states.top()->onPlay();
-    } else {
-        close();
     }
+    // } else {
+    //     close();
+    // }
     return (true);
 }
 

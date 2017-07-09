@@ -102,6 +102,7 @@ set(SRC
     src/GUI.cpp
     src/main.cpp
     src/MenuState.cpp
+    src/BenchmarkingState.cpp
 )
 
 set(INC
@@ -113,6 +114,7 @@ set(INC
     include/GUI.hpp
     include/AState.hpp
     include/MenuState.hpp
+    include/BenchmarkingState.hpp
 )
 
 # find imgui
