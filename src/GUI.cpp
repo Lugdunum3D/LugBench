@@ -92,3 +92,15 @@ void GUI::displayConfigInfoArrayFloat(const char* title, const std::vector<float
         ImGui::Unindent();
     }
 }
+
+void GUI::displayConfigInfoArrayStr(const char* title, const std::vector<const char *>& dataArray) {
+	if (ImGui::CollapsingHeader(title)) {
+		ImGui::Indent();
+		{
+			for (auto element : dataArray) {
+				ImGui::Text(element);
+			}
+		}
+		ImGui::Unindent();
+	}
+}

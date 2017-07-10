@@ -21,5 +21,6 @@ namespace GUI {
     void displayConfigInfoArrayUint8(const char* title, const std::vector<uint8_t>& dataArray);
     void displayConfigInfoArrayUint32(const char* title, const std::vector<uint32_t>& dataArray);
     void displayConfigInfoArrayFloat(const char* title, const std::vector<float>& dataArray);
+	void displayConfigInfoArrayStr(const char* title, const std::vector<const char *>& dataArray);
 
 } // GUI
