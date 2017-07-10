@@ -248,19 +248,41 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 			if (ImGui::CollapsingHeader("Device", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
 				GUI::displayConfigInfoUI("Name", _physicalDeviceInfo->properties.deviceName);
 				GUI::displayConfigInfoUI("Device ID", (char *)std::to_string(_physicalDeviceInfo->properties.deviceID).c_str());
+				
 				std::string driverVersion = std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).major) + "." +
 					std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).minor) + "."
 					+ std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).patch);
 				GUI::displayConfigInfoUI("Driver Version", (char *)driverVersion.c_str());
+
+				std::string apiVersion = std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).major) + "." +
+					std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).minor) + "."
+					+ std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion).patch);
+				GUI::displayConfigInfoUI("Driver Version", (char *)apiVersion.c_str());
+
 				GUI::displayConfigInfoUI("Vendor ID", (char *)std::to_string(_physicalDeviceInfo->properties.vendorID).c_str());
-				GUI::displayConfigInfoUI("API Version", (char *)std::to_string(_physicalDeviceInfo->properties.apiVersion).c_str());
 				GUI::displayConfigInfoUI("Device Type", (char *)lug::Graphics::Vulkan::API::RTTI::toStr(_physicalDeviceInfo->properties.deviceType));
-				GUI::displayConfigInfoUI("API Version", (char *)std::to_string(_physicalDeviceInfo->properties.apiVersion).c_str());
+				GUI::displayConfigInfoUI("pipeline Cache UUID", (char *)std::to_string(_physicalDeviceInfo->properties.vendorID).c_str());
 			}
 
           
+			if (ImGui::CollapsingHeader("Swapchain", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+				GUI::displayConfigInfoUI("minImageCount", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.minImageCount).c_str());
+				GUI::displayConfigInfoUI("maxImageCount", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.maxImageCount).c_str());
+				if (ImGui::CollapsingHeader("currentExtent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+					GUI::displayConfigInfoUI("width", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.currentExtent.width).c_str());
+					GUI::displayConfigInfoUI("height", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.currentExtent.height).c_str());
+				}
+				if (ImGui::CollapsingHeader("minImageExtent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+					GUI::displayConfigInfoUI("width", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.minImageExtent.width).c_str());
+					GUI::displayConfigInfoUI("height", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.minImageExtent.height).c_str());
+				}
+				if (ImGui::CollapsingHeader("maxImageExtent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+					GUI::displayConfigInfoUI("width", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.maxImageExtent.width).c_str());
+					GUI::displayConfigInfoUI("height", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.maxImageExtent.height).c_str());
+				}
+				GUI::displayConfigInfoUI("maxImageArrayLayers", (char *)std::to_string(_physicalDeviceInfo->swapchain.capabilities.maxImageArrayLayers).c_str());
+			}
 
-			
             ImGui::Separator();
             ImGui::NewLine();
             if (ImGui::Button("< RETURN")) {
