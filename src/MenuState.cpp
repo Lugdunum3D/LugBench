@@ -374,11 +374,11 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                             if (ImGui::CollapsingHeader("Sparse Properties")) {
                                 ImGui::Indent();
                                 {
-                                    GUI::displayConfigInfoBool("residencyStandard2DBlockShape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape);
-                                    GUI::displayConfigInfoBool("residencyStandard2DMultisampleBlockShape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape);
-                                    GUI::displayConfigInfoBool("residencyStandard3DBlockShape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape);
-                                    GUI::displayConfigInfoBool("residencyAlignedMipSize", _physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize);
-                                    GUI::displayConfigInfoBool("residencyNonResidentStrict", _physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict);
+                                    GUI::displayConfigInfoBool("Residency Standard 2D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Standard 2D Multisample Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Standard 3D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Aligned Mip Size", _physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize);
+                                    GUI::displayConfigInfoBool("Residency Non Resident Strict", _physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict);
 
                                 }
                                 ImGui::Unindent();
@@ -391,61 +391,61 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     if (ImGui::CollapsingHeader("Features")) {
                         ImGui::Indent();
                         {
-                            GUI::displayConfigInfoBool("robustBufferAccess", _physicalDeviceInfo->features.robustBufferAccess);
-                            GUI::displayConfigInfoBool("fullDrawIndexUint32", _physicalDeviceInfo->features.fullDrawIndexUint32);
-                            GUI::displayConfigInfoBool("imageCubeArray", _physicalDeviceInfo->features.imageCubeArray);
-                            GUI::displayConfigInfoBool("independentBlend", _physicalDeviceInfo->features.independentBlend);
-                            GUI::displayConfigInfoBool("geometryShader", _physicalDeviceInfo->features.geometryShader);
-                            GUI::displayConfigInfoBool("tessellationShader", _physicalDeviceInfo->features.tessellationShader);
-                            GUI::displayConfigInfoBool("sampleRateShading", _physicalDeviceInfo->features.sampleRateShading);
-                            GUI::displayConfigInfoBool("dualSrcBlend", _physicalDeviceInfo->features.dualSrcBlend);
-                            GUI::displayConfigInfoBool("logicOp", _physicalDeviceInfo->features.logicOp);
-                            GUI::displayConfigInfoBool("multiDrawIndirect", _physicalDeviceInfo->features.multiDrawIndirect);
-                            GUI::displayConfigInfoBool("drawIndirectFirstInstance", _physicalDeviceInfo->features.drawIndirectFirstInstance);
-                            GUI::displayConfigInfoBool("depthClamp", _physicalDeviceInfo->features.depthClamp);
-                            GUI::displayConfigInfoBool("depthBiasClamp", _physicalDeviceInfo->features.depthBiasClamp);
-                            GUI::displayConfigInfoBool("fillModeNonSolid", _physicalDeviceInfo->features.fillModeNonSolid);
-                            GUI::displayConfigInfoBool("depthBounds", _physicalDeviceInfo->features.depthBounds);
-                            GUI::displayConfigInfoBool("wideLines", _physicalDeviceInfo->features.wideLines);
-                            GUI::displayConfigInfoBool("largePoints", _physicalDeviceInfo->features.largePoints);
-                            GUI::displayConfigInfoBool("alphaToOne", _physicalDeviceInfo->features.alphaToOne);
-                            GUI::displayConfigInfoBool("multiViewport", _physicalDeviceInfo->features.multiViewport);
-                            GUI::displayConfigInfoBool("samplerAnisotropy", _physicalDeviceInfo->features.samplerAnisotropy);
-                            GUI::displayConfigInfoBool("textureCompressionETC2", _physicalDeviceInfo->features.textureCompressionETC2);
-                            GUI::displayConfigInfoBool("textureCompressionASTC_LDR", _physicalDeviceInfo->features.textureCompressionASTC_LDR);
-                            GUI::displayConfigInfoBool("textureCompressionBC", _physicalDeviceInfo->features.textureCompressionBC);
-                            GUI::displayConfigInfoBool("occlusionQueryPrecise", _physicalDeviceInfo->features.occlusionQueryPrecise);
-                            GUI::displayConfigInfoBool("pipelineStatisticsQuery", _physicalDeviceInfo->features.pipelineStatisticsQuery);
-                            GUI::displayConfigInfoBool("vertexPipelineStoresAndAtomics", _physicalDeviceInfo->features.vertexPipelineStoresAndAtomics);
-                            GUI::displayConfigInfoBool("fragmentStoresAndAtomics", _physicalDeviceInfo->features.fragmentStoresAndAtomics);
-                            GUI::displayConfigInfoBool("shaderTessellationAndGeometryPointSize", _physicalDeviceInfo->features.shaderTessellationAndGeometryPointSize);
-                            GUI::displayConfigInfoBool("shaderImageGatherExtended", _physicalDeviceInfo->features.shaderImageGatherExtended);
-                            GUI::displayConfigInfoBool("shaderStorageImageExtendedFormats", _physicalDeviceInfo->features.shaderStorageImageExtendedFormats);
-                            GUI::displayConfigInfoBool("shaderStorageImageMultisample", _physicalDeviceInfo->features.shaderStorageImageMultisample);
-                            GUI::displayConfigInfoBool("shaderStorageImageReadWithoutFormat", _physicalDeviceInfo->features.shaderStorageImageReadWithoutFormat);
-                            GUI::displayConfigInfoBool("shaderStorageImageWriteWithoutFormat", _physicalDeviceInfo->features.shaderStorageImageWriteWithoutFormat);
-                            GUI::displayConfigInfoBool("shaderUniformBufferArrayDynamicIndexing", _physicalDeviceInfo->features.shaderUniformBufferArrayDynamicIndexing);
-                            GUI::displayConfigInfoBool("shaderSampledImageArrayDynamicIndexing", _physicalDeviceInfo->features.shaderSampledImageArrayDynamicIndexing);
-                            GUI::displayConfigInfoBool("shaderStorageBufferArrayDynamicIndexing", _physicalDeviceInfo->features.shaderStorageBufferArrayDynamicIndexing);
-                            GUI::displayConfigInfoBool("shaderStorageImageArrayDynamicIndexing", _physicalDeviceInfo->features.shaderStorageImageArrayDynamicIndexing);
-                            GUI::displayConfigInfoBool("shaderClipDistance", _physicalDeviceInfo->features.shaderClipDistance);
-                            GUI::displayConfigInfoBool("shaderCullDistance", _physicalDeviceInfo->features.shaderCullDistance);
-                            GUI::displayConfigInfoBool("shaderFloat64", _physicalDeviceInfo->features.shaderFloat64);
-                            GUI::displayConfigInfoBool("shaderInt64", _physicalDeviceInfo->features.shaderInt64);
-                            GUI::displayConfigInfoBool("shaderInt16", _physicalDeviceInfo->features.shaderInt16);
-                            GUI::displayConfigInfoBool("shaderResourceResidency", _physicalDeviceInfo->features.shaderResourceResidency);
-                            GUI::displayConfigInfoBool("shaderResourceMinLod", _physicalDeviceInfo->features.shaderResourceMinLod);
-                            GUI::displayConfigInfoBool("sparseBinding", _physicalDeviceInfo->features.sparseBinding);
-                            GUI::displayConfigInfoBool("sparseResidencyBuffer", _physicalDeviceInfo->features.sparseResidencyBuffer);
-                            GUI::displayConfigInfoBool("sparseResidencyImage2D", _physicalDeviceInfo->features.sparseResidencyImage2D);
-                            GUI::displayConfigInfoBool("sparseResidencyImage3D", _physicalDeviceInfo->features.sparseResidencyImage3D);
-                            GUI::displayConfigInfoBool("sparseResidency2Samples", _physicalDeviceInfo->features.sparseResidency2Samples);
-                            GUI::displayConfigInfoBool("sparseResidency4Samples", _physicalDeviceInfo->features.sparseResidency4Samples);
-                            GUI::displayConfigInfoBool("sparseResidency8Samples", _physicalDeviceInfo->features.sparseResidency8Samples);
-                            GUI::displayConfigInfoBool("sparseResidency16Samples", _physicalDeviceInfo->features.sparseResidency16Samples);
-                            GUI::displayConfigInfoBool("sparseResidencyAliased", _physicalDeviceInfo->features.sparseResidencyAliased);
-                            GUI::displayConfigInfoBool("variableMultisampleRate", _physicalDeviceInfo->features.variableMultisampleRate);
-                            GUI::displayConfigInfoBool("inheritedQueries", _physicalDeviceInfo->features.inheritedQueries);
+                            GUI::displayConfigInfoBool("Robust Buffer Access", _physicalDeviceInfo->features.robustBufferAccess);
+                            GUI::displayConfigInfoBool("Full Draw Index Uint32", _physicalDeviceInfo->features.fullDrawIndexUint32);
+                            GUI::displayConfigInfoBool("Image Cube Array", _physicalDeviceInfo->features.imageCubeArray);
+                            GUI::displayConfigInfoBool("Independent Blend", _physicalDeviceInfo->features.independentBlend);
+                            GUI::displayConfigInfoBool("Geometry Shader", _physicalDeviceInfo->features.geometryShader);
+                            GUI::displayConfigInfoBool("Tessellation Shader", _physicalDeviceInfo->features.tessellationShader);
+                            GUI::displayConfigInfoBool("Sample Rate Shading", _physicalDeviceInfo->features.sampleRateShading);
+                            GUI::displayConfigInfoBool("Dual Src Blend", _physicalDeviceInfo->features.dualSrcBlend);
+                            GUI::displayConfigInfoBool("LogicOp", _physicalDeviceInfo->features.logicOp);
+                            GUI::displayConfigInfoBool("Multi Draw Indirect", _physicalDeviceInfo->features.multiDrawIndirect);
+                            GUI::displayConfigInfoBool("Draw Indirect First Instance", _physicalDeviceInfo->features.drawIndirectFirstInstance);
+                            GUI::displayConfigInfoBool("Depth Clamp", _physicalDeviceInfo->features.depthClamp);
+                            GUI::displayConfigInfoBool("Depth Bias Clamp", _physicalDeviceInfo->features.depthBiasClamp);
+                            GUI::displayConfigInfoBool("Fill Mode Non Solid", _physicalDeviceInfo->features.fillModeNonSolid);
+                            GUI::displayConfigInfoBool("Depth Bounds", _physicalDeviceInfo->features.depthBounds);
+                            GUI::displayConfigInfoBool("Wide Lines", _physicalDeviceInfo->features.wideLines);
+                            GUI::displayConfigInfoBool("Large Points", _physicalDeviceInfo->features.largePoints);
+                            GUI::displayConfigInfoBool("Alpha To One", _physicalDeviceInfo->features.alphaToOne);
+                            GUI::displayConfigInfoBool("Multi Viewport", _physicalDeviceInfo->features.multiViewport);
+                            GUI::displayConfigInfoBool("Sampler Anisotropy", _physicalDeviceInfo->features.samplerAnisotropy);
+                            GUI::displayConfigInfoBool("Texture Compression ETC2", _physicalDeviceInfo->features.textureCompressionETC2);
+                            GUI::displayConfigInfoBool("Texture Compression ASTC_LDR", _physicalDeviceInfo->features.textureCompressionASTC_LDR);
+                            GUI::displayConfigInfoBool("Texture Compression BC", _physicalDeviceInfo->features.textureCompressionBC);
+                            GUI::displayConfigInfoBool("Occlusion Query Precise", _physicalDeviceInfo->features.occlusionQueryPrecise);
+                            GUI::displayConfigInfoBool("Pipeline Statistics Query", _physicalDeviceInfo->features.pipelineStatisticsQuery);
+                            GUI::displayConfigInfoBool("Vertex Pipeline Stores And Atomics", _physicalDeviceInfo->features.vertexPipelineStoresAndAtomics);
+                            GUI::displayConfigInfoBool("Fragment Stores And Atomics", _physicalDeviceInfo->features.fragmentStoresAndAtomics);
+                            GUI::displayConfigInfoBool("Shader Tessellation And Geometry Point Size", _physicalDeviceInfo->features.shaderTessellationAndGeometryPointSize);
+                            GUI::displayConfigInfoBool("Shader Image Gather Extended", _physicalDeviceInfo->features.shaderImageGatherExtended);
+                            GUI::displayConfigInfoBool("Shader Storage Image Extended Formats", _physicalDeviceInfo->features.shaderStorageImageExtendedFormats);
+                            GUI::displayConfigInfoBool("Shader Storage Image Multisample", _physicalDeviceInfo->features.shaderStorageImageMultisample);
+                            GUI::displayConfigInfoBool("Shader Storage Image Read Without Format", _physicalDeviceInfo->features.shaderStorageImageReadWithoutFormat);
+                            GUI::displayConfigInfoBool("Shader Storage Image Write Without Format", _physicalDeviceInfo->features.shaderStorageImageWriteWithoutFormat);
+                            GUI::displayConfigInfoBool("Shader Uniform Buffer Array Dynamic Indexing", _physicalDeviceInfo->features.shaderUniformBufferArrayDynamicIndexing);
+                            GUI::displayConfigInfoBool("Shader Sampled Image Array Dynamic Indexing", _physicalDeviceInfo->features.shaderSampledImageArrayDynamicIndexing);
+                            GUI::displayConfigInfoBool("Shader Storage Buffer Array Dynamic Indexing", _physicalDeviceInfo->features.shaderStorageBufferArrayDynamicIndexing);
+                            GUI::displayConfigInfoBool("Shader Storage Image Array Dynamic Indexing", _physicalDeviceInfo->features.shaderStorageImageArrayDynamicIndexing);
+                            GUI::displayConfigInfoBool("Shader Clip Distance", _physicalDeviceInfo->features.shaderClipDistance);
+                            GUI::displayConfigInfoBool("Shader Cull Distance", _physicalDeviceInfo->features.shaderCullDistance);
+                            GUI::displayConfigInfoBool("Shader Float64", _physicalDeviceInfo->features.shaderFloat64);
+                            GUI::displayConfigInfoBool("Shader Int64", _physicalDeviceInfo->features.shaderInt64);
+                            GUI::displayConfigInfoBool("Shader Int16", _physicalDeviceInfo->features.shaderInt16);
+                            GUI::displayConfigInfoBool("Shader ResourceResidency", _physicalDeviceInfo->features.shaderResourceResidency);
+                            GUI::displayConfigInfoBool("Shader ResourceMinLod", _physicalDeviceInfo->features.shaderResourceMinLod);
+                            GUI::displayConfigInfoBool("Sparse Binding", _physicalDeviceInfo->features.sparseBinding);
+                            GUI::displayConfigInfoBool("Sparse Residency Buffer", _physicalDeviceInfo->features.sparseResidencyBuffer);
+                            GUI::displayConfigInfoBool("Sparse Residency Image2D", _physicalDeviceInfo->features.sparseResidencyImage2D);
+                            GUI::displayConfigInfoBool("Sparse Residency Image3D", _physicalDeviceInfo->features.sparseResidencyImage3D);
+                            GUI::displayConfigInfoBool("Sparse Residency 2Samples", _physicalDeviceInfo->features.sparseResidency2Samples);
+                            GUI::displayConfigInfoBool("Sparse Residency 4Samples", _physicalDeviceInfo->features.sparseResidency4Samples);
+                            GUI::displayConfigInfoBool("Sparse Residency 8Samples", _physicalDeviceInfo->features.sparseResidency8Samples);
+                            GUI::displayConfigInfoBool("Sparse Residency 16Samples", _physicalDeviceInfo->features.sparseResidency16Samples);
+                            GUI::displayConfigInfoBool("Sparse Residency Aliased", _physicalDeviceInfo->features.sparseResidencyAliased);
+                            GUI::displayConfigInfoBool("Variable Multisample Rate", _physicalDeviceInfo->features.variableMultisampleRate);
+                            GUI::displayConfigInfoBool("Inherited Queries", _physicalDeviceInfo->features.inheritedQueries);
                         }
                         ImGui::Unindent();
                     }
@@ -453,8 +453,30 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     if (ImGui::CollapsingHeader("Memory")) {
                         ImGui::Indent();
                         {
-                            GUI::displayConfigInfoUnsignedLongValue("memoryTypeCount", _physicalDeviceInfo->memoryProperties.memoryTypeCount);
-                            GUI::displayConfigInfoUnsignedLongValue("memoryHeapCount", _physicalDeviceInfo->memoryProperties.memoryHeapCount);
+                            GUI::displayConfigInfoUnsignedLongValue("Memory Type Count", _physicalDeviceInfo->memoryProperties.memoryTypeCount);
+                            GUI::displayConfigInfoUnsignedLongValue("Memory Heap Count", _physicalDeviceInfo->memoryProperties.memoryHeapCount);
+                        }
+                        ImGui::Unindent();
+                    }
+
+                    if (ImGui::CollapsingHeader("Swapchain")) {
+                        ImGui::Indent();
+                        {
+                            GUI::displayConfigInfoUnsignedLongValue("Min Image Count", _physicalDeviceInfo->swapchain.capabilities.minImageCount);
+                            GUI::displayConfigInfoUnsignedLongValue("Max Image Count", _physicalDeviceInfo->swapchain.capabilities.maxImageCount);
+                            if (ImGui::CollapsingHeader("Current Extent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+                                GUI::displayConfigInfoUnsignedLongValue("Width", _physicalDeviceInfo->swapchain.capabilities.currentExtent.width);
+                                GUI::displayConfigInfoUnsignedLongValue("Height", _physicalDeviceInfo->swapchain.capabilities.currentExtent.height);
+                            }
+                            if (ImGui::CollapsingHeader("Min Image Extent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+                                GUI::displayConfigInfoUnsignedLongValue("Width", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.width);
+                                GUI::displayConfigInfoUnsignedLongValue("Height", _physicalDeviceInfo->swapchain.capabilities.minImageExtent.height);
+                            }
+                            if (ImGui::CollapsingHeader("Max Image Extent", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+                                GUI::displayConfigInfoUnsignedLongValue("Width", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.width);
+                                GUI::displayConfigInfoUnsignedLongValue("Height", _physicalDeviceInfo->swapchain.capabilities.maxImageExtent.height);
+                            }
+                            GUI::displayConfigInfoUnsignedLongValue("Max Image Array Layers", _physicalDeviceInfo->swapchain.capabilities.maxImageArrayLayers);
                         }
                         ImGui::Unindent();
                     }
