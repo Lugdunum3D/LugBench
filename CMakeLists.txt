@@ -180,12 +180,7 @@ add_resources(${EXECUTABLE_NAME} lug_resources ${LUG_RESOURCES_DIR} ${LUG_RESOUR
 add_resources(${EXECUTABLE_NAME} sample_resources "${CMAKE_SOURCE_DIR}/resources" ${OTHER_RESOURCES})
 
 # add api uri
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api-dev.herokuapp.com")
-    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api.herokuapp.com")
-else()
-    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api.herokuapp.com")
-endif()
+set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api-dev.herokuapp.com")
 
 lug_set_option(LUGBENCH_API_URI ${DEFAULT_LUGBENCH_API_URI} STRING "URI of the Lugbench API")
 add_definitions(/DLUGBENCH_API_URI="${LUGBENCH_API_URI}")

@@ -44,6 +44,7 @@ APIClient::JSONResponse APIClient::putRequest(const std::string& url, const std:
 #else
 
 #include <restclient-cpp/restclient.h>
+#include <restclient-cpp/connection.h>
 
 APIClient::JSONResponse APIClient::getRequestResponse(const std::string& url) {
     RestClient::Response r = RestClient::get(url);
@@ -53,7 +54,12 @@ APIClient::JSONResponse APIClient::getRequestResponse(const std::string& url) {
 
 APIClient::JSONResponse APIClient::putRequest(const std::string& url, const std::string& json) {
     nlohmann::json reponseJson;
-    RestClient::Response r = RestClient::put(url, "application/json;charset=utf-8", json);
+
+	// get a connection object
+    RestClient::Connection* conn = new RestClient::Connection(url);
+    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+
+	RestClient::Response r = conn->post("", json);
     reponseJson = nlohmann::json(r.body);
     return std::make_tuple(r.code, reponseJson);
 }

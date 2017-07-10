@@ -84,43 +84,8 @@ bool Application::init(int argc, char* argv[]) {
 		}
 	}
 
-    // // Create the scene
-    // _scene = _graphics.createScene();
-
-    // // Add directional light to scene
-    // {
-    //     std::unique_ptr<lug::Graphics::Light::Light> light = _scene->createLight("light", lug::Graphics::Light::Light::Type::Directional);
-
-    //     // Set the diffuse color to white and the position
-    //     light->setDiffuse({1.0f, 1.0f, 1.0f});
-    //     static_cast<lug::Graphics::Light::Directional*>(light.get())->setDirection({0.0f, -4.0f, 5.0f});
-
-    //     _scene->getRoot()->createSceneNode("light node", std::move(light));
-    // }
-
     // Create camera
     _camera = _graphics.createCamera("camera");
-//    camera->setScene(_scene.get());
-
-    // // Add camera to scene
-    // {
-    //     std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", camera.get());
-
-    //     std::unique_ptr<lug::Graphics::Scene::Node> movableCameraNode = _scene->createSceneNode("movable camera node");
-
-    //     movableCameraNode->attachMovableObject(std::move(movableCamera));
-
-    //     _scene->getRoot()->attachChild(std::move(movableCameraNode));
-    // }
-
-    // // Attach cameras to RenderView
-    // {
-    //     auto& renderViews = _graphics.getRenderer()->getWindow()->getRenderViews();
-
-    //     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-
-    //     renderViews[0]->attachCamera(std::move(camera));
-    // }
 	
     std::shared_ptr<AState> menuState;
 
@@ -144,12 +109,37 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
     if (physicalDeviceInfo == NULL) {
         return false;
     }
-    const nlohmann::json json = GPUInfoProvider::get(*physicalDeviceInfo);
-    #if !defined(LUG_SYSTEM_ANDROID) // TODO(Yoann) FMT has memory corruption on Android with big string
-        //LUG_LOG.info("{}", json.dump());
-    #endif
-    //APIClient::GPU::put(json);
     return (true);
+}
+
+bool Application::sendResult() {
+	lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+
+	lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+	if (physicalDeviceInfo == NULL) {
+		return false;
+	}	
+
+	const nlohmann::json json = GPUInfoProvider::get(*physicalDeviceInfo);
+	nlohmann::json jsonToSend;
+
+	jsonToSend["name"] = physicalDeviceInfo->properties.deviceName;
+
+#if defined(LUG_SYSTEM_ANDROID)
+    jsonToSend["os"] = "Android";
+#elif defined(LUG_SYSTEM_WINDOWS)
+    jsonToSend["os"] = "Windows";
+#else
+    jsonToSend["os"] = "Linux";
+#endif
+
+	jsonToSend["deviceId"] = physicalDeviceInfo->properties.deviceID;
+	jsonToSend["vendorId"] = physicalDeviceInfo->properties.vendorID;
+	jsonToSend["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
+	jsonToSend["vulkanInfo"] = json;
+	APIClient::GPU::put(jsonToSend);
+	return true;
 }
 
 void Application::onEvent(const lug::Window::Event& event) {
@@ -186,9 +176,6 @@ bool Application::popState() {
     if (!_states.empty()) {
         _states.top()->onPlay();
     }
-    // } else {
-    //     close();
-    // }
     return (true);
 }
 
