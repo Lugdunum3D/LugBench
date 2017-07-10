@@ -36,7 +36,7 @@ private:
     bool no_border{true};
     bool no_resize{true};
     bool no_move{true};
-    bool no_scrollbar{true};
+    bool no_scrollbar{false};
     bool no_collapse{true};
     bool no_menu{true};
 
