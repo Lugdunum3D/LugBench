@@ -7,6 +7,7 @@
 // TODO: Remove this when the ResourceManager is done
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
+#include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 
 #include <lug/System/Time.hpp>
 
@@ -74,6 +75,13 @@ bool MenuState::onPush() {
         _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
     }
 
+	lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+
+	_physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+	if (_physicalDeviceInfo == NULL) {
+		return false;
+	}
 	return true;
 }
  
@@ -237,9 +245,22 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowSize(windowSize);
             ImGui::SetWindowPos(windowPos);
 
-            GUI::displayConfigInfoUI("Device", "Stuart's Super Duper PC");
-            GUI::displayConfigInfoUI("OS", "Windows 10");
-            GUI::displayConfigInfoUI("Flavour", "Salty");
+			if (ImGui::CollapsingHeader("Device", ImGuiTreeNodeFlags_NoAutoOpenOnLog)) {
+				GUI::displayConfigInfoUI("Name", _physicalDeviceInfo->properties.deviceName);
+				GUI::displayConfigInfoUI("Device ID", (char *)std::to_string(_physicalDeviceInfo->properties.deviceID).c_str());
+				std::string driverVersion = std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).major) + "." +
+					std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).minor) + "."
+					+ std::to_string(lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion).patch);
+				GUI::displayConfigInfoUI("Driver Version", (char *)driverVersion.c_str());
+				GUI::displayConfigInfoUI("Vendor ID", (char *)std::to_string(_physicalDeviceInfo->properties.vendorID).c_str());
+				GUI::displayConfigInfoUI("API Version", (char *)std::to_string(_physicalDeviceInfo->properties.apiVersion).c_str());
+				GUI::displayConfigInfoUI("Device Type", (char *)lug::Graphics::Vulkan::API::RTTI::toStr(_physicalDeviceInfo->properties.deviceType));
+				GUI::displayConfigInfoUI("API Version", (char *)std::to_string(_physicalDeviceInfo->properties.apiVersion).c_str());
+			}
+
+          
+
+			
             ImGui::Separator();
             ImGui::NewLine();
             if (ImGui::Button("< RETURN")) {

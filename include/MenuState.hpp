@@ -24,6 +24,7 @@ private:
 
     // Temporary store mesh because we don't have resource manager yet
     std::unique_ptr<lug::Graphics::Render::Model> _model;
+	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 
     float _rotation{0.0f};
 
