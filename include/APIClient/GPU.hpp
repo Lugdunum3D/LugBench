@@ -18,5 +18,4 @@ JSONResponse getScores();
 JSONResponse getScenario(const std::string& id);
 JSONResponse getScenarios();
 
-
 } // APIClient

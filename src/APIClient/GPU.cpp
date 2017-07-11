@@ -3,11 +3,11 @@
 #include <APIClient/Router.hpp>
 
 APIClient::JSONResponse APIClient::putDevice(const nlohmann::json& json) {
-	return APIClient::putRequest(APIClient::Router::getUrlString(APIClient::Router::Route::postDevice), json.dump());
+    return APIClient::putRequest(APIClient::Router::getUrlString(APIClient::Router::Route::postDevice), json.dump());
 }
 
 APIClient::JSONResponse APIClient::putScore(const nlohmann::json& json) {
-	return APIClient::putRequest(APIClient::Router::getUrlString(APIClient::Router::Route::postScore), json.dump());
+    return APIClient::putRequest(APIClient::Router::getUrlString(APIClient::Router::Route::postScore), json.dump());
 }
 
 APIClient::JSONResponse APIClient::getDevice(const std::string& id) {

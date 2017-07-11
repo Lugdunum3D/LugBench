@@ -6,14 +6,14 @@ namespace APIClient {
 namespace Router {
 
 enum class Route : uint8_t {
-	getDevice,
-	getDevices,
-	getScore,
-	getScores,
-	getScenario,
-	getScenarios,
-	postDevice,
-	postScore
+    getDevice,
+    getDevices,
+    getScore,
+    getScores,
+    getScenario,
+    getScenarios,
+    postDevice,
+    postScore
 };
 
 static constexpr const char* baseAPIUri = LUGBENCH_API_URI;

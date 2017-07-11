@@ -61,15 +61,15 @@ bool Application::init(int argc, char* argv[]) {
         return false;
     }
 
-	lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
 
-	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-	for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
-		if (!initDevice(&choosedDevice)) {
-			LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
-		}
-	}
+    for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
+        if (!initDevice(&choosedDevice)) {
+            LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
+        }
+    }
 
     // Create camera
     {
@@ -112,15 +112,15 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
 }
 
 bool Application::sendResult(uint32_t nbFrames) {
-	lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-	lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-	if (physicalDeviceInfo == NULL) {
-		return false;
-	}
+    lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+    if (physicalDeviceInfo == NULL) {
+        return false;
+    }
 
-	std::string deviceId;
+    std::string deviceId;
 
     // sending device
     {
@@ -142,7 +142,7 @@ bool Application::sendResult(uint32_t nbFrames) {
         device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
         auto res = APIClient::putDevice(device);
-		deviceId = std::get<1>(res)["id"].get<std::string>();
+        deviceId = std::get<1>(res)["id"].get<std::string>();
     }
 
     // sending score
@@ -174,9 +174,9 @@ void Application::onEvent(const lug::Window::Event& event) {
 
 void Application::onFrame(const lug::System::Time& elapsedTime) {
 
-	if (_states.empty()) {
-		return;
-	}
+    if (_states.empty()) {
+        return;
+    }
 
     std::shared_ptr<AState> tmpState = _states.top(); // Needed to prevent fault if popping a state
 

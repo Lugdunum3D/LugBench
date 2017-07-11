@@ -248,16 +248,16 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
 
     json["swapchain"] = {
         {"maxImageArrayLayers", physicalDeviceInfo.swapchain.capabilities.maxImageArrayLayers},
-		{"minImageCount", physicalDeviceInfo.swapchain.capabilities.minImageCount},
-		{"maxImageCount", physicalDeviceInfo.swapchain.capabilities.maxImageCount},
-		{"formats", [](const auto& formats)  {
-				std::vector<std::string> res{};
-				for (const auto& tmp : formats) {
-					res.push_back(lug::Graphics::Vulkan::API::RTTI::toStr(tmp.format));
-				}
-				return res;
-			} (physicalDeviceInfo.swapchain.formats)
-		},
+        {"minImageCount", physicalDeviceInfo.swapchain.capabilities.minImageCount},
+        {"maxImageCount", physicalDeviceInfo.swapchain.capabilities.maxImageCount},
+        {"formats", [](const auto& formats)  {
+                std::vector<std::string> res{};
+                for (const auto& tmp : formats) {
+                    res.push_back(lug::Graphics::Vulkan::API::RTTI::toStr(tmp.format));
+                }
+                return res;
+            } (physicalDeviceInfo.swapchain.formats)
+        },
         {"presentModes", [](const auto& presentModes)  {
                 std::vector<std::string> res{};
                 for (const auto& tmp : presentModes) {
@@ -267,7 +267,7 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
             } (physicalDeviceInfo.swapchain.presentModes)
         },
         {"supportedTransforms", lug::Graphics::Vulkan::API::RTTI::VkSurfaceTransformFlagsKHRToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedTransforms)},
-	    {"supportedCompositeAlpha", lug::Graphics::Vulkan::API::RTTI::VkCompositeAlphaFlagsKHRToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedCompositeAlpha)},
+        {"supportedCompositeAlpha", lug::Graphics::Vulkan::API::RTTI::VkCompositeAlphaFlagsKHRToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedCompositeAlpha)},
         {"supportedUsageFlags", lug::Graphics::Vulkan::API::RTTI::VkImageUsageFlagsToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedUsageFlags)},
 #if defined(LUG_SYSTEM_ANDROID)
         {"surfaceExtension", "VK_KHR_android_surface"},

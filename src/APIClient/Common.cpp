@@ -54,11 +54,12 @@ APIClient::JSONResponse APIClient::getRequestResponse(const std::string& url) {
 
 APIClient::JSONResponse APIClient::putRequest(const std::string& url, const std::string& json) {
 
-	// get a connection object
+    // get a connection object
     RestClient::Connection* conn = new RestClient::Connection(url);
     conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
 
-	RestClient::Response r = conn->post("", json);
+    RestClient::Response r = conn->post("", json);
+    LUG_LOG.info("{}", r.body);
     nlohmann::json reponseJson = nlohmann::json(nlohmann::json::parse(r.body));
     return std::make_tuple(r.code, reponseJson);
 }

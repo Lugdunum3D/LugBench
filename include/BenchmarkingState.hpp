@@ -20,7 +20,7 @@ public:
     bool onPush() override;
 
 private:
-	const lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
+    const lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 
     float _rotation{0.0f};
 

@@ -13,5 +13,4 @@ using JSONResponse = std::tuple<ResponseCode, nlohmann::json>;
 JSONResponse getRequestResponse(const std::string& url);
 JSONResponse putRequest(const std::string& url, const std::string& json);
 
-
 } // APIClient
