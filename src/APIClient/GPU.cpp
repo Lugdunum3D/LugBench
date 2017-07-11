@@ -15,7 +15,7 @@ APIClient::JSONResponse APIClient::getDevice(const std::string& id) {
 }
 
 APIClient::JSONResponse APIClient::getDevices() {
-    return APIClient::getRequestResponse(APIClient::Router::getUrlString(Router::Route::getDevice));
+    return APIClient::getRequestResponse(APIClient::Router::getUrlString(Router::Route::getDevices));
 }
 
 APIClient::JSONResponse APIClient::getScore(const std::string& id) {
