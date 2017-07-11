@@ -248,146 +248,145 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 
             if (ImGui::CollapsingHeader("Device", ImGuiTreeNodeFlags_DefaultOpen)) {
                 ImGui::Indent();
-				{
-					GUI::displayConfigInfoString("Name", _physicalDeviceInfo->properties.deviceName);
-					GUI::displayConfigInfoVersion("Driver Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion));
-					GUI::displayConfigInfoValue("API Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion));
-					if (ImGui::CollapsingHeader("Extra Info")) {
-						ImGui::Indent();
-						{
-							GUI::displayConfigInfoValue("Device ID", _physicalDeviceInfo->properties.deviceID);
-							GUI::displayConfigInfoValue("Vendor ID", _physicalDeviceInfo->properties.vendorID);
-							GUI::displayConfigInfoString("Device Type", lug::Graphics::Vulkan::API::RTTI::toStr(_physicalDeviceInfo->properties.deviceType));
-							GUI::displayConfigInfoArrayUint8("Pipeline Cache UUID", std::vector<uint8_t>(std::begin(_physicalDeviceInfo->properties.pipelineCacheUUID), std::end(_physicalDeviceInfo->properties.pipelineCacheUUID)));
-							if (ImGui::CollapsingHeader("Limits")) {
-								ImGui::Indent();
-								{
-									GUI::displayConfigInfoValue("Max Image Dimension 1D", _physicalDeviceInfo->properties.limits.maxImageDimension1D);
-									GUI::displayConfigInfoValue("Max Image Dimension 2D", _physicalDeviceInfo->properties.limits.maxImageDimension2D);
-									GUI::displayConfigInfoValue("Max Image Dimension 3D", _physicalDeviceInfo->properties.limits.maxImageDimension3D);
-									GUI::displayConfigInfoValue("Max Image Dimension Cube", _physicalDeviceInfo->properties.limits.maxImageDimensionCube);
-									GUI::displayConfigInfoValue("Max Image Array Layers", _physicalDeviceInfo->properties.limits.maxImageArrayLayers);
-									GUI::displayConfigInfoValue("Max Texel Buffer Elements", _physicalDeviceInfo->properties.limits.maxTexelBufferElements);
-									GUI::displayConfigInfoValue("Max Uniform Buffer Range", _physicalDeviceInfo->properties.limits.maxUniformBufferRange);
-									GUI::displayConfigInfoValue("Max Storage Buffer Range", _physicalDeviceInfo->properties.limits.maxStorageBufferRange);
-									GUI::displayConfigInfoValue("Max Push Constants Size", _physicalDeviceInfo->properties.limits.maxPushConstantsSize);
-									GUI::displayConfigInfoValue("Max Memory Allocation Count", _physicalDeviceInfo->properties.limits.maxMemoryAllocationCount);
-									GUI::displayConfigInfoValue("Max Sampler Allocation Count", _physicalDeviceInfo->properties.limits.maxSamplerAllocationCount);
-									GUI::displayConfigInfoUnsignedLongValue("Buffer Image Granularity", _physicalDeviceInfo->properties.limits.bufferImageGranularity);
-									GUI::displayConfigInfoUnsignedLongValue("Sparse Address Space Size", _physicalDeviceInfo->properties.limits.sparseAddressSpaceSize);
-									GUI::displayConfigInfoValue("Max Bound Descriptor Sets", _physicalDeviceInfo->properties.limits.maxBoundDescriptorSets);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Samplers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorSamplers);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Uniform Buffers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorUniformBuffers);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Storage Buffers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageBuffers);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Sampled Images", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorSampledImages);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Storage Images", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageImages);
-									GUI::displayConfigInfoValue("Max Per Stage Descriptor Input Attachments", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorInputAttachments);
-									GUI::displayConfigInfoValue("Max Per Stage Resources", _physicalDeviceInfo->properties.limits.maxPerStageResources);
-									GUI::displayConfigInfoValue("Max Descriptor Set Samplers", _physicalDeviceInfo->properties.limits.maxDescriptorSetSamplers);
-									GUI::displayConfigInfoValue("Max Descriptor Set Uniform Buffers", _physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffers);
-									GUI::displayConfigInfoValue("Max Descriptor Set Uniform Buffers Dynamic", _physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffersDynamic);
-									GUI::displayConfigInfoValue("Max Descriptor Set Storage Buffers", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffers);
-									GUI::displayConfigInfoValue("Max Descriptor Set Storage Buffers Dynamic", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffersDynamic);
-									GUI::displayConfigInfoValue("Max Descriptor Set Sampled Images", _physicalDeviceInfo->properties.limits.maxDescriptorSetSampledImages);
-									GUI::displayConfigInfoValue("Max Descriptor Set Storage Images", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageImages);
-									GUI::displayConfigInfoValue("Max Descriptor Set Input Attachments", _physicalDeviceInfo->properties.limits.maxDescriptorSetInputAttachments);
-									GUI::displayConfigInfoValue("Max Vertex Input Attributes", _physicalDeviceInfo->properties.limits.maxVertexInputAttributes);
-									GUI::displayConfigInfoValue("Max Vertex Input Bindings", _physicalDeviceInfo->properties.limits.maxVertexInputBindings);
-									GUI::displayConfigInfoValue("Max Vertex Input AttributeOffset", _physicalDeviceInfo->properties.limits.maxVertexInputAttributeOffset);
-									GUI::displayConfigInfoValue("Max Vertex Input BindingStride", _physicalDeviceInfo->properties.limits.maxVertexInputBindingStride);
-									GUI::displayConfigInfoValue("Max Vertex Output Components", _physicalDeviceInfo->properties.limits.maxVertexOutputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation GenerationLevel", _physicalDeviceInfo->properties.limits.maxTessellationGenerationLevel);
-									GUI::displayConfigInfoValue("Max Tessellation PatchSize", _physicalDeviceInfo->properties.limits.maxTessellationPatchSize);
-									GUI::displayConfigInfoValue("Max Tessellation Control Per Vertex Input Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexInputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation Control Per Vertex Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexOutputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation Control Per Patch Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerPatchOutputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation Control Total Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlTotalOutputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation Evaluation Input Components", _physicalDeviceInfo->properties.limits.maxTessellationEvaluationInputComponents);
-									GUI::displayConfigInfoValue("Max Tessellation Evaluation Output Components", _physicalDeviceInfo->properties.limits.maxTessellationEvaluationOutputComponents);
-									GUI::displayConfigInfoValue("Max Geometry Shader Invocations", _physicalDeviceInfo->properties.limits.maxGeometryShaderInvocations);
-									GUI::displayConfigInfoValue("Max Geometry Input Components", _physicalDeviceInfo->properties.limits.maxGeometryInputComponents);
-									GUI::displayConfigInfoValue("Max Geometry Output Components", _physicalDeviceInfo->properties.limits.maxGeometryOutputComponents);
-									GUI::displayConfigInfoValue("Max Geometry Output Vertices", _physicalDeviceInfo->properties.limits.maxGeometryOutputVertices);
-									GUI::displayConfigInfoValue("Max Geometry Total Output Components", _physicalDeviceInfo->properties.limits.maxGeometryTotalOutputComponents);
-									GUI::displayConfigInfoValue("Max Fragment Input Components", _physicalDeviceInfo->properties.limits.maxFragmentInputComponents);
-									GUI::displayConfigInfoValue("Max Fragment Output Attachments", _physicalDeviceInfo->properties.limits.maxFragmentOutputAttachments);
-									GUI::displayConfigInfoValue("Max Fragment Dual SrcAttachments", _physicalDeviceInfo->properties.limits.maxFragmentDualSrcAttachments);
-									GUI::displayConfigInfoValue("Max Fragment Combined Output Resources", _physicalDeviceInfo->properties.limits.maxFragmentCombinedOutputResources);
-									GUI::displayConfigInfoValue("Max Compute Shared Memory Size", _physicalDeviceInfo->properties.limits.maxComputeSharedMemorySize);
-									GUI::displayConfigInfoArrayUint32("Max Compute Work Group Count", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount), std::end(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount)));
-									GUI::displayConfigInfoValue("Max Compute Work Group Invocations", _physicalDeviceInfo->properties.limits.maxComputeWorkGroupInvocations);
-									GUI::displayConfigInfoArrayUint32("Max Compute Work Group Size", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize), std::end(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize)));
-									GUI::displayConfigInfoValue("Sub Pixel Precision Bits", _physicalDeviceInfo->properties.limits.subPixelPrecisionBits);
-									GUI::displayConfigInfoValue("Sub Texel Precision Bits", _physicalDeviceInfo->properties.limits.subTexelPrecisionBits);
-									GUI::displayConfigInfoValue("Mipmap Precision Bits", _physicalDeviceInfo->properties.limits.mipmapPrecisionBits);
-									GUI::displayConfigInfoValue("Max Draw Indexed Index Value", _physicalDeviceInfo->properties.limits.maxDrawIndexedIndexValue);
-									GUI::displayConfigInfoValue("Max Draw Indirect Count", _physicalDeviceInfo->properties.limits.maxDrawIndirectCount);
-									GUI::displayConfigInfoFloatValue("Max Sampler Lod Bias", _physicalDeviceInfo->properties.limits.maxSamplerLodBias);
-									GUI::displayConfigInfoFloatValue("Max Sampler Anisotropy", _physicalDeviceInfo->properties.limits.maxSamplerAnisotropy);
-									GUI::displayConfigInfoValue("Max Viewports", _physicalDeviceInfo->properties.limits.maxViewports);
-									GUI::displayConfigInfoArrayUint32("Max Viewport Dimensions", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxViewportDimensions), std::end(_physicalDeviceInfo->properties.limits.maxViewportDimensions)));
-									GUI::displayConfigInfoArrayFloat("Viewport Bounds Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.viewportBoundsRange), std::end(_physicalDeviceInfo->properties.limits.viewportBoundsRange)));
-									GUI::displayConfigInfoValue("Viewport Sub Pixel Bits", _physicalDeviceInfo->properties.limits.viewportSubPixelBits);
-									GUI::displayConfigInfoUnsignedLongValue("Min Memory Map Alignment", _physicalDeviceInfo->properties.limits.minMemoryMapAlignment);
-									GUI::displayConfigInfoUnsignedLongValue("Min Texel Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minTexelBufferOffsetAlignment);
-									GUI::displayConfigInfoUnsignedLongValue("Min Uniform Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minUniformBufferOffsetAlignment);
-									GUI::displayConfigInfoUnsignedLongValue("Min Storage Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minStorageBufferOffsetAlignment);
-									GUI::displayConfigInfoValue("Min Texel Offset", _physicalDeviceInfo->properties.limits.minTexelOffset);
-									GUI::displayConfigInfoValue("Max Texel Offset", _physicalDeviceInfo->properties.limits.maxTexelOffset);
-									GUI::displayConfigInfoValue("Min Texel Gather Offset", _physicalDeviceInfo->properties.limits.minTexelGatherOffset);
-									GUI::displayConfigInfoValue("Max Texel Gather Offset", _physicalDeviceInfo->properties.limits.maxTexelGatherOffset);
-									GUI::displayConfigInfoFloatValue("Min Interpolation Offset", _physicalDeviceInfo->properties.limits.minInterpolationOffset);
-									GUI::displayConfigInfoFloatValue("Max InterpolationOffset", _physicalDeviceInfo->properties.limits.maxInterpolationOffset);
-									GUI::displayConfigInfoValue("Sub Pixel Interpolation Offset Bits", _physicalDeviceInfo->properties.limits.subPixelInterpolationOffsetBits);
-									GUI::displayConfigInfoValue("Max FramebufferWidth", _physicalDeviceInfo->properties.limits.maxFramebufferWidth);
-									GUI::displayConfigInfoValue("Max FramebufferHeight", _physicalDeviceInfo->properties.limits.maxFramebufferHeight);
-									GUI::displayConfigInfoValue("Max FramebufferLayers", _physicalDeviceInfo->properties.limits.maxFramebufferLayers);
-									GUI::displayConfigInfoValue("Framebuffer Color Sample Counts", _physicalDeviceInfo->properties.limits.framebufferColorSampleCounts);
-									GUI::displayConfigInfoValue("Framebuffer Depth Sample Counts", _physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts);
-									GUI::displayConfigInfoValue("Framebuffer Stencil Sample Counts", _physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts);
-									GUI::displayConfigInfoValue("Framebuffer No Attachments Sample Counts", _physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts);
-									GUI::displayConfigInfoValue("Max Color Attachments", _physicalDeviceInfo->properties.limits.maxColorAttachments);
-									GUI::displayConfigInfoValue("Sampled Image Color Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts);
-									GUI::displayConfigInfoValue("Sampled Image Integer Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts);
-									GUI::displayConfigInfoValue("Sampled Image Depth Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts);
-									GUI::displayConfigInfoValue("Sampled Image Stencil Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts);
-									GUI::displayConfigInfoValue("Storage Image Sample Counts", _physicalDeviceInfo->properties.limits.storageImageSampleCounts);
-									GUI::displayConfigInfoValue("Max SampleMaskWords", _physicalDeviceInfo->properties.limits.maxSampleMaskWords);
-									GUI::displayConfigInfoValue("Timestamp Compute And Graphics", _physicalDeviceInfo->properties.limits.timestampComputeAndGraphics);
-									GUI::displayConfigInfoFloatValue("Timestamp Period", _physicalDeviceInfo->properties.limits.timestampPeriod);
-									GUI::displayConfigInfoValue("Max Clip Distances", _physicalDeviceInfo->properties.limits.maxClipDistances);
-									GUI::displayConfigInfoValue("Max Cull Distances", _physicalDeviceInfo->properties.limits.maxCullDistances);
-									GUI::displayConfigInfoValue("Max Combined Clip And Cull Distances", _physicalDeviceInfo->properties.limits.maxCombinedClipAndCullDistances);
-									GUI::displayConfigInfoValue("Discrete Queue Priorities", _physicalDeviceInfo->properties.limits.discreteQueuePriorities);
-									GUI::displayConfigInfoArrayFloat("Point Size Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.pointSizeRange), std::end(_physicalDeviceInfo->properties.limits.pointSizeRange)));
-									GUI::displayConfigInfoArrayFloat("Line Width Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.lineWidthRange), std::end(_physicalDeviceInfo->properties.limits.lineWidthRange)));
-									GUI::displayConfigInfoFloatValue("Point Size Granularity", _physicalDeviceInfo->properties.limits.pointSizeGranularity);
-									GUI::displayConfigInfoFloatValue("Line Width Granularity", _physicalDeviceInfo->properties.limits.lineWidthGranularity);
-									GUI::displayConfigInfoValue("Strict Lines", _physicalDeviceInfo->properties.limits.strictLines);
-									GUI::displayConfigInfoValue("Standard Sample Locations", _physicalDeviceInfo->properties.limits.standardSampleLocations);
-									GUI::displayConfigInfoUnsignedLongValue("Optimal Buffer Copy Offset Alignment", _physicalDeviceInfo->properties.limits.optimalBufferCopyOffsetAlignment);
-									GUI::displayConfigInfoUnsignedLongValue("Optimal Buffer Copy Row Pitch Alignment", _physicalDeviceInfo->properties.limits.optimalBufferCopyRowPitchAlignment);
-									GUI::displayConfigInfoUnsignedLongValue("Non Coherent AtomSize", _physicalDeviceInfo->properties.limits.nonCoherentAtomSize);
-								}
-								ImGui::Unindent();
-							}
-							if (ImGui::CollapsingHeader("Sparse Properties")) {
-								ImGui::Indent();
-								{
-									GUI::displayConfigInfoBool("Residency Standard 2D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape);
-									GUI::displayConfigInfoBool("Residency Standard 2D Multisample Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape);
-									GUI::displayConfigInfoBool("Residency Standard 3D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape);
-									GUI::displayConfigInfoBool("Residency Aligned Mip Size", _physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize);
-									GUI::displayConfigInfoBool("Residency Non Resident Strict", _physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict);
+                {
+                    GUI::displayConfigInfoString("Name", _physicalDeviceInfo->properties.deviceName);
+                    GUI::displayConfigInfoVersion("Driver Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion));
+                    GUI::displayConfigInfoValue("API Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion));
+                    if (ImGui::CollapsingHeader("Extra Info")) {
+                        ImGui::Indent();
+                        {
+                            GUI::displayConfigInfoValue("Device ID", _physicalDeviceInfo->properties.deviceID);
+                            GUI::displayConfigInfoValue("Vendor ID", _physicalDeviceInfo->properties.vendorID);
+                            GUI::displayConfigInfoString("Device Type", lug::Graphics::Vulkan::API::RTTI::toStr(_physicalDeviceInfo->properties.deviceType));
+                            GUI::displayConfigInfoArrayUint8("Pipeline Cache UUID", std::vector<uint8_t>(std::begin(_physicalDeviceInfo->properties.pipelineCacheUUID), std::end(_physicalDeviceInfo->properties.pipelineCacheUUID)));
+                            if (ImGui::CollapsingHeader("Limits")) {
+                                ImGui::Indent();
+                                {
+                                    GUI::displayConfigInfoValue("Max Image Dimension 1D", _physicalDeviceInfo->properties.limits.maxImageDimension1D);
+                                    GUI::displayConfigInfoValue("Max Image Dimension 2D", _physicalDeviceInfo->properties.limits.maxImageDimension2D);
+                                    GUI::displayConfigInfoValue("Max Image Dimension 3D", _physicalDeviceInfo->properties.limits.maxImageDimension3D);
+                                    GUI::displayConfigInfoValue("Max Image Dimension Cube", _physicalDeviceInfo->properties.limits.maxImageDimensionCube);
+                                    GUI::displayConfigInfoValue("Max Image Array Layers", _physicalDeviceInfo->properties.limits.maxImageArrayLayers);
+                                    GUI::displayConfigInfoValue("Max Texel Buffer Elements", _physicalDeviceInfo->properties.limits.maxTexelBufferElements);
+                                    GUI::displayConfigInfoValue("Max Uniform Buffer Range", _physicalDeviceInfo->properties.limits.maxUniformBufferRange);
+                                    GUI::displayConfigInfoValue("Max Storage Buffer Range", _physicalDeviceInfo->properties.limits.maxStorageBufferRange);
+                                    GUI::displayConfigInfoValue("Max Push Constants Size", _physicalDeviceInfo->properties.limits.maxPushConstantsSize);
+                                    GUI::displayConfigInfoValue("Max Memory Allocation Count", _physicalDeviceInfo->properties.limits.maxMemoryAllocationCount);
+                                    GUI::displayConfigInfoValue("Max Sampler Allocation Count", _physicalDeviceInfo->properties.limits.maxSamplerAllocationCount);
+                                    GUI::displayConfigInfoUnsignedLongValue("Buffer Image Granularity", _physicalDeviceInfo->properties.limits.bufferImageGranularity);
+                                    GUI::displayConfigInfoUnsignedLongValue("Sparse Address Space Size", _physicalDeviceInfo->properties.limits.sparseAddressSpaceSize);
+                                    GUI::displayConfigInfoValue("Max Bound Descriptor Sets", _physicalDeviceInfo->properties.limits.maxBoundDescriptorSets);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Samplers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorSamplers);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Uniform Buffers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorUniformBuffers);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Storage Buffers", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageBuffers);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Sampled Images", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorSampledImages);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Storage Images", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorStorageImages);
+                                    GUI::displayConfigInfoValue("Max Per Stage Descriptor Input Attachments", _physicalDeviceInfo->properties.limits.maxPerStageDescriptorInputAttachments);
+                                    GUI::displayConfigInfoValue("Max Per Stage Resources", _physicalDeviceInfo->properties.limits.maxPerStageResources);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Samplers", _physicalDeviceInfo->properties.limits.maxDescriptorSetSamplers);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Uniform Buffers", _physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffers);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Uniform Buffers Dynamic", _physicalDeviceInfo->properties.limits.maxDescriptorSetUniformBuffersDynamic);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Storage Buffers", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffers);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Storage Buffers Dynamic", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageBuffersDynamic);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Sampled Images", _physicalDeviceInfo->properties.limits.maxDescriptorSetSampledImages);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Storage Images", _physicalDeviceInfo->properties.limits.maxDescriptorSetStorageImages);
+                                    GUI::displayConfigInfoValue("Max Descriptor Set Input Attachments", _physicalDeviceInfo->properties.limits.maxDescriptorSetInputAttachments);
+                                    GUI::displayConfigInfoValue("Max Vertex Input Attributes", _physicalDeviceInfo->properties.limits.maxVertexInputAttributes);
+                                    GUI::displayConfigInfoValue("Max Vertex Input Bindings", _physicalDeviceInfo->properties.limits.maxVertexInputBindings);
+                                    GUI::displayConfigInfoValue("Max Vertex Input AttributeOffset", _physicalDeviceInfo->properties.limits.maxVertexInputAttributeOffset);
+                                    GUI::displayConfigInfoValue("Max Vertex Input BindingStride", _physicalDeviceInfo->properties.limits.maxVertexInputBindingStride);
+                                    GUI::displayConfigInfoValue("Max Vertex Output Components", _physicalDeviceInfo->properties.limits.maxVertexOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation GenerationLevel", _physicalDeviceInfo->properties.limits.maxTessellationGenerationLevel);
+                                    GUI::displayConfigInfoValue("Max Tessellation PatchSize", _physicalDeviceInfo->properties.limits.maxTessellationPatchSize);
+                                    GUI::displayConfigInfoValue("Max Tessellation Control Per Vertex Input Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexInputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation Control Per Vertex Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerVertexOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation Control Per Patch Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlPerPatchOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation Control Total Output Components", _physicalDeviceInfo->properties.limits.maxTessellationControlTotalOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation Evaluation Input Components", _physicalDeviceInfo->properties.limits.maxTessellationEvaluationInputComponents);
+                                    GUI::displayConfigInfoValue("Max Tessellation Evaluation Output Components", _physicalDeviceInfo->properties.limits.maxTessellationEvaluationOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Geometry Shader Invocations", _physicalDeviceInfo->properties.limits.maxGeometryShaderInvocations);
+                                    GUI::displayConfigInfoValue("Max Geometry Input Components", _physicalDeviceInfo->properties.limits.maxGeometryInputComponents);
+                                    GUI::displayConfigInfoValue("Max Geometry Output Components", _physicalDeviceInfo->properties.limits.maxGeometryOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Geometry Output Vertices", _physicalDeviceInfo->properties.limits.maxGeometryOutputVertices);
+                                    GUI::displayConfigInfoValue("Max Geometry Total Output Components", _physicalDeviceInfo->properties.limits.maxGeometryTotalOutputComponents);
+                                    GUI::displayConfigInfoValue("Max Fragment Input Components", _physicalDeviceInfo->properties.limits.maxFragmentInputComponents);
+                                    GUI::displayConfigInfoValue("Max Fragment Output Attachments", _physicalDeviceInfo->properties.limits.maxFragmentOutputAttachments);
+                                    GUI::displayConfigInfoValue("Max Fragment Dual SrcAttachments", _physicalDeviceInfo->properties.limits.maxFragmentDualSrcAttachments);
+                                    GUI::displayConfigInfoValue("Max Fragment Combined Output Resources", _physicalDeviceInfo->properties.limits.maxFragmentCombinedOutputResources);
+                                    GUI::displayConfigInfoValue("Max Compute Shared Memory Size", _physicalDeviceInfo->properties.limits.maxComputeSharedMemorySize);
+                                    GUI::displayConfigInfoArrayUint32("Max Compute Work Group Count", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount), std::end(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupCount)));
+                                    GUI::displayConfigInfoValue("Max Compute Work Group Invocations", _physicalDeviceInfo->properties.limits.maxComputeWorkGroupInvocations);
+                                    GUI::displayConfigInfoArrayUint32("Max Compute Work Group Size", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize), std::end(_physicalDeviceInfo->properties.limits.maxComputeWorkGroupSize)));
+                                    GUI::displayConfigInfoValue("Sub Pixel Precision Bits", _physicalDeviceInfo->properties.limits.subPixelPrecisionBits);
+                                    GUI::displayConfigInfoValue("Sub Texel Precision Bits", _physicalDeviceInfo->properties.limits.subTexelPrecisionBits);
+                                    GUI::displayConfigInfoValue("Mipmap Precision Bits", _physicalDeviceInfo->properties.limits.mipmapPrecisionBits);
+                                    GUI::displayConfigInfoValue("Max Draw Indexed Index Value", _physicalDeviceInfo->properties.limits.maxDrawIndexedIndexValue);
+                                    GUI::displayConfigInfoValue("Max Draw Indirect Count", _physicalDeviceInfo->properties.limits.maxDrawIndirectCount);
+                                    GUI::displayConfigInfoFloatValue("Max Sampler Lod Bias", _physicalDeviceInfo->properties.limits.maxSamplerLodBias);
+                                    GUI::displayConfigInfoFloatValue("Max Sampler Anisotropy", _physicalDeviceInfo->properties.limits.maxSamplerAnisotropy);
+                                    GUI::displayConfigInfoValue("Max Viewports", _physicalDeviceInfo->properties.limits.maxViewports);
+                                    GUI::displayConfigInfoArrayUint32("Max Viewport Dimensions", std::vector<uint32_t>(std::begin(_physicalDeviceInfo->properties.limits.maxViewportDimensions), std::end(_physicalDeviceInfo->properties.limits.maxViewportDimensions)));
+                                    GUI::displayConfigInfoArrayFloat("Viewport Bounds Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.viewportBoundsRange), std::end(_physicalDeviceInfo->properties.limits.viewportBoundsRange)));
+                                    GUI::displayConfigInfoValue("Viewport Sub Pixel Bits", _physicalDeviceInfo->properties.limits.viewportSubPixelBits);
+                                    GUI::displayConfigInfoUnsignedLongValue("Min Memory Map Alignment", _physicalDeviceInfo->properties.limits.minMemoryMapAlignment);
+                                    GUI::displayConfigInfoUnsignedLongValue("Min Texel Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minTexelBufferOffsetAlignment);
+                                    GUI::displayConfigInfoUnsignedLongValue("Min Uniform Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minUniformBufferOffsetAlignment);
+                                    GUI::displayConfigInfoUnsignedLongValue("Min Storage Buffer Offset Alignment", _physicalDeviceInfo->properties.limits.minStorageBufferOffsetAlignment);
+                                    GUI::displayConfigInfoValue("Min Texel Offset", _physicalDeviceInfo->properties.limits.minTexelOffset);
+                                    GUI::displayConfigInfoValue("Max Texel Offset", _physicalDeviceInfo->properties.limits.maxTexelOffset);
+                                    GUI::displayConfigInfoValue("Min Texel Gather Offset", _physicalDeviceInfo->properties.limits.minTexelGatherOffset);
+                                    GUI::displayConfigInfoValue("Max Texel Gather Offset", _physicalDeviceInfo->properties.limits.maxTexelGatherOffset);
+                                    GUI::displayConfigInfoFloatValue("Min Interpolation Offset", _physicalDeviceInfo->properties.limits.minInterpolationOffset);
+                                    GUI::displayConfigInfoFloatValue("Max InterpolationOffset", _physicalDeviceInfo->properties.limits.maxInterpolationOffset);
+                                    GUI::displayConfigInfoValue("Sub Pixel Interpolation Offset Bits", _physicalDeviceInfo->properties.limits.subPixelInterpolationOffsetBits);
+                                    GUI::displayConfigInfoValue("Max FramebufferWidth", _physicalDeviceInfo->properties.limits.maxFramebufferWidth);
+                                    GUI::displayConfigInfoValue("Max FramebufferHeight", _physicalDeviceInfo->properties.limits.maxFramebufferHeight);
+                                    GUI::displayConfigInfoValue("Max FramebufferLayers", _physicalDeviceInfo->properties.limits.maxFramebufferLayers);
+                                    GUI::displayConfigInfoValue("Framebuffer Color Sample Counts", _physicalDeviceInfo->properties.limits.framebufferColorSampleCounts);
+                                    GUI::displayConfigInfoValue("Framebuffer Depth Sample Counts", _physicalDeviceInfo->properties.limits.framebufferDepthSampleCounts);
+                                    GUI::displayConfigInfoValue("Framebuffer Stencil Sample Counts", _physicalDeviceInfo->properties.limits.framebufferStencilSampleCounts);
+                                    GUI::displayConfigInfoValue("Framebuffer No Attachments Sample Counts", _physicalDeviceInfo->properties.limits.framebufferNoAttachmentsSampleCounts);
+                                    GUI::displayConfigInfoValue("Max Color Attachments", _physicalDeviceInfo->properties.limits.maxColorAttachments);
+                                    GUI::displayConfigInfoValue("Sampled Image Color Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageColorSampleCounts);
+                                    GUI::displayConfigInfoValue("Sampled Image Integer Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageIntegerSampleCounts);
+                                    GUI::displayConfigInfoValue("Sampled Image Depth Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageDepthSampleCounts);
+                                    GUI::displayConfigInfoValue("Sampled Image Stencil Sample Counts", _physicalDeviceInfo->properties.limits.sampledImageStencilSampleCounts);
+                                    GUI::displayConfigInfoValue("Storage Image Sample Counts", _physicalDeviceInfo->properties.limits.storageImageSampleCounts);
+                                    GUI::displayConfigInfoValue("Max SampleMaskWords", _physicalDeviceInfo->properties.limits.maxSampleMaskWords);
+                                    GUI::displayConfigInfoValue("Timestamp Compute And Graphics", _physicalDeviceInfo->properties.limits.timestampComputeAndGraphics);
+                                    GUI::displayConfigInfoFloatValue("Timestamp Period", _physicalDeviceInfo->properties.limits.timestampPeriod);
+                                    GUI::displayConfigInfoValue("Max Clip Distances", _physicalDeviceInfo->properties.limits.maxClipDistances);
+                                    GUI::displayConfigInfoValue("Max Cull Distances", _physicalDeviceInfo->properties.limits.maxCullDistances);
+                                    GUI::displayConfigInfoValue("Max Combined Clip And Cull Distances", _physicalDeviceInfo->properties.limits.maxCombinedClipAndCullDistances);
+                                    GUI::displayConfigInfoValue("Discrete Queue Priorities", _physicalDeviceInfo->properties.limits.discreteQueuePriorities);
+                                    GUI::displayConfigInfoArrayFloat("Point Size Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.pointSizeRange), std::end(_physicalDeviceInfo->properties.limits.pointSizeRange)));
+                                    GUI::displayConfigInfoArrayFloat("Line Width Range", std::vector<float>(std::begin(_physicalDeviceInfo->properties.limits.lineWidthRange), std::end(_physicalDeviceInfo->properties.limits.lineWidthRange)));
+                                    GUI::displayConfigInfoFloatValue("Point Size Granularity", _physicalDeviceInfo->properties.limits.pointSizeGranularity);
+                                    GUI::displayConfigInfoFloatValue("Line Width Granularity", _physicalDeviceInfo->properties.limits.lineWidthGranularity);
+                                    GUI::displayConfigInfoValue("Strict Lines", _physicalDeviceInfo->properties.limits.strictLines);
+                                    GUI::displayConfigInfoValue("Standard Sample Locations", _physicalDeviceInfo->properties.limits.standardSampleLocations);
+                                    GUI::displayConfigInfoUnsignedLongValue("Optimal Buffer Copy Offset Alignment", _physicalDeviceInfo->properties.limits.optimalBufferCopyOffsetAlignment);
+                                    GUI::displayConfigInfoUnsignedLongValue("Optimal Buffer Copy Row Pitch Alignment", _physicalDeviceInfo->properties.limits.optimalBufferCopyRowPitchAlignment);
+                                    GUI::displayConfigInfoUnsignedLongValue("Non Coherent AtomSize", _physicalDeviceInfo->properties.limits.nonCoherentAtomSize);
+                                }
+                                ImGui::Unindent();
+                            }
+                            if (ImGui::CollapsingHeader("Sparse Properties")) {
+                                ImGui::Indent();
+                                {
+                                    GUI::displayConfigInfoBool("Residency Standard 2D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Standard 2D Multisample Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Standard 3D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape);
+                                    GUI::displayConfigInfoBool("Residency Aligned Mip Size", _physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize);
+                                    GUI::displayConfigInfoBool("Residency Non Resident Strict", _physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict);
 
-								}
-								ImGui::Unindent();
-							}
-							ImGui::Unindent();
-						}
-						ImGui::Unindent();
-					}
-					ImGui::Unindent();
+                                }
+                                ImGui::Unindent();
+                            }
+                            ImGui::Unindent();
+                        }
+                        ImGui::Unindent();
+                    }
                     if (ImGui::CollapsingHeader("Features")) {
                         ImGui::Indent();
                         {
@@ -450,90 +449,94 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::Unindent();
                     }
 
-					
+
                     if (ImGui::CollapsingHeader("Memory")) {
                         ImGui::Indent();
                         {
                             GUI::displayConfigInfoUnsignedLongValue("Memory Type Count", _physicalDeviceInfo->memoryProperties.memoryTypeCount);
                             GUI::displayConfigInfoUnsignedLongValue("Memory Heap Count", _physicalDeviceInfo->memoryProperties.memoryHeapCount);
+
+                            for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
+                                if (ImGui::CollapsingHeader("Memory Types"))
+                                {
+                                    ImGui::Indent();
+                                    {
+                                        GUI::displayConfigInfoArrayStr("Property Flags",
+                                            lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(
+                                                _physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags));
+                                        GUI::displayConfigInfoUnsignedLongValue("Heap Index", _physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex);
+                                    }
+                                    ImGui::Unindent();
+                                }
+                            }
+
+                            for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
+                                if (ImGui::CollapsingHeader("Memory Heaps"))
+                                {
+                                    ImGui::Indent();
+                                    {
+                                        GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
+                                        GUI::displayConfigInfoArrayStr("Flags", lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags));
+                                    }
+                                    ImGui::Unindent();
+                                }
+                            }
                         }
-                       
-						for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
-							ImGui::Indent();
-							if (ImGui::CollapsingHeader("Memory Types"))
-							{
-								GUI::displayConfigInfoArrayStr("Property Flags",
-									lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(
-										_physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags));
-								GUI::displayConfigInfoUnsignedLongValue("Heap Index", _physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex);
-							}
-							ImGui::Unindent();
-						}
-						
+                        ImGui::Unindent();
+                    }
+
+                    if (ImGui::CollapsingHeader("Queues")) {
+                        ImGui::Indent();
+                        {
+                            for (auto tmp : _physicalDeviceInfo->queueFamilies) {
+
+                                GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags));
+                                GUI::displayConfigInfoUnsignedLongValue("Queue Count", tmp.queueCount);
+                                GUI::displayConfigInfoValue("Timestamp Valid Bits", tmp.timestampValidBits);
+                                if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
+                                    ImGui::Indent();
+                                    GUI::displayConfigInfoUnsignedLongValue("Width", tmp.minImageTransferGranularity.width);
+                                    GUI::displayConfigInfoUnsignedLongValue("Height", tmp.minImageTransferGranularity.height);
+                                    GUI::displayConfigInfoUnsignedLongValue("Depth", tmp.minImageTransferGranularity.depth);
+                                    ImGui::Unindent();
+                                }
+                            }
+                        }
+                        ImGui::Unindent();
                     }
 
 
-					for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
-						if (ImGui::CollapsingHeader("Memory Heaps"))
-						{
-							ImGui::Indent();
-							GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
-							GUI::displayConfigInfoArrayStr("Flags",
-								lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags));
-							ImGui::Unindent();
-						}
-						
-					}
+                    if (ImGui::CollapsingHeader("Extensions")) {
+                        ImGui::Indent();
+                        {
+                            for (auto extension : _physicalDeviceInfo->extensions) {
+                                GUI::displayConfigInfoString("Extension Name", extension.extensionName);
+                                ImGui::Indent();
+                                {
+                                    GUI::displayConfigInfoVersion("Spec Version", lug::Core::Version::fromInt(extension.specVersion));
+                                }
+                                ImGui::Unindent();
+                            }
+                        }
+                        ImGui::Unindent();
+                    }
 
-					if (ImGui::CollapsingHeader("Queues")) {
-						ImGui::Indent();
-						for (auto tmp : _physicalDeviceInfo->queueFamilies) {
-							
-							GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags));
-							GUI::displayConfigInfoUnsignedLongValue("Queue Count", tmp.queueCount);
-							GUI::displayConfigInfoValue("Timestamp Valid Bits", tmp.timestampValidBits);
-							if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
-								ImGui::Indent();
-								GUI::displayConfigInfoUnsignedLongValue("Width", tmp.minImageTransferGranularity.width);
-								GUI::displayConfigInfoUnsignedLongValue("Height", tmp.minImageTransferGranularity.height);
-								GUI::displayConfigInfoUnsignedLongValue("Depth", tmp.minImageTransferGranularity.depth);
-								ImGui::Unindent();
-							}
-							
-						}
-						ImGui::Unindent();
-					}
+                    if (ImGui::CollapsingHeader("Formats")) {
+                        ImGui::Indent();
+                        {
+                            for (auto format : _physicalDeviceInfo->formatProperties) {
+                                if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
+                                    ImGui::Indent();
+                                    GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
+                                    GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
+                                    GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
+                                    ImGui::Unindent();
+                                }
+                            }
+                        }
+                        ImGui::Unindent();
+                    }
 
-
-					if (ImGui::CollapsingHeader("Extensions")) {
-						ImGui::Indent();
-						for (auto extension : _physicalDeviceInfo->extensions) {
-							GUI::displayConfigInfoString("Extension Name", extension.extensionName);
-							if (ImGui::CollapsingHeader("Spec Version")) {
-								ImGui::Indent();
-								GUI::displayConfigInfoUnsignedLongValue("Major", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).major));
-								GUI::displayConfigInfoUnsignedLongValue("Minor", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).minor));
-								GUI::displayConfigInfoUnsignedLongValue("Patch", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).patch));
-								ImGui::Unindent();
-							}
-						}
-						ImGui::Unindent();
-					}
-
-					if (ImGui::CollapsingHeader("Formats")) {
-						ImGui::Indent();
-						for (auto format : _physicalDeviceInfo->formatProperties) {
-							if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
-								ImGui::Indent();
-								GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
-								GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
-								GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
-								ImGui::Unindent();
-							}
-						}
-						ImGui::Unindent();
-					}
-					
                     if (ImGui::CollapsingHeader("Swapchain")) {
                         ImGui::Indent();
                         {
