@@ -456,27 +456,41 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                             GUI::displayConfigInfoUnsignedLongValue("Memory Type Count", _physicalDeviceInfo->memoryProperties.memoryTypeCount);
                             GUI::displayConfigInfoUnsignedLongValue("Memory Heap Count", _physicalDeviceInfo->memoryProperties.memoryHeapCount);
 
-                            for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
-                                if (ImGui::CollapsingHeader("Memory Types"))
-                                {
+                            if (ImGui::CollapsingHeader("Memory Types"))
+                            {
+                                for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
+                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Type %d", i);
                                     ImGui::Indent();
                                     {
-                                        GUI::displayConfigInfoArrayStr("Property Flags",
-                                            lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(
-                                                _physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags));
+                                        std::vector<const char*> propertyFlags = lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags);
+                                        if (propertyFlags.size() > 0) {
+                                            ImGui::PushID(static_cast<int>(i));
+                                            {
+                                                GUI::displayConfigInfoArrayStr("Property Flags", propertyFlags);
+                                            }
+                                            ImGui::PopID();
+                                        }
                                         GUI::displayConfigInfoUnsignedLongValue("Heap Index", _physicalDeviceInfo->memoryProperties.memoryTypes[i].heapIndex);
                                     }
                                     ImGui::Unindent();
                                 }
                             }
 
-                            for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
-                                if (ImGui::CollapsingHeader("Memory Heaps"))
-                                {
+                            if (ImGui::CollapsingHeader("Memory Heaps"))
+                            {
+                                for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
+                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Heap %d", i);
                                     ImGui::Indent();
                                     {
                                         GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
-                                        GUI::displayConfigInfoArrayStr("Flags", lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags));
+                                        std::vector<const char*> flags = lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags);
+                                        if (flags.size() > 0) {
+                                            ImGui::PushID(static_cast<int>(i));
+                                            {
+                                                GUI::displayConfigInfoArrayStr("Flags", flags);
+                                            }
+                                            ImGui::PopID();
+                                        }
                                     }
                                     ImGui::Unindent();
                                 }
@@ -488,87 +502,57 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     if (ImGui::CollapsingHeader("Queues")) {
                         ImGui::Indent();
                         {
-                            for (auto tmp : _physicalDeviceInfo->queueFamilies) {
-
-                                GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags));
-                                GUI::displayConfigInfoUnsignedLongValue("Queue Count", tmp.queueCount);
-                                GUI::displayConfigInfoValue("Timestamp Valid Bits", tmp.timestampValidBits);
-                                if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
+                            for (int i = 0; i < _physicalDeviceInfo->queueFamilies.size(); ++i) {
+                                ImGui::PushID(i);
+                                {
+                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Queue %d", i);
                                     ImGui::Indent();
-                                    GUI::displayConfigInfoUnsignedLongValue("Width", tmp.minImageTransferGranularity.width);
-                                    GUI::displayConfigInfoUnsignedLongValue("Height", tmp.minImageTransferGranularity.height);
-                                    GUI::displayConfigInfoUnsignedLongValue("Depth", tmp.minImageTransferGranularity.depth);
+                                    {
+                                        VkQueueFamilyProperties queueFamilyProperties = _physicalDeviceInfo->queueFamilies[i];
+                                        GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(queueFamilyProperties.queueFlags));
+                                        GUI::displayConfigInfoUnsignedLongValue("Queue Count", queueFamilyProperties.queueCount);
+                                        GUI::displayConfigInfoValue("Timestamp Valid Bits", queueFamilyProperties.timestampValidBits);
+                                        if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
+                                            ImGui::Indent();
+                                            {
+                                                GUI::displayConfigInfoUnsignedLongValue("Width", queueFamilyProperties.minImageTransferGranularity.width);
+                                                GUI::displayConfigInfoUnsignedLongValue("Height", queueFamilyProperties.minImageTransferGranularity.height);
+                                                GUI::displayConfigInfoUnsignedLongValue("Depth", queueFamilyProperties.minImageTransferGranularity.depth);
+                                            }
+                                            ImGui::Unindent();
+                                        }
+                                    }
                                     ImGui::Unindent();
                                 }
+                                ImGui::PopID();
                             }
                         }
                         ImGui::Unindent();
                     }
 
 
-					for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
-						if (ImGui::CollapsingHeader("Memory Heaps"))
-						{
-							ImGui::Indent();
-							GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
-							GUI::displayConfigInfoArrayStr("Flags",
-								lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags));
-							ImGui::Unindent();
-						}
-						
-					}
+                    if (ImGui::CollapsingHeader("Extensions")) {
+                        ImGui::Indent();
+                        for (auto extension : _physicalDeviceInfo->extensions) {
+                            GUI::displayConfigInfoVersion(extension.extensionName, lug::Core::Version::fromInt(extension.specVersion));
+                        }
+                        ImGui::Unindent();
+                    }
 
-					if (ImGui::CollapsingHeader("Queues")) {
-						ImGui::Indent();
+                    if (ImGui::CollapsingHeader("Formats")) {
+                        ImGui::Indent();
+                        for (auto format : _physicalDeviceInfo->formatProperties) {
+                            if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
+                                ImGui::Indent();
+                                GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
+                                GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
+                                GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
+                                ImGui::Unindent();
+                            }
+                        }
+                        ImGui::Unindent();
+                    }
 
-						for (auto tmp : _physicalDeviceInfo->queueFamilies) {
-							ImGui::PushID(&tmp);
-							GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags));
-							GUI::displayConfigInfoUnsignedLongValue("Queue Count", tmp.queueCount);
-							GUI::displayConfigInfoValue("Timestamp Valid Bits", tmp.timestampValidBits);
-							if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
-								ImGui::Indent();
-								GUI::displayConfigInfoUnsignedLongValue("Width", tmp.minImageTransferGranularity.width);
-								GUI::displayConfigInfoUnsignedLongValue("Height", tmp.minImageTransferGranularity.height);
-								GUI::displayConfigInfoUnsignedLongValue("Depth", tmp.minImageTransferGranularity.depth);
-								ImGui::Unindent();
-							}
-							ImGui::PopID();
-							
-						}
-						ImGui::Unindent();
-					}
-
-
-					if (ImGui::CollapsingHeader("Extensions")) {
-						ImGui::Indent();
-						for (auto extension : _physicalDeviceInfo->extensions) {
-							GUI::displayConfigInfoString("Extension Name", extension.extensionName);
-							if (ImGui::CollapsingHeader("Spec Version")) {
-								ImGui::Indent();
-								GUI::displayConfigInfoUnsignedLongValue("Major", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).major));
-								GUI::displayConfigInfoUnsignedLongValue("Minor", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).minor));
-								GUI::displayConfigInfoUnsignedLongValue("Patch", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).patch));
-								ImGui::Unindent();
-							}
-						}
-						ImGui::Unindent();
-					}
-
-					if (ImGui::CollapsingHeader("Formats")) {
-						ImGui::Indent();
-						for (auto format : _physicalDeviceInfo->formatProperties) {
-							if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
-								ImGui::Indent();
-								GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
-								GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
-								GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
-								ImGui::Unindent();
-							}
-						}
-						ImGui::Unindent();
-					}
-					
                     if (ImGui::CollapsingHeader("Swapchain")) {
                         ImGui::Indent();
                         {
