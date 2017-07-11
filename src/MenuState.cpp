@@ -506,37 +506,69 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     }
 
 
-                    if (ImGui::CollapsingHeader("Extensions")) {
-                        ImGui::Indent();
-                        {
-                            for (auto extension : _physicalDeviceInfo->extensions) {
-                                GUI::displayConfigInfoString("Extension Name", extension.extensionName);
-                                ImGui::Indent();
-                                {
-                                    GUI::displayConfigInfoVersion("Spec Version", lug::Core::Version::fromInt(extension.specVersion));
-                                }
-                                ImGui::Unindent();
-                            }
-                        }
-                        ImGui::Unindent();
-                    }
+					for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
+						if (ImGui::CollapsingHeader("Memory Heaps"))
+						{
+							ImGui::Indent();
+							GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
+							GUI::displayConfigInfoArrayStr("Flags",
+								lug::Graphics::Vulkan::API::RTTI::VkMemoryHeapFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryHeaps[i].flags));
+							ImGui::Unindent();
+						}
+						
+					}
 
-                    if (ImGui::CollapsingHeader("Formats")) {
-                        ImGui::Indent();
-                        {
-                            for (auto format : _physicalDeviceInfo->formatProperties) {
-                                if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
-                                    ImGui::Indent();
-                                    GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
-                                    GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
-                                    GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
-                                    ImGui::Unindent();
-                                }
-                            }
-                        }
-                        ImGui::Unindent();
-                    }
+					if (ImGui::CollapsingHeader("Queues")) {
+						ImGui::Indent();
 
+						for (auto tmp : _physicalDeviceInfo->queueFamilies) {
+							ImGui::PushID(&tmp);
+							GUI::displayConfigInfoArrayStr("Queue Flags", lug::Graphics::Vulkan::API::RTTI::VkQueueFlagsToStrVec(tmp.queueFlags));
+							GUI::displayConfigInfoUnsignedLongValue("Queue Count", tmp.queueCount);
+							GUI::displayConfigInfoValue("Timestamp Valid Bits", tmp.timestampValidBits);
+							if (ImGui::CollapsingHeader("Min Image Transfer Granularity")) {
+								ImGui::Indent();
+								GUI::displayConfigInfoUnsignedLongValue("Width", tmp.minImageTransferGranularity.width);
+								GUI::displayConfigInfoUnsignedLongValue("Height", tmp.minImageTransferGranularity.height);
+								GUI::displayConfigInfoUnsignedLongValue("Depth", tmp.minImageTransferGranularity.depth);
+								ImGui::Unindent();
+							}
+							ImGui::PopID();
+							
+						}
+						ImGui::Unindent();
+					}
+
+
+					if (ImGui::CollapsingHeader("Extensions")) {
+						ImGui::Indent();
+						for (auto extension : _physicalDeviceInfo->extensions) {
+							GUI::displayConfigInfoString("Extension Name", extension.extensionName);
+							if (ImGui::CollapsingHeader("Spec Version")) {
+								ImGui::Indent();
+								GUI::displayConfigInfoUnsignedLongValue("Major", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).major));
+								GUI::displayConfigInfoUnsignedLongValue("Minor", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).minor));
+								GUI::displayConfigInfoUnsignedLongValue("Patch", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).patch));
+								ImGui::Unindent();
+							}
+						}
+						ImGui::Unindent();
+					}
+
+					if (ImGui::CollapsingHeader("Formats")) {
+						ImGui::Indent();
+						for (auto format : _physicalDeviceInfo->formatProperties) {
+							if (ImGui::CollapsingHeader(lug::Graphics::Vulkan::API::RTTI::toStr(format.first))) {
+								ImGui::Indent();
+								GUI::displayConfigInfoArrayStr("Linear Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.linearTilingFeatures));
+								GUI::displayConfigInfoArrayStr("Optimal Tiling Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.optimalTilingFeatures));
+								GUI::displayConfigInfoArrayStr("Buffer Features", lug::Graphics::Vulkan::API::RTTI::VkFormatFeatureFlagsToStrVec(format.second.bufferFeatures));
+								ImGui::Unindent();
+							}
+						}
+						ImGui::Unindent();
+					}
+					
                     if (ImGui::CollapsingHeader("Swapchain")) {
                         ImGui::Indent();
                         {
