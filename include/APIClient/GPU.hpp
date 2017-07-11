@@ -5,11 +5,18 @@
 #include <APIClient/Common.hpp>
 
 namespace APIClient {
-namespace GPU {
 
-JSONResponse put(const nlohmann::json& json);
-JSONResponse getAll();
-JSONResponse get(const std::string& id);
+JSONResponse putDevice(const nlohmann::json& json);
+JSONResponse putScore(const nlohmann::json& json);
 
-} // GPU
+JSONResponse getDevice(const std::string& id);
+JSONResponse getDevices();
+
+JSONResponse getScore(const std::string& id);
+JSONResponse getScores();
+
+JSONResponse getScenario(const std::string& id);
+JSONResponse getScenarios();
+
+
 } // APIClient

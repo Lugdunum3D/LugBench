@@ -96,13 +96,6 @@ bool MenuState::onPop() {
     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
     _application.setCamera(renderViews[0]->detachCamera());
 
-    if (!_application.getCamera()) {
-        LUG_LOG.error("NOPE");
-    }
-    else {
-        LUG_LOG.info("OK");
-    }
-
     _scene = nullptr;
 
     return true;

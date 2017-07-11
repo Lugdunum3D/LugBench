@@ -35,7 +35,7 @@ public:
     std::unique_ptr<lug::Graphics::Render::Camera>& getCamera();
     void setCamera(std::unique_ptr<lug::Graphics::Render::Camera> camera);
 
-    bool sendResult();
+    bool sendResult(uint32_t frames);
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);    

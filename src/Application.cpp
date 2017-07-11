@@ -1,27 +1,15 @@
 #include <Application.hpp>
 
-#include <ctime>
-#include <sstream>
-
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
 #include <APIClient/GPU.hpp>
-#include <APIClient/Router.hpp>
 #include <GPUInfoProvider.hpp>
 
-#include "AState.hpp"
 #include "MenuState.hpp"
 #include "BenchmarkingState.hpp"
 
-#include <lug/Graphics/Light/Directional.hpp>
-#include <lug/Graphics/Scene/ModelInstance.hpp>
-
-// TODO: Remove this when the ResourceManager is done
-#include <lug/Graphics/Renderer.hpp>
-#include <lug/Graphics/Vulkan/Renderer.hpp>
-
-#include <lug/System/Time.hpp>
+#include <json/json.hpp>
 
 Application::Application() : lug::Core::Application::Application{{"hello", {0, 1, 0}}} {
     std::srand((uint32_t)std::time(0));
@@ -73,8 +61,6 @@ bool Application::init(int argc, char* argv[]) {
 
 	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-
-
 	for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
 
 		if (!initDevice(&choosedDevice)) {
@@ -112,7 +98,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
     return (true);
 }
 
-bool Application::sendResult() {
+bool Application::sendResult(uint32_t nbFrames) {
 	lug::Graphics::Renderer* renderer = _graphics.getRenderer();
 	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
@@ -121,25 +107,45 @@ bool Application::sendResult() {
 		return false;
 	}	
 
-	const nlohmann::json json = GPUInfoProvider::get(*physicalDeviceInfo);
-	nlohmann::json jsonToSend;
+	std::string deviceId;
 
-	jsonToSend["name"] = physicalDeviceInfo->properties.deviceName;
+    // sending device
+    {
+        nlohmann::json device;
 
-#if defined(LUG_SYSTEM_ANDROID)
-    jsonToSend["os"] = "Android";
-#elif defined(LUG_SYSTEM_WINDOWS)
-    jsonToSend["os"] = "Windows";
-#else
-    jsonToSend["os"] = "Linux";
-#endif
+        device["name"] = physicalDeviceInfo->properties.deviceName;
 
-	jsonToSend["deviceId"] = physicalDeviceInfo->properties.deviceID;
-	jsonToSend["vendorId"] = physicalDeviceInfo->properties.vendorID;
-	jsonToSend["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
-	jsonToSend["vulkanInfo"] = json;
-	APIClient::GPU::put(jsonToSend);
-	return true;
+    #if defined(LUG_SYSTEM_ANDROID)
+        device["os"] = "Android";
+    #elif defined(LUG_SYSTEM_WINDOWS)
+        device["os"] = "Windows";
+    #else
+        device["os"] = "Linux";
+    #endif
+
+        device["deviceId"] = physicalDeviceInfo->properties.deviceID;
+        device["vendorId"] = physicalDeviceInfo->properties.vendorID;
+        device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
+        device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
+
+        auto res = APIClient::putDevice(device);
+		deviceId = std::get<1>(res)["id"].get<std::string>();
+    }
+
+    // sending score
+    {
+        nlohmann::json score;
+
+        score["device"] = deviceId;
+        score["scenario"] = "595ed69c734d1d25634280b0";
+        score["nbFrames"] = nbFrames;
+        score["averageFps"] = nbFrames / 10.0f;
+
+        auto response = APIClient::putScore(score);
+
+        return std::get<0>(response) == 201 ? true : false;
+    }
+
 }
 
 void Application::onEvent(const lug::Window::Event& event) {

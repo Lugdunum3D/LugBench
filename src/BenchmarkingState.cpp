@@ -94,6 +94,8 @@ bool BenchmarkingState::onPush() {
 }
 
 bool BenchmarkingState::onPop() {
+    _application.sendResult(frames);
+
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
@@ -102,17 +104,8 @@ bool BenchmarkingState::onPop() {
     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
     _application.setCamera(renderViews[0]->detachCamera());
 
-    if (!_application.getCamera()) {
-        LUG_LOG.error("NOPE");
-    } else {
-        LUG_LOG.info("OK");
-    }
+    _scene = nullptr;
 
-  _scene = nullptr;
-
-//  _application.addResult(_fps);
-  LUG_LOG.info("Result = {}", _fps);
-  
    return true;
 }
 
@@ -127,10 +120,12 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     elapsed += elapsedTime.getSeconds<float>();
     frames++;
 
-    if (elapsed >= 1.0f) {
-        _fps = (_fps + (frames / elapsed)) / 2;
-        frames = 0;
-        elapsed = 0;
+    if (elapsed >= 10.0f) {
+        std::shared_ptr<AState> menuState;
+        menuState = std::make_shared<MenuState>(_application);
+        _application.popState();
+        _application.pushState(menuState);
+        return true;
     }
 
     _rotation += (0.05f * elapsedTime.getMilliseconds<float>());
