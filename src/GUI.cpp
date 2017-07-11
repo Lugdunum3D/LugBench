@@ -2,16 +2,16 @@
 
 
 void GUI::displayConfigInfoString(const char* title, const char* content, const ImVec4 color) {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
-        ImGui::Text(content);
+        ImGui::Text("%s", content);
     }
     ImGui::Unindent();
 }
 
 void GUI::displayConfigInfoVersion(const char* title, const lug::Core::Version& version, const ImVec4 color) {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
         ImGui::Text("%d.%d.%d", version.major, version.minor, version.patch);
@@ -20,7 +20,7 @@ void GUI::displayConfigInfoVersion(const char* title, const lug::Core::Version& 
 }
 
 void GUI::displayConfigInfoValue(const char* title, const int value, const ImVec4 color) {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
         ImGui::Text("%d", value);
@@ -29,7 +29,7 @@ void GUI::displayConfigInfoValue(const char* title, const int value, const ImVec
 }
 
 void GUI::displayConfigInfoFloatValue(const char* title, const float value, const ImVec4 color) {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
         ImGui::Text("%.3f", value);
@@ -38,17 +38,17 @@ void GUI::displayConfigInfoFloatValue(const char* title, const float value, cons
 }
 
 void GUI::displayConfigInfoUnsignedLongValue(const char* title, const uint64_t value, const ImVec4 color) {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
-        ImGui::Text("%d", value);
+        ImGui::Text("%lu", value);
     }
     ImGui::Unindent();
 }
 
 void GUI::displayConfigInfoBool(const char* title, const bool isTrue, const ImVec4 color)
 {
-    ImGui::TextColored(color, title);
+    ImGui::TextColored(color, "%s", title);
     ImGui::Indent();
     {
         if (isTrue == true) { ImGui::Text("True"); }
@@ -98,7 +98,7 @@ void GUI::displayConfigInfoArrayStr(const char* title, const std::vector<const c
 		ImGui::Indent();
 		{
 			for (auto element : dataArray) {
-				ImGui::Text(element);
+				ImGui::Text("%s", element);
 			}
 		}
 		ImGui::Unindent();

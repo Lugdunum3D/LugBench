@@ -1,12 +1,12 @@
 #include <APIClient/Common.hpp>
 
 #include <lug/Config.hpp>
+#include <lug/System/Logger/Logger.hpp>
 
 #if defined(LUG_SYSTEM_ANDROID)
 
 #include <jni.h>
 #include <lug/Window/Android/WindowImplAndroid.hpp>
-#include <lug/System/Logger/Logger.hpp>
 
 APIClient::JSONResponse APIClient::getRequestResponse(const std::string&) {
     // TODO

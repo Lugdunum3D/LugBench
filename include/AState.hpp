@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Application.hpp"
-
 class Application;
+
+#include <lug/Graphics/Resource.hpp>
+#include <lug/Graphics/Scene/Scene.hpp>
+#include <lug/System/Time.hpp>
+#include <lug/Window/Event.hpp>
 
 class AState {
 public:
@@ -19,5 +22,6 @@ public:
     virtual bool onPush() { return true; };
 
 protected:
-   Application          &_application;
+    Application                                                     &_application;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
 };

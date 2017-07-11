@@ -1,6 +1,11 @@
-#include <Application.hpp>
+#include "Application.hpp"
 
-#include <lug/Graphics/Renderer.hpp>
+#include <ctime>
+#include <sstream>
+
+#include <lug/Graphics/Builder/Camera.hpp>
+#include <lug/Graphics/Builder/Light.hpp>
+#include <lug/System/Logger/Logger.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
 #include <APIClient/GPU.hpp>
@@ -11,12 +16,11 @@
 
 #include <json/json.hpp>
 
-Application::Application() : lug::Core::Application::Application{{"hello", {0, 1, 0}}} {
+Application::Application() : lug::Core::Application::Application{{"lugbench", {0, 1, 0}}} {
     std::srand((uint32_t)std::time(0));
     getRenderWindowInfo().windowInitInfo.title = "LugBench";
 
     getRenderWindowInfo().renderViewsInitInfo.push_back({
-        lug::Graphics::Render::Technique::Type::Forward,    // renderTechniqueType
         {                                                   // viewport
             {                                               // offset
                 0.0f,                                       // x
@@ -62,17 +66,26 @@ bool Application::init(int argc, char* argv[]) {
 	lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
 	for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
-
 		if (!initDevice(&choosedDevice)) {
-
 			LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
-
 		}
 	}
 
     // Create camera
-    _camera = _graphics.createCamera("camera");
-	
+    {
+        lug::Graphics::Builder::Camera cameraBuilder(*renderer);
+
+        cameraBuilder.setFovY(45.0f);
+        cameraBuilder.setZNear(0.1f);
+        cameraBuilder.setZFar(1000.0f);
+
+        _camera = cameraBuilder.build();
+        if (!_camera) {
+            LUG_LOG.error("Application::init Can't create camera");
+            return false;
+        }
+    }
+
     std::shared_ptr<AState> menuState;
 
     menuState = std::make_shared<MenuState>(*this);
@@ -81,11 +94,11 @@ bool Application::init(int argc, char* argv[]) {
     return true;
 }
 
-bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice) {
+bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-    vkRender->getPreferences().device = choosedDevice;
+    vkRender->getPreferences().device = choosenDevice;
 
     if (!lug::Core::Application::finishInit()) {
         return false;
@@ -95,7 +108,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedD
     if (physicalDeviceInfo == NULL) {
         return false;
     }
-    return (true);
+    return true;
 }
 
 bool Application::sendResult(uint32_t nbFrames) {
@@ -105,7 +118,7 @@ bool Application::sendResult(uint32_t nbFrames) {
 	lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
 	if (physicalDeviceInfo == NULL) {
 		return false;
-	}	
+	}
 
 	std::string deviceId;
 
@@ -176,13 +189,13 @@ bool Application::haveState() {
 
 bool Application::popState() {
     if (!_states.top()->onPop()) {
-        return (false);
+        return false;
     }
     _states.pop();
     if (!_states.empty()) {
         _states.top()->onPlay();
     }
-    return (true);
+    return true;
 }
 
 bool Application::pushState(std::shared_ptr<AState> &state) {
@@ -191,13 +204,13 @@ bool Application::pushState(std::shared_ptr<AState> &state) {
     }
     _states.push(state);
     if (!_states.top()->onPush()) {
-        return (false);
+        return false;
     }
-    return (true);
+    return true;
 }
 
 bool Application::popAndPushState(std::shared_ptr<AState> &state) {
     _states.pop();
     _states.push(state);
-    return (true);
+    return true;
 }

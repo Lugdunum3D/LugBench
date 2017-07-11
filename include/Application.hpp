@@ -10,7 +10,7 @@
 
 class AState;
 
-class Application : public lug::Core::Application {
+class Application : public ::lug::Core::Application {
 public:
     Application();
 
@@ -32,16 +32,16 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    std::unique_ptr<lug::Graphics::Render::Camera>& getCamera();
-    void setCamera(std::unique_ptr<lug::Graphics::Render::Camera> camera);
-
     bool sendResult(uint32_t frames);
 
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
+
 private:
-    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);    
+    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
     std::stack<std::shared_ptr<AState>> _states;
 
-    std::unique_ptr<lug::Graphics::Render::Camera> _camera;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 };
 
 #include "Application.inl"

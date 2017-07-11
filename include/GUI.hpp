@@ -1,8 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <lug\Core\Version.hpp>
-
+#include <lug/Core/Version.hpp>
 #include <imgui.h>
 
 #include <vector>

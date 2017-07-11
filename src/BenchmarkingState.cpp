@@ -1,13 +1,15 @@
 #include "BenchmarkingState.hpp"
 
-#include <lug/Graphics/Light/Directional.hpp>
-#include <lug/Graphics/Scene/ModelInstance.hpp>
-
-// TODO: Remove this when the ResourceManager is done
+#include <lug/Graphics/Builder/Light.hpp>
+#include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
+#include <lug/Math/Geometry/Trigonometry.hpp>
+#include <lug/System/Logger/Logger.hpp>
 
 #include <lug/System/Time.hpp>
+
+#include <imgui.h>
 
 #include "MenuState.hpp"
 
@@ -15,53 +17,50 @@ BenchmarkingState::BenchmarkingState(Application &application) : AState(applicat
     LUG_LOG.info("BenchmarkingState constructor");
 }
 
-BenchmarkingState::~BenchmarkingState() {
-}
+BenchmarkingState::~BenchmarkingState() {}
 
 bool BenchmarkingState::onPush() {
     LUG_LOG.info("BenchmarkingState onPush");
 
-    // Load the model
-    {
-        // Low Poly by Olexandr Zymohliad
-        // is licensed under CC Attribution
-        // https://skfb.ly/IXwu
-        _model = _application.getGraphics().createModel("model", "models/LowPoly/Low poly.obj");
-
-        if (!_model) {
-            throw;
-        }
+    // Load scene
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/DamagedHelmet/DamagedHelmet.gltf");
+    if (!sceneResource) {
+        return false;
     }
-        if (!_application.getCamera()) {
-            LUG_LOG.error("CAMERA IS NULLLLL");
-        }
-
 
     // Create the scene
-    _scene = _application.getGraphics().createScene();
+    _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
 
-    // Add directional light to scene
+
+    // Attach directional light to the root node
     {
-        std::unique_ptr<lug::Graphics::Light::Light> light = _scene->createLight("light", lug::Graphics::Light::Light::Type::Directional);
+        lug::Graphics::Builder::Light lightBuilder(*renderer);
 
-        // Set the diffuse color to white and the position
-        light->setDiffuse({1.0f, 1.0f, 1.0f});
-        static_cast<lug::Graphics::Light::Directional*>(light.get())->setDirection({0.0f, -4.0f, 5.0f});
+        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+        lightBuilder.setColor({1.0f, 1.0f, 1.0f, 1.0f});
+        lightBuilder.setDirection({0.0f, -4.0f, 5.0f});
 
-        _scene->getRoot()->createSceneNode("light node", std::move(light));
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+        if (!light) {
+            LUG_LOG.error("Application::init Can't create directional light");
+            return false;
+        }
+
+        _scene->getRoot().attachLight(light);
     }
-
-    _application.getCamera()->setScene(_scene.get());
 
     // Add camera to scene
     {
-        std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", _application.getCamera().get());
+        lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
+        _scene->getRoot().attachChild(*node);
 
-        std::unique_ptr<lug::Graphics::Scene::Node> movableCameraNode = _scene->createSceneNode("movable camera node");
+        node->attachCamera(_application.getCamera());
 
-        movableCameraNode->attachMovableObject(std::move(movableCamera));
-
-        _scene->getRoot()->attachChild(std::move(movableCameraNode));
+        // Set initial position of the camera
+        node->setPosition({2.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        // Look at once
+        node->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
     }
 
     // Attach cameras to RenderView
@@ -73,24 +72,9 @@ bool BenchmarkingState::onPush() {
         if (!_application.getCamera()) {
             LUG_LOG.error("CAMERA IS NULL");
         }
-        renderViews[0]->attachCamera(std::move(_application.getCamera()));
+        renderViews[0]->attachCamera(_application.getCamera());
     }
-
-    // Add model to scene
-    {
-        std::unique_ptr<lug::Graphics::Scene::ModelInstance> modelInstance = _scene->createModelInstance("model instance", _model.get());
-        _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
-    }
-
-
-
-
-    // Add model to scene
-    {
-        std::unique_ptr<lug::Graphics::Scene::ModelInstance> modelInstance = _scene->createModelInstance("model instance", _model.get());
-        _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
-    }
-	return true;
+    return true;
 }
 
 bool BenchmarkingState::onPop() {
@@ -100,9 +84,8 @@ bool BenchmarkingState::onPop() {
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
 
-    auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
-    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-    _application.setCamera(renderViews[0]->detachCamera());
+    // auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
+    // LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
 
     _scene = nullptr;
 
@@ -128,7 +111,7 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
         return true;
     }
 
-    _rotation += (0.05f * elapsedTime.getMilliseconds<float>());
+    _rotation += 0.01f * elapsedTime.getMilliseconds<float>();
 
     if (_rotation > 360.0f) {
         _rotation -= 360.0f;
@@ -137,10 +120,10 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
 
     for (int i = 0; i < 1; ++i) {
-        float x = 30.0f * cos(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
-       float y = 30.0f * sin(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
+        float x = 2.0f * cos(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
+        float y = 2.0f * sin(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
 
-        renderViews[i]->getCamera()->setPosition({x, 5.0f, y}, lug::Graphics::Node::TransformSpace::World);
+        _scene->getSceneNode("camera")->setPosition({x, 2.0f, y}, lug::Graphics::Node::TransformSpace::World);
         renderViews[i]->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
     }
 
@@ -153,7 +136,7 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
 
-    ImGui::Begin("Main Menu", isOpen, window_flags);
+    ImGui::Begin("Main Menu", &isOpen, window_flags);
     {
         lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
@@ -171,7 +154,7 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
         ImGui::SetCursorPos(buttonPos);
         if (ImGui::Button("STOP", buttonSize)) {
             std::shared_ptr<AState> menuState;
-			menuState = std::make_shared<MenuState>(_application);
+            menuState = std::make_shared<MenuState>(_application);
             _application.popState();
             _application.pushState(menuState);
         }

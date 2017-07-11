@@ -5,11 +5,8 @@
 
 #include <lug/Graphics/Scene/Scene.hpp>
 
-#include <imgui.h>
 #include <lug/System/Time.hpp>
 #include <lug/System/Clock.hpp>
-
-
 
 class BenchmarkingState : public AState {
 public:
@@ -23,16 +20,12 @@ public:
     bool onPush() override;
 
 private:
-    std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
-
-    // Temporary store mesh because we don't have resource manager yet
-    std::unique_ptr<lug::Graphics::Render::Model> _model;
 	const lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 
     float _rotation{0.0f};
 
     // Variables for "Sample Window"
-    bool *isOpen{false};
+    bool isOpen{false};
 
     bool no_titlebar{true};
     bool no_border{true};

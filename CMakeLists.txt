@@ -132,22 +132,28 @@ include_directories(${IMGUI_INCLUDE_DIR})
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS
-    shader.vert
-    shader-directional.frag
-    shader-point.frag
-    shader-spot.frag
-	gui.vert
-	gui.frag
+    gui.vert
+    gui.frag
 )
-
 # List of resources in the directory ${LUG_RESOURCES_DIR}
 set(LUG_RESOURCES
     # Nothing for the moment
+    shaders/forward/shader.vert
+    shaders/forward/shader.frag
+    models/DamagedHelmet/DamagedHelmet.bin
+    models/DamagedHelmet/DamagedHelmet.gltf
+    models/DamagedHelmet/textures/Default_albedo.jpg
+    models/DamagedHelmet/textures/Default_AO.jpg
+    models/DamagedHelmet/textures/Default_emissive.jpg
+    models/DamagedHelmet/textures/Default_metallic_roughness.jpg
+    models/DamagedHelmet/textures/Default_normal.jpg
 )
 
 # List of resources in the directory ${CMAKE_SOURCE_DIR}/resources
 set(OTHER_RESOURCES
-    # Nothing for the moment
+    models/Duck/Duck0.bin
+    models/Duck/Duck.gltf
+    models/Duck/DuckCM.png
 )
 
 # create target

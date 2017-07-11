@@ -5,8 +5,6 @@
 
 #include <lug/Graphics/Scene/Scene.hpp>
 
-#include <imgui.h>
-
 class MenuState : public AState {
 public:
     MenuState() = delete;
@@ -19,17 +17,12 @@ public:
     bool onPush() override;
 
 private:
-    std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
-
-
-    // Temporary store mesh because we don't have resource manager yet
-    std::unique_ptr<lug::Graphics::Render::Model> _model;
 	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 
     float _rotation{0.0f};
 
     // Variables for "Sample Window" (temporary)
-    bool *isOpen{false};
+    bool isOpen{false};
 
     bool no_menu_bar{false};
     bool no_titlebar{true};

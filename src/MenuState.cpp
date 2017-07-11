@@ -1,81 +1,94 @@
 #include "MenuState.hpp"
 #include "GUI.hpp"
 
-#include <lug/Graphics/Light/Directional.hpp>
-#include <lug/Graphics/Scene/ModelInstance.hpp>
-
-// TODO: Remove this when the ResourceManager is done
+#include <lug/Graphics/Builder/Light.hpp>
+#include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
+#include <lug/Math/Geometry/Trigonometry.hpp>
 
 #include <lug/System/Time.hpp>
 
 #include "BenchmarkingState.hpp"
 
-MenuState::MenuState(Application &application) : AState(application) {
-}
+MenuState::MenuState(Application &application) : AState(application) {}
 
 MenuState::~MenuState() {
     LUG_LOG.info("MenuState destructor");
 }
 
 bool MenuState::onPush() {
-    // Load the model
-    {
-        // Low Poly by Olexandr Zymohliad
-        // is licensed under CC Attribution
-        // https://skfb.ly/IXwu
-        _model = _application.getGraphics().createModel("model", "models/LowPoly/cello.obj");
 
-        if (!_model) {
-            throw;
+    // Load scene
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
+    if (!sceneResource) {
+        return false;
+    }
+
+    _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+
+    // Scale duck
+    {
+        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
+    }
+
+    // Attach directional light to the root node
+    {
+        lug::Graphics::Builder::Light lightBuilder(*renderer);
+
+        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+        lightBuilder.setColor({1.0f, 1.0f, 1.0f, 1.0f});
+        lightBuilder.setDirection({0.0f, 4.0f, -5.0f});
+
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+        if (!light) {
+            LUG_LOG.error("Application::init Can't create directional light");
+            return false;
+        }
+
+        _scene->getRoot().attachLight(light);
+    }
+
+    // Attach ambient light to the root node
+    {
+        lug::Graphics::Builder::Light lightBuilder(*renderer);
+
+        lightBuilder.setType(lug::Graphics::Render::Light::Type::Ambient);
+        lightBuilder.setColor({0.05f, 0.05f, 0.05f, 0.05f});
+
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+        if (!light) {
+            LUG_LOG.error("Application::init Can't create ambient light");
+            return false;
+        }
+
+        _scene->getSceneNode("duck")->attachLight(light);
+    }
+
+    // Attach camera
+    {
+        lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
+        _scene->getRoot().attachChild(*node);
+
+        node->attachCamera(_application.getCamera());
+
+        // Set initial position of the camera
+        node->setPosition({3.0f, 4.0f, 3.0f}, lug::Graphics::Node::TransformSpace::World);
+        // Look at once
+        node->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+
+        // Attach camera to RenderView
+        {
+            auto& renderViews = renderer->getWindow()->getRenderViews();
+
+            LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+            renderViews[0]->attachCamera(_application.getCamera());
         }
     }
 
-    // Create the scene
-    _scene = _application.getGraphics().createScene();
-
-    // Add directional light to scene
-    {
-        std::unique_ptr<lug::Graphics::Light::Light> light = _scene->createLight("light", lug::Graphics::Light::Light::Type::Directional);
-
-        // Set the diffuse color to white and the position
-        light->setDiffuse({ 1.0f, 1.0f, 1.0f });
-        static_cast<lug::Graphics::Light::Directional*>(light.get())->setDirection({ 0.0f, -4.0f, 5.0f });
-
-        _scene->getRoot()->createSceneNode("light node", std::move(light));
-    }
-
-    _application.getCamera()->setScene(_scene.get());
-
-    // Add camera to scene
-    {
-        std::unique_ptr<lug::Graphics::Scene::MovableCamera> movableCamera = _scene->createMovableCamera("movable camera", _application.getCamera().get());
-
-        std::unique_ptr<lug::Graphics::Scene::Node> movableCameraNode = _scene->createSceneNode("movable camera node");
-
-        movableCameraNode->attachMovableObject(std::move(movableCamera));
-
-        _scene->getRoot()->attachChild(std::move(movableCameraNode));
-    }
-
-    // Attach cameras to RenderView
-    {
-        auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
-
-        LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-
-        renderViews[0]->attachCamera(std::move(_application.getCamera()));
-    }
-
-    // Add model to scene
-    {
-        std::unique_ptr<lug::Graphics::Scene::ModelInstance> modelInstance = _scene->createModelInstance("model instance", _model.get());
-        _scene->getRoot()->createSceneNode("model instance node", std::move(modelInstance));
-    }
-
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
     _physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
@@ -92,9 +105,9 @@ bool MenuState::onPop() {
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
 
-    auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
-    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-    _application.setCamera(renderViews[0]->detachCamera());
+    // auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
+    // LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+    // _application.setCamera(renderViews[0]->detachCamera());
 
     _scene = nullptr;
 
@@ -108,20 +121,19 @@ void MenuState::onEvent(const lug::Window::Event& event) {
 }
 
 bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
-    _rotation += (0.05f * elapsedTime.getMilliseconds<float>());
+    _rotation += 0.05f * elapsedTime.getMilliseconds<float>();
 
     if (_rotation > 360.0f) {
         _rotation -= 360.0f;
     }
 
-    auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
+    // _scene->getSceneNode("duck")->setRotation(lug::Math::Geometry::radians(_rotation), {0, 1, 0});
 
-    for (int i = 0; i < 1; ++i) {
-        float x = 30.0f * cos(lug::Math::Geometry::radians((i % 2) ? _rotation : -_rotation));
+    float x = 3.0f * cos(lug::Math::Geometry::radians(_rotation));
+    float y = 3.0f * sin(lug::Math::Geometry::radians(_rotation));
 
-        renderViews[i]->getCamera()->setPosition({ x, 5.0f, 10.0f }, lug::Graphics::Node::TransformSpace::World);
-        renderViews[i]->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-    }
+    _scene->getSceneNode("camera")->setPosition({x, 4.0f, y}, lug::Graphics::Node::TransformSpace::World);
+    _scene->getSceneNode("camera")->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
 
     ImGuiWindowFlags window_flags = 0;
     if (no_titlebar)  window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -152,7 +164,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::EndMainMenuBar();
         }
 
-        ImGui::Begin("Sample Window", isOpen, window_flags);
+        ImGui::Begin("Sample Window", &isOpen, window_flags);
         {
             ImGui::Checkbox("No Menu Bar", &no_menu_bar);
             ImGui::NewLine();
@@ -169,7 +181,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         }
         ImGui::End();
 
-        ImGui::Begin("Main Menu", isOpen, window_flags);
+        ImGui::Begin("Main Menu", &isOpen, window_flags);
         {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
@@ -227,9 +239,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             }
         }
         ImGui::End();
-    }
-    else if (display_info_screen == true) {
-        ImGui::Begin("Info Display", isOpen, window_flags);
+    } else if (display_info_screen == true) {
+        ImGui::Begin("Info Display", &isOpen, window_flags);
         {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
@@ -442,17 +453,15 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::Unindent();
                     }
 
-
                     if (ImGui::CollapsingHeader("Memory")) {
                         ImGui::Indent();
                         {
                             GUI::displayConfigInfoUnsignedLongValue("Memory Type Count", _physicalDeviceInfo->memoryProperties.memoryTypeCount);
                             GUI::displayConfigInfoUnsignedLongValue("Memory Heap Count", _physicalDeviceInfo->memoryProperties.memoryHeapCount);
 
-                            if (ImGui::CollapsingHeader("Memory Types"))
-                            {
+                            if (ImGui::CollapsingHeader("Memory Types")) {
                                 for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryTypeCount; ++i) {
-                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Type %d", i);
+                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Type %lu", i);
                                     ImGui::Indent();
                                     {
                                         std::vector<const char*> propertyFlags = lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(_physicalDeviceInfo->memoryProperties.memoryTypes[i].propertyFlags);
@@ -469,10 +478,9 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                                 }
                             }
 
-                            if (ImGui::CollapsingHeader("Memory Heaps"))
-                            {
+                            if (ImGui::CollapsingHeader("Memory Heaps")) {
                                 for (size_t i = 0; i < _physicalDeviceInfo->memoryProperties.memoryHeapCount; ++i) {
-                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Heap %d", i);
+                                    ImGui::TextColored(ImVec4(0, 255, 0, 255), "Heap %lu", i);
                                     ImGui::Indent();
                                     {
                                         GUI::displayConfigInfoUnsignedLongValue("Size", _physicalDeviceInfo->memoryProperties.memoryHeaps[i].size);
@@ -495,7 +503,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     if (ImGui::CollapsingHeader("Queues")) {
                         ImGui::Indent();
                         {
-                            for (int i = 0; i < _physicalDeviceInfo->queueFamilies.size(); ++i) {
+                            for (uint32_t i = 0; i < _physicalDeviceInfo->queueFamilies.size(); ++i) {
                                 ImGui::PushID(i);
                                 {
                                     ImGui::TextColored(ImVec4(0, 255, 0, 255), "Queue %d", i);
@@ -579,9 +587,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             }
         }
         ImGui::End();
-    }
-    else if (display_result_screen == true) {
-        ImGui::Begin("Result Display", isOpen, window_flags);
+    } else if (display_result_screen == true) {
+        ImGui::Begin("Result Display", &isOpen, window_flags);
         {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
