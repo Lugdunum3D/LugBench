@@ -32,23 +32,16 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
+    std::unique_ptr<lug::Graphics::Render::Camera>& getCamera();
+    void setCamera(std::unique_ptr<lug::Graphics::Render::Camera> camera);
 
-    // std::unique_ptr<lug::Graphics::Scene::Scene>& getScene() {
-    //     return _scene;
-
-    std::unique_ptr<lug::Graphics::Render::Camera>& getCamera() {
-        return _camera;
-    }
-
-    void setCamera(std::unique_ptr<lug::Graphics::Render::Camera> camera) {
-        _camera = std::move(camera);
-    }
+    bool sendResult();
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosedDevice);    
     std::stack<std::shared_ptr<AState>> _states;
 
-//    std::unique_ptr<lug::Graphics::Scene::Scene> _scene;
     std::unique_ptr<lug::Graphics::Render::Camera> _camera;
-
 };
+
+#include "Application.inl"
