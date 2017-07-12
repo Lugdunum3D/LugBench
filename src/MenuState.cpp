@@ -611,8 +611,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 				display_result_screen = !display_result_screen;
 			}
 			ImGui::EndChild();
-  
-			ImGui::ShowTestWindow();
         }
         ImGui::End();
     }
