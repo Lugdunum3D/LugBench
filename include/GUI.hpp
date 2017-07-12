@@ -17,9 +17,11 @@ void displayConfigInfoUnsignedLongValue(const char* title, const uint64_t value,
 
 void displayConfigInfoBool(const char* title, const bool isTrue, const ImVec4 color = { 0, 255, 0, 255 });
 
+
 void displayConfigInfoArrayUint8(const char* title, const std::vector<uint8_t>& dataArray);
 void displayConfigInfoArrayUint32(const char* title, const std::vector<uint32_t>& dataArray);
 void displayConfigInfoArrayFloat(const char* title, const std::vector<float>& dataArray);
 void displayConfigInfoArrayStr(const char* title, const std::vector<const char *>& dataArray);
+void displayScoreInCell(const char * deviceName, const float score, const float progressbarValue);
 
 } // GUI

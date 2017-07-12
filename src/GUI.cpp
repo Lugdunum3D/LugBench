@@ -104,3 +104,15 @@ void GUI::displayConfigInfoArrayStr(const char* title, const std::vector<const c
         ImGui::Unindent();
     }
 }
+
+void GUI::displayScoreInCell(const char * deviceName, const float score, const float progressbarValue) {
+
+	ImGui::BeginGroup();
+	ImGui::Text("Your GPU: %s",deviceName);
+	ImGui::Value("Your score", score);
+
+
+	ImGui::ProgressBar(progressbarValue, ImVec2(-1, 50.0F));
+	ImGui::Separator();
+	ImGui::EndGroup();
+}

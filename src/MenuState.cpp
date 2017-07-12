@@ -598,24 +598,21 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowSize(windowSize);
             ImGui::SetWindowPos(windowPos);
 
-            ImGui::SetCursorPos({ 50, 10 });
-            ImGui::Button("Test", { 50, 20 });
-            ImGui::SetCursorPos({ 250, 10 });
-            ImGui::Button("Score", { 50, 20 });
-            ImGui::NewLine();
+			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
 
-            for (int i = 0; i < 3; ++i) {
-                ImGui::SetCursorPos({ 60, 20 * static_cast<float>(i + 2) });
-                ImGui::Text("Test");
-                ImGui::SetCursorPos({ 260, 20 * static_cast<float>(i + 2) });
-                ImGui::Text("1337 f/s");
-            }
-
-            ImGui::Separator();
-            ImGui::NewLine();
-            if (ImGui::Button("< RETURN")) {
-                display_result_screen = !display_result_screen;
-            }
+			ImGui::BeginChild("Score list");
+			for (int i = 0; i < 10; i++) {
+				ImGui::PushID(i);
+				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
+				ImGui::PopID();
+			}
+			ImGui::NewLine();
+			if (ImGui::Button("< RETURN")) {
+				display_result_screen = !display_result_screen;
+			}
+			ImGui::EndChild();
+  
+			ImGui::ShowTestWindow();
         }
         ImGui::End();
     }
