@@ -94,7 +94,7 @@ bool BenchmarkingState::onPop() {
 
 void BenchmarkingState::onEvent(const lug::Window::Event& event) {
     if (event.type == lug::Window::Event::Type::Close) {
-       _application.popState();
+       _application.close();
     }
 }
 
