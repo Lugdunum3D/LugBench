@@ -78,7 +78,7 @@ bool BenchmarkingState::onPush() {
 }
 
 bool BenchmarkingState::onPop() {
-    _application.sendResult(frames);
+    _application.sendResult(_frames);
 
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
@@ -100,10 +100,10 @@ void BenchmarkingState::onEvent(const lug::Window::Event& event) {
 
 bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
 
-    elapsed += elapsedTime.getSeconds<float>();
-    frames++;
+    _elapsed += elapsedTime.getSeconds<float>();
+    _frames++;
 
-    if (elapsed >= 10.0f) {
+    if (_elapsed >= 10.0f) {
         std::shared_ptr<AState> menuState;
         menuState = std::make_shared<MenuState>(_application);
         _application.popState();
@@ -135,31 +135,6 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_scrollbar) window_flags |= ImGuiWindowFlags_NoScrollbar;
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
-
-    ImGui::Begin("Main Menu", &isOpen, window_flags);
-    {
-        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-        // Sets the window to be at the bottom of the screen (1/3rd of the height)
-        ImVec2 windowSize{static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f};
-        ImVec2 windowPos = {0, static_cast<float>(window->getHeight() - windowSize.y)};
-        ImGui::SetWindowSize(windowSize);
-        ImGui::SetWindowPos(windowPos);
-
-        // Centers the button and keeps it square at all times
-        ImVec2 buttonSize;
-        if (windowSize.x > windowSize.y) { buttonSize = {(windowSize.y / 2.f), (windowSize.y / 2.f)}; }
-        else { buttonSize = {(windowSize.x / 2.f), (windowSize.x / 2.f)}; }
-        ImVec2 buttonPos{(windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f)};
-        ImGui::SetCursorPos(buttonPos);
-        if (ImGui::Button("STOP", buttonSize)) {
-            std::shared_ptr<AState> menuState;
-            menuState = std::make_shared<MenuState>(_application);
-            _application.popState();
-            _application.pushState(menuState);
-        }
-    }
-    ImGui::End();
 
     return true;
 }

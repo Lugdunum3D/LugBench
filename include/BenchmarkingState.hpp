@@ -20,12 +20,7 @@ public:
     bool onPush() override;
 
 private:
-    const lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
-
     float _rotation{0.0f};
-
-    // Variables for "Sample Window"
-    bool isOpen{false};
 
     bool no_titlebar{true};
     bool no_border{true};
@@ -35,7 +30,6 @@ private:
     bool no_collapse{true};
     bool no_menu{true};
 
-    float elapsed = 0;
-    uint32_t frames = 0;
-    float _fps = 1.0f;
+    float _elapsed = 0;
+    uint32_t _frames = 0;
 };
