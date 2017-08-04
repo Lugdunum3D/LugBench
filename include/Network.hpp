@@ -23,6 +23,8 @@ enum Route : uint8_t {
 
 class Network {
 public:
+    Network();
+    ~Network();
 
     void putDevice(const nlohmann::json& json);
     void putScore(const nlohmann::json& json);
@@ -30,19 +32,21 @@ public:
     void getDevice(const std::string& id);
     void getDevices();
 
-    void etScore(const std::string& id);
+    void getScore(const std::string& id);
     void getScores();
 
     void getScenario(const std::string& id);
     void getScenarios();
+
+    JSONResponse _response;
+    std::mutex _mutex;
 
 private:
     void get(const std::string& url);
     void put(const std::string& url, const std::string& json);
     std::string getUrlString(Route route, const std::string& id = "");
 
-    std::mutex _mutex;
-    JSONResponse _response;
+    std::thread _networkThread;
 };
 
 } // LugBench

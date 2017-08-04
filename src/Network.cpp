@@ -27,7 +27,7 @@ Network::~Network() {
 }
 
 void Network::putDevice(const nlohmann::json& json) {
-    return put(getUrlString(Route::putDevice), json.dump());
+    _networkThread = std::thread(&Network::put, this, getUrlString(Route::putDevice), json.dump());
 }
 
 void Network::putScore(const nlohmann::json& json) {
@@ -150,7 +150,7 @@ void Network::put(const std::string& url, const std::string& json) {
 void Network::get(const std::string& url) {
     RestClient::Response r = RestClient::get(url);
     nlohmann::json json = nlohmann::json::parse(r.body);
-    return std::make_tuple(r.code, json);
+    _response = std::make_tuple(r.code, json);
 }
 
 void Network::put(const std::string& url, const std::string& json) {
@@ -159,9 +159,15 @@ void Network::put(const std::string& url, const std::string& json) {
     RestClient::Connection* conn = new RestClient::Connection(url);
     conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
 
-    RestClient::Response r = conn->post("", json);
-    nlohmann::json reponseJson = nlohmann::json::parse(r.body);
-    _response = std::make_tuple(r.code, reponseJson);
+    while (1) {
+        RestClient::Response r = conn->post("", json);
+        if (r.code != -1) {
+            nlohmann::json reponseJson = nlohmann::json::parse(r.body);
+            _response = std::make_tuple(r.code, reponseJson);
+            _mutex.unlock();
+            return;
+        }
+    }
 }
 
 #endif

@@ -50,7 +50,7 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
     LugBench::Network _network;
-    std::shared_ptr<StdThread> _networkThread;
+    std::thread _networkThread;
 };
 
 #include "Application.inl"

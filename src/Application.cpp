@@ -12,6 +12,8 @@
 
 #include "MenuState.hpp"
 #include "BenchmarkingState.hpp"
+#include <StdThread.hpp>
+#include <Network.hpp>
 
 #include <json/json.hpp>
 
@@ -140,7 +142,7 @@ bool Application::sendResult(uint32_t ) {
         device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
         device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
-        _networkThread = std::make_shared<StdThread>(&_network.putDevice, this, device);
+        _network.putDevice(device);
         isSendingDevice = true;
         return true;
         // deviceId = std::get<1>(res)["id"].get<std::string>();
@@ -174,7 +176,12 @@ void Application::onEvent(const lug::Window::Event& event) {
 }
 
 void Application::getResponse() {
-    
+    if (_network._mutex.try_lock()) {
+        LUG_LOG.info("Code : {}", std::get<0>(_network._response));
+        LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
+        _network._mutex.unlock();
+        isSendingDevice = false;
+    }
 }
 
 void Application::onFrame(const lug::System::Time& elapsedTime) {

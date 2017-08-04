@@ -19,7 +19,7 @@ public:
 
     ~StdThread() {}
 
-    void swap(Thread &t) {
+    void swap(std::thread &t) {
         (void)(t);
         throw std::runtime_error("Cannot swap with Thread");
     }

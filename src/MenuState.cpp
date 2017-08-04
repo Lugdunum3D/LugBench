@@ -244,11 +244,11 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             // Sendind result bar
             if (_application.isSendingDevice || _application.isSendingScore) {
                 // Centers the button and keeps it square at all times
-                ImVec2 buttonSize = {windowSize.x / 4.f, windowSize.y};
+                ImVec2 buttonSize = {windowSize.x, windowSize.y};
                 // if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
                 // else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
                 // ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y / 4.f) };
-                ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y) };
+                ImVec2 buttonPos{ windowSize.x, windowSize.y};
                 ImGui::SetCursorPos(buttonPos);
                 if (_application.isSendingDevice) {
                     if (ImGui::Button("Sending device in progress...", buttonSize)) {}                    
