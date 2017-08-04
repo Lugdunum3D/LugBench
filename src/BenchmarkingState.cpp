@@ -103,7 +103,7 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     _elapsed += elapsedTime.getSeconds<float>();
     _frames++;
 
-    if (_elapsed >= 10.0f) {
+    if (_elapsed >= 2.0f) {
         std::shared_ptr<AState> menuState;
         menuState = std::make_shared<MenuState>(_application);
         _application.popState();

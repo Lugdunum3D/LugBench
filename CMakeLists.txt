@@ -94,27 +94,24 @@ find_package(LUG REQUIRED core graphics system window math)
 include_directories(${LUG_INCLUDE_DIR})
 
 set(SRC
-    src/APIClient/Common.cpp
-    src/APIClient/GPU.cpp
-    src/APIClient/Router.cpp
     src/Application.cpp
     src/GPUInfoProvider.cpp
     src/GUI.cpp
     src/main.cpp
     src/MenuState.cpp
     src/BenchmarkingState.cpp
+    src/Network.cpp
 )
 
 set(INC
-    include/APIClient/Common.hpp
-    include/APIClient/GPU.hpp
-    include/APIClient/Router.hpp
     include/Application.hpp
     include/GPUInfoProvider.hpp
     include/GUI.hpp
     include/AState.hpp
     include/MenuState.hpp
     include/BenchmarkingState.hpp
+    include/Network.hpp
+    include/StdThread.hpp>
 )
 
 # find imgui

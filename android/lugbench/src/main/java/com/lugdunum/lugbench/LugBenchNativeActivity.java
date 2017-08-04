@@ -18,12 +18,17 @@ import java.util.Map;
 
 public class LugBenchNativeActivity extends NativeActivity {
     private final static String TAG = "LugBenchNativeActivity";
+    private String res;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    private void sendRequest(final String url, final String json) {
+    private String getRequest(final String url) {
+        return url;
+    }
+
+    private String sendRequest(final String url, final String json) {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
@@ -31,6 +36,8 @@ public class LugBenchNativeActivity extends NativeActivity {
                 @Override
                 public void onResponse(String response) {
                     Log.v(TAG, response);
+//                    this.res = response;
+                    getRequest(response);
                 }
             },
             new Response.ErrorListener() {
@@ -48,12 +55,13 @@ public class LugBenchNativeActivity extends NativeActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("Content-Type","application/json");
-                // TODO : Version
+                headers.put("User-agent", "LugBench/0.1.0");
                 return headers;
             }
         };
 
         queue.add(stringRequest);
+        return "hey this is sendRequest java response";
     }
 }
 

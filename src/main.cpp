@@ -10,7 +10,6 @@
 #endif
 #include <lug/Window/Window.hpp>
 
-#include <APIClient/Router.hpp>
 #include <Application.hpp>
 
 int main(int argc, char* argv[]) {
@@ -19,8 +18,6 @@ int main(int argc, char* argv[]) {
 #else
     LUG_LOG.addHandler(lug::System::Logger::makeHandler<lug::System::Logger::StdoutHandler>("stdout"));
 #endif
-
-    LUG_LOG.info("Lugbench: Using API: {}", APIClient::Router::baseAPIUri);
 
     Application app;
 

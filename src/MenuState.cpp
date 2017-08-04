@@ -115,6 +115,9 @@ bool MenuState::onPop() {
 }
 
 void MenuState::onEvent(const lug::Window::Event& event) {
+    if (_application.isSendingDevice || _application.isSendingScore) {
+        return;
+    }
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
     }
@@ -237,6 +240,23 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     display_result_screen = !display_result_screen;
                 }
             }
+
+            // Sendind result bar
+            if (_application.isSendingDevice || _application.isSendingScore) {
+                // Centers the button and keeps it square at all times
+                ImVec2 buttonSize = {windowSize.x / 4.f, windowSize.y};
+                // if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
+                // else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
+                // ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y / 4.f) };
+                ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y) };
+                ImGui::SetCursorPos(buttonPos);
+                if (_application.isSendingDevice) {
+                    if (ImGui::Button("Sending device in progress...", buttonSize)) {}                    
+                } else {
+                    if (ImGui::Button("Sending score in progress...", buttonSize)) {}                                        
+                }
+            }
+
         }
         ImGui::End();
     } else if (display_info_screen == true) {

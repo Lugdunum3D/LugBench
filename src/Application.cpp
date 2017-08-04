@@ -8,7 +8,6 @@
 #include <lug/System/Logger/Logger.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
-#include <APIClient/GPU.hpp>
 #include <GPUInfoProvider.hpp>
 
 #include "MenuState.hpp"
@@ -88,7 +87,7 @@ bool Application::init(int argc, char* argv[]) {
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<MenuState>(*this);
+    menuState = std::make_shared<BenchmarkingState>(*this);
     pushState(menuState);
 
     return true;
@@ -111,7 +110,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-bool Application::sendResult(uint32_t nbFrames) {
+bool Application::sendResult(uint32_t ) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
@@ -141,23 +140,25 @@ bool Application::sendResult(uint32_t nbFrames) {
         device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
         device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
-        auto res = APIClient::putDevice(device);
-        deviceId = std::get<1>(res)["id"].get<std::string>();
+        _networkThread = std::make_shared<StdThread>(&_network.putDevice, this, device);
+        isSendingDevice = true;
+        return true;
+        // deviceId = std::get<1>(res)["id"].get<std::string>();
     }
 
-    // sending score
-    {
-        nlohmann::json score;
+    // // sending score
+    // {
+    //     nlohmann::json score;
 
-        score["device"] = deviceId;
-        score["scenario"] = "595ed69c734d1d25634280b0";
-        score["nbFrames"] = nbFrames;
-        score["averageFps"] = nbFrames / 10.0f;
+    //     score["device"] = deviceId;
+    //     score["scenario"] = "595ed69c734d1d25634280b0";
+    //     score["nbFrames"] = nbFrames;
+    //     score["averageFps"] = nbFrames / 10.0f;
 
-        auto response = APIClient::putScore(score);
+    //     auto response = APIClient::putScore(score);
 
-        return std::get<0>(response) == 201 ? true : false;
-    }
+    //     return std::get<0>(response) == 201 ? true : false;
+    // }
 
 }
 
@@ -172,10 +173,17 @@ void Application::onEvent(const lug::Window::Event& event) {
     tmpState->onEvent(event);
 }
 
+void Application::getResponse() {
+    
+}
+
 void Application::onFrame(const lug::System::Time& elapsedTime) {
 
     if (_states.empty()) {
         return;
+    }
+    if (isSendingDevice || isSendingScore) {
+        getResponse();
     }
 
     std::shared_ptr<AState> tmpState = _states.top(); // Needed to prevent fault if popping a state

@@ -6,7 +6,9 @@
 #include <lug/Core/Application.hpp>
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
 
-#include "AState.hpp"
+#include <AState.hpp>
+#include <Network.hpp>
+#include <StdThread.hpp>
 
 class AState;
 
@@ -33,8 +35,12 @@ public:
     bool popAndPushState(std::shared_ptr<AState> &state);
 
     bool sendResult(uint32_t frames);
+    void getResponse();
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
+
+    bool isSendingDevice{false};
+    bool isSendingScore{false};
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
@@ -42,6 +48,9 @@ private:
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
+
+    LugBench::Network _network;
+    std::shared_ptr<StdThread> _networkThread;
 };
 
 #include "Application.inl"
