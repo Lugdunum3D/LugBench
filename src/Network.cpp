@@ -28,10 +28,12 @@ Network::~Network() {
 
 void Network::putDevice(const nlohmann::json& json) {
     _networkThread = std::thread(&Network::put, this, getUrlString(Route::putDevice), json.dump());
+    _networkThread.detach();
 }
 
 void Network::putScore(const nlohmann::json& json) {
-    return put(getUrlString(Route::putScore), json.dump());
+    _networkThread = std::thread(&Network::put, this, getUrlString(Route::putScore), json.dump());
+    _networkThread.detach();
 }
 
 void Network::getDevice(const std::string& id) {

@@ -112,7 +112,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-bool Application::sendResult(uint32_t ) {
+bool Application::sendResult(uint32_t nbFrames) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
@@ -144,23 +144,9 @@ bool Application::sendResult(uint32_t ) {
 
         _network.putDevice(device);
         isSendingDevice = true;
+        _nbFrames = nbFrames;
         return true;
-        // deviceId = std::get<1>(res)["id"].get<std::string>();
     }
-
-    // // sending score
-    // {
-    //     nlohmann::json score;
-
-    //     score["device"] = deviceId;
-    //     score["scenario"] = "595ed69c734d1d25634280b0";
-    //     score["nbFrames"] = nbFrames;
-    //     score["averageFps"] = nbFrames / 10.0f;
-
-    //     auto response = APIClient::putScore(score);
-
-    //     return std::get<0>(response) == 201 ? true : false;
-    // }
 
 }
 
@@ -177,10 +163,36 @@ void Application::onEvent(const lug::Window::Event& event) {
 
 void Application::getResponse() {
     if (_network._mutex.try_lock()) {
-        LUG_LOG.info("Code : {}", std::get<0>(_network._response));
-        LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
-        _network._mutex.unlock();
-        isSendingDevice = false;
+        if (isSendingDevice) {
+            LUG_LOG.info("isSendingDevice response");
+            LUG_LOG.info("Code : {}", std::get<0>(_network._response));
+            LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
+            _deviceID = std::get<1>(_network._response)["id"].get<std::string>();
+            _network._mutex.unlock();
+            isSendingDevice = false;
+            isSendingScore = true;
+            _network._response = {};
+
+            // sending score
+            {
+                nlohmann::json score;
+
+                score["device"] = _deviceID;
+                score["scenario"] = "595ed69c734d1d25634280b0";
+                score["nbFrames"] = _nbFrames;
+                score["averageFps"] = _nbFrames / 10.0f;
+
+                _network.putScore(score);
+            }
+        } else {
+            LUG_LOG.info("isSendingScore response");
+            LUG_LOG.info("Code : {}", std::get<0>(_network._response));
+            LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
+            _network._mutex.unlock();
+            isSendingScore = false;
+            _network._response = {};
+
+        }
     }
 }
 

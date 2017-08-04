@@ -35,5 +35,6 @@ private:
 
     bool display_info_screen{false};
     bool display_result_screen{false};
+    bool display_sending_screen{false};
 
 };

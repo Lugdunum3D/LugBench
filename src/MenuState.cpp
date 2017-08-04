@@ -147,7 +147,12 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
 
-    if (display_info_screen == false && display_result_screen == false) {
+    if (_application.isSendingDevice || _application.isSendingScore) {
+        display_sending_screen = true;
+    }
+
+
+    if (display_info_screen == false && display_result_screen == false && !display_sending_screen) {
         if (!no_menu_bar) {
             ImGui::BeginMainMenuBar();
             {
@@ -240,23 +245,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                     display_result_screen = !display_result_screen;
                 }
             }
-
-            // Sendind result bar
-            if (_application.isSendingDevice || _application.isSendingScore) {
-                // Centers the button and keeps it square at all times
-                ImVec2 buttonSize = {windowSize.x, windowSize.y};
-                // if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
-                // else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
-                // ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y / 4.f) };
-                ImVec2 buttonPos{ windowSize.x, windowSize.y};
-                ImGui::SetCursorPos(buttonPos);
-                if (_application.isSendingDevice) {
-                    if (ImGui::Button("Sending device in progress...", buttonSize)) {}                    
-                } else {
-                    if (ImGui::Button("Sending score in progress...", buttonSize)) {}                                        
-                }
-            }
-
         }
         ImGui::End();
     } else if (display_info_screen == true) {
@@ -632,6 +620,27 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 			}
 			ImGui::EndChild();
         }
+        ImGui::End();
+    } else if (display_sending_screen) {
+        ImGui::Begin("Result Display", &isOpen, window_flags);
+        {
+            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+            // Sets the window to be at the bottom of the screen (1/3rd of the height)
+            ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f };
+            ImVec2 windowPos = { 0, static_cast<float>(window->getHeight() - windowSize.y) };
+            ImGui::SetWindowSize(windowSize);
+            ImGui::SetWindowPos(windowPos);
+            // Centers the button and keeps it square at all times
+            ImVec2 buttonSize{windowSize.x - 10.0f , windowSize.y - 10.0f};
+
+            if (_application.isSendingDevice) {
+                if (ImGui::Button("Sending device in progress...", buttonSize)) {}                    
+            } else {
+                if (ImGui::Button("Sending score in progress...", buttonSize)) {}                                        
+            }
+        }
+        display_sending_screen = false;
         ImGui::End();
     }
     return true;
