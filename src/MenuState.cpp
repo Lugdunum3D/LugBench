@@ -115,7 +115,7 @@ bool MenuState::onPop() {
 }
 
 void MenuState::onEvent(const lug::Window::Event& event) {
-    if (_application.isSendingDevice || _application.isSendingScore) {
+    if (_application.isSending()) {
         return;
     }
     if (event.type == lug::Window::Event::Type::Close) {
@@ -147,7 +147,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (no_collapse)  window_flags |= ImGuiWindowFlags_NoCollapse;
     if (!no_menu)     window_flags |= ImGuiWindowFlags_MenuBar;
 
-    if (_application.isSendingDevice || _application.isSendingScore) {
+    if (_application.isSending()) {
         display_sending_screen = true;
     }
 
@@ -634,10 +634,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             // Centers the button and keeps it square at all times
             ImVec2 buttonSize{windowSize.x - 10.0f , windowSize.y - 10.0f};
 
-            if (_application.isSendingDevice) {
-                if (ImGui::Button("Sending device in progress...", buttonSize)) {}                    
-            } else {
-                if (ImGui::Button("Sending score in progress...", buttonSize)) {}                                        
+            if (_application.isSending()) {
+                ImGui::Button("Sending data in progress...", buttonSize);                   
             }
         }
         display_sending_screen = false;

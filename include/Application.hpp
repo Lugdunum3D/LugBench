@@ -7,8 +7,7 @@
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
 
 #include <AState.hpp>
-#include <Network.hpp>
-#include <StdThread.hpp>
+#include <LugNetwork.hpp>
 
 class AState;
 
@@ -34,13 +33,17 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    bool sendResult(uint32_t frames);
-    void getResponse();
+    bool sendDevice(uint32_t frames);
+    void sendScore();
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
 
-    bool isSendingDevice{false};
-    bool isSendingScore{false};
+    bool isSending() {
+        if (_isSendingDevice || _isSendingScore) {
+            return true;
+        }
+        return false;
+    }
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
@@ -49,9 +52,12 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
-    LugBench::Network _network;
+    LugBench::LugNetwork _network;
     std::string _deviceID{};
     uint32_t _nbFrames{0};
+    bool _isSendingDevice{false};
+    bool _isSendingScore{false};
+
 };
 
 #include "Application.inl"

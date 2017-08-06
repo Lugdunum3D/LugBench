@@ -6,7 +6,7 @@
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 #include <lug/System/Logger/Logger.hpp>
-
+#include <lug/Graphics/Graphics.hpp>
 #include <lug/System/Time.hpp>
 
 #include <imgui.h>
@@ -78,7 +78,7 @@ bool BenchmarkingState::onPush() {
 }
 
 bool BenchmarkingState::onPop() {
-    _application.sendResult(_frames);
+    _application.sendDevice(_frames);
 
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
@@ -103,7 +103,7 @@ bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
     _elapsed += elapsedTime.getSeconds<float>();
     _frames++;
 
-    if (_elapsed >= 2.0f) {
+    if (_elapsed >= 3.0f) {
         std::shared_ptr<AState> menuState;
         menuState = std::make_shared<MenuState>(_application);
         _application.popState();

@@ -12,8 +12,8 @@
 
 #include "MenuState.hpp"
 #include "BenchmarkingState.hpp"
-#include <StdThread.hpp>
-#include <Network.hpp>
+#include <thread>
+#include <LugNetwork.hpp>
 
 #include <json/json.hpp>
 
@@ -112,16 +112,14 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-bool Application::sendResult(uint32_t nbFrames) {
+bool Application::sendDevice(uint32_t nbFrames) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    if (physicalDeviceInfo == NULL) {
+    if (!physicalDeviceInfo) {
         return false;
     }
-
-    std::string deviceId;
 
     // sending device
     {
@@ -142,12 +140,11 @@ bool Application::sendResult(uint32_t nbFrames) {
         device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
         device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
-        _network.putDevice(device);
-        isSendingDevice = true;
         _nbFrames = nbFrames;
-        return true;
+        _network.putDevice(device.dump());
+        _isSendingDevice = true;
     }
-
+    return true;
 }
 
 void Application::onEvent(const lug::Window::Event& event) {
@@ -161,39 +158,22 @@ void Application::onEvent(const lug::Window::Event& event) {
     tmpState->onEvent(event);
 }
 
-void Application::getResponse() {
-    if (_network._mutex.try_lock()) {
-        if (isSendingDevice) {
-            LUG_LOG.info("isSendingDevice response");
-            LUG_LOG.info("Code : {}", std::get<0>(_network._response));
-            LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
-            _deviceID = std::get<1>(_network._response)["id"].get<std::string>();
-            _network._mutex.unlock();
-            isSendingDevice = false;
-            isSendingScore = true;
-            _network._response = {};
+void Application::sendScore() {
 
-            // sending score
-            {
-                nlohmann::json score;
+       // sending score
+       {
+            nlohmann::json score;
+            nlohmann::json lastResquestBody;
 
-                score["device"] = _deviceID;
-                score["scenario"] = "595ed69c734d1d25634280b0";
-                score["nbFrames"] = _nbFrames;
-                score["averageFps"] = _nbFrames / 10.0f;
+            lastResquestBody = nlohmann::json::parse(_network.getLastRequestBody());
 
-                _network.putScore(score);
-            }
-        } else {
-            LUG_LOG.info("isSendingScore response");
-            LUG_LOG.info("Code : {}", std::get<0>(_network._response));
-            LUG_LOG.info("Body : {}", std::get<1>(_network._response)["id"].get<std::string>());
-            _network._mutex.unlock();
-            isSendingScore = false;
-            _network._response = {};
+            score["device"] = lastResquestBody["id"].get<std::string>();
+            score["scenario"] = "595ed69c734d1d25634280b0";
+            score["nbFrames"] = _nbFrames;
+            score["averageFps"] = _nbFrames / 10.0f;
 
-        }
-    }
+            _network.putScore(score);
+       }
 }
 
 void Application::onFrame(const lug::System::Time& elapsedTime) {
@@ -201,8 +181,14 @@ void Application::onFrame(const lug::System::Time& elapsedTime) {
     if (_states.empty()) {
         return;
     }
-    if (isSendingDevice || isSendingScore) {
-        getResponse();
+    if (_isSendingDevice && _network.getLastResquestStatusCode() > 0) {
+        _isSendingDevice = false;
+        _isSendingScore = true;
+        sendScore();
+    }
+
+    if (_isSendingScore && _network.getLastResquestStatusCode() > 0) {
+        _isSendingScore = false;
     }
 
     std::shared_ptr<AState> tmpState = _states.top(); // Needed to prevent fault if popping a state

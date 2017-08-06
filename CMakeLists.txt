@@ -100,7 +100,7 @@ set(SRC
     src/main.cpp
     src/MenuState.cpp
     src/BenchmarkingState.cpp
-    src/Network.cpp
+    src/LugNetwork.cpp
 )
 
 set(INC
@@ -110,8 +110,7 @@ set(INC
     include/AState.hpp
     include/MenuState.hpp
     include/BenchmarkingState.hpp
-    include/Network.hpp
-    include/StdThread.hpp>
+    include/LugNetwork.hpp
 )
 
 # find imgui

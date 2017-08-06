@@ -6,44 +6,76 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LugBenchNativeActivity extends NativeActivity {
     private final static String TAG = "LugBenchNativeActivity";
-    private String res;
+    private RequestQueue queue;
+    private String mLastRequestBody;
+    private int mLastStatusCode;
+    private String mUrl;
+    private String mJson;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        queue = Volley.newRequestQueue(this);
+        mLastStatusCode = 0;
     }
 
-    private String getRequest(final String url) {
-        return url;
+    private int getLastRequestStatusCode() {
+        return mLastStatusCode;
     }
 
-    private String sendRequest(final String url, final String json) {
-        RequestQueue queue = Volley.newRequestQueue(this);
+    private String getLastRequestBody() {
+        return mLastRequestBody;
+    }
 
-        StringRequest stringRequest = new StringRequest(Request.Method.PUT, url,
+    private void get(final String url) {
+    }
+
+    private void put(final String url, final String json) {
+        mUrl = url;
+        mJson = json;
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.v(TAG, response);
-//                    this.res = response;
-                    getRequest(response);
+                    mLastRequestBody = response;
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.v(TAG, "Failed to send the request: " + Integer.toString(error.networkResponse.statusCode));
+                    if (error instanceof NetworkError || error instanceof NoConnectionError) {
+                        put(mUrl, mJson);
+                    }
+                    if (error == null || error.networkResponse == null) {
+                        Log.v(TAG, "Failed to send");
+                        return;
+                    }
+                    if (error.networkResponse.statusCode == 409) {
+                        mLastStatusCode = error.networkResponse.statusCode;
+                        mLastRequestBody = new String(error.networkResponse.data);  
+                        return;                      
+                    }
+                    Log.v(TAG, "Unhandled Status Code " + Integer.toString(error.networkResponse.statusCode));
                 }
             }
         ) {
@@ -58,10 +90,14 @@ public class LugBenchNativeActivity extends NativeActivity {
                 headers.put("User-agent", "LugBench/0.1.0");
                 return headers;
             }
+
         };
 
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                3000,   //DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+                3000,   //DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         queue.add(stringRequest);
-        return "hey this is sendRequest java response";
     }
 }
-

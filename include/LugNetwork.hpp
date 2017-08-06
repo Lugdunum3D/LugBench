@@ -1,16 +1,16 @@
 #pragma once
 
-#include <json/json.hpp>
-#include <mutex>
+#include <string>
+#if !defined(LUG_SYSTEM_ANDROID)
+    #include <mutex>
+#endif
 
 static constexpr const char* baseNetworkUri = LUGBENCH_API_URI;
 static constexpr const char* NetworkVersion = LUGBENCH_API_VERSION;
 
-using JSONResponse = std::tuple<int, nlohmann::json>;
-
 namespace LugBench {
 
-enum Route : uint8_t {
+enum  Route : uint8_t {
     getDevice,
     getDevices,
     getScore,
@@ -21,13 +21,13 @@ enum Route : uint8_t {
     putScore
 };
 
-class Network {
+class LugNetwork {
 public:
-    Network();
-    ~Network();
+    LugNetwork();
+    ~LugNetwork();
 
-    void putDevice(const nlohmann::json& json);
-    void putScore(const nlohmann::json& json);
+    void putDevice(const std::string& json);
+    void putScore(const std::string& json);
 
     void getDevice(const std::string& id);
     void getDevices();
@@ -38,15 +38,24 @@ public:
     void getScenario(const std::string& id);
     void getScenarios();
 
-    JSONResponse _response;
-    std::mutex _mutex;
+    int getLastResquestStatusCode() {
+        return _lastResquestStatusCode;
+    }
+
+    std::string getLastRequestBody() {
+        return _lastResquestBody;
+    }
 
 private:
     void get(const std::string& url);
     void put(const std::string& url, const std::string& json);
     std::string getUrlString(Route route, const std::string& id = "");
 
-    std::thread _networkThread;
+#if !defined(LUG_SYSTEM_ANDROID)
+    std::mutex _mutex;
+#endif
+    std::string _lastResquestBody{};
+    int _lastResquestStatusCode{0};
 };
 
 } // LugBench
