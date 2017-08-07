@@ -45,6 +45,10 @@ public:
         return false;
     }
 
+    LugBench::LugNetwork& getNetwork() {
+        return _network;
+    }
+
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
     std::stack<std::shared_ptr<AState>> _states;

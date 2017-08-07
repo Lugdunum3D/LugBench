@@ -56,7 +56,12 @@ void LugNetwork::getScore(const std::string& id) {
 }
 
 void LugNetwork::getScores() {
-    return get(getUrlString(Route::getScores));
+    _lastRequestBody = {};
+    _lastRequestStatusCode = 0;
+
+    LUG_LOG.info("s url : {}", getUrlString(Route::getScores));
+    std::thread networkThread = std::thread(&LugNetwork::get, this, getUrlString(Route::getScores));
+    networkThread.detach();
 }
 
 void LugNetwork::getScenario(const std::string& id) {
@@ -177,10 +182,24 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 
 #else
 
-void LugNetwork::get(const std::string&) {
-    // RestClient::Response r = RestClient::get(url);
-    // nlohmann::json json = nlohmann::json::parse(r.body);
-    // _response = std::make_tuple(r.code, json);
+void LugNetwork::get(const std::string& url) {
+    LUG_LOG.info("url : {}", url);
+    _mutex.lock();
+    RestClient::Connection* conn = new RestClient::Connection(url);
+    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+
+    while (1) {
+        RestClient::Response r = conn->get("");
+        if (r.code != -1) {
+            _lastRequestBody = r.body;
+            _lastRequestStatusCode = r.code;
+            _mutex.unlock();
+            return;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+
 }
 
 void LugNetwork::put(const std::string& url, const std::string& json) {
@@ -191,8 +210,8 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
     while (1) {
         RestClient::Response r = conn->post("", json);
         if (r.code != -1) {
-            _lastResquestBody = r.body;
-            _lastResquestStatusCode = r.code;
+            _lastRequestBody = r.body;
+            _lastRequestStatusCode = r.code;
             _mutex.unlock();
             return;
         }

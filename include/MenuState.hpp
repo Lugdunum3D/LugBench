@@ -4,6 +4,7 @@
 #include "Application.hpp"
 
 #include <lug/Graphics/Scene/Scene.hpp>
+#include <json/json.hpp>
 
 class MenuState : public AState {
 public:
@@ -36,5 +37,9 @@ private:
     bool display_info_screen{false};
     bool display_result_screen{false};
     bool display_sending_screen{false};
+
+    nlohmann::json _devices{};
+    bool _isReceiving{false};
+    bool _isStarted{false};
 
 };

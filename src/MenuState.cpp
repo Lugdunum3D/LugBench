@@ -10,7 +10,11 @@
 
 #include <lug/System/Time.hpp>
 
+#include <lug/System/Logger/Logger.hpp>
 #include "BenchmarkingState.hpp"
+#include "GUI.hpp"
+#include <json/json.hpp>
+#include "LugNetwork.hpp"
 
 MenuState::MenuState(Application &application) : AState(application) {}
 
@@ -596,6 +600,28 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         }
         ImGui::End();
     } else if (display_result_screen == true) {
+
+        if (_isStarted == false) {
+            _isReceiving = true;
+            _application.getNetwork().getScores();
+            _isStarted = true;
+            return true;
+        }
+        if (_isReceiving) {
+            if (_application.getNetwork().getLastRequestStatusCode() > 0) {
+                _isReceiving = false;
+                LUG_LOG.info("statuscode: {}", _application.getNetwork().getLastRequestStatusCode());
+                LUG_LOG.info("body: {}", _application.getNetwork().getLastRequestBody());
+                nlohmann::json response = nlohmann::json::parse(_application.getNetwork().getLastRequestBody());
+                _devices = response["data"];
+            }
+            return true;
+        }
+
+        size_t deviceCount = _devices.size();
+        if (deviceCount == 0) {
+            return true;
+        }
         ImGui::Begin("Result Display", &isOpen, window_flags);
         {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
@@ -606,12 +632,17 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowSize(windowSize);
             ImGui::SetWindowPos(windowPos);
 
-			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
+//			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
+            nlohmann::json highestScoreDevice = _devices[0];
+            float bigestStore = highestScoreDevice["averageFps"].get<float>();
+            GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f); 
 
 			ImGui::BeginChild("Score list");
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < deviceCount; i++) {
 				ImGui::PushID(i);
-				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
+                nlohmann::json device = _devices[i]; 
+                GUI::displayScoreInCell(_devices[i]["device"].get<std::string>().c_str(), 68.7f, bigestStore / _devices[i]["averageFps"].get<float>() );
+//				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
 				ImGui::PopID();
 			}
 			ImGui::NewLine();

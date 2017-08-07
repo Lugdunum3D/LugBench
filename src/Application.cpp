@@ -185,14 +185,13 @@ void Application::onFrame(const lug::System::Time& elapsedTime) {
         LUG_LOG.info("_isSendingDevice is true");
         LUG_LOG.info(" plop status code {}", _network.getLastRequestStatusCode());
     }
-    if (_isSendingDevice && _network.getLastRequestStatusCode() > 0) {
-        LUG_LOG.info("sendDevice status code : {}", _network.getLastRequestStatusCode());
-        LUG_LOG.info("sendDevice body : {}", _network.getLastRequestBody());
-        _isSendingDevice = false;
-        _isSendingScore = true;
+    if (_isSendingDevice && _network.getLastRequestStatusCode() > 0) { 
+        LUG_LOG.info("sendDevice status code : {}", _network.getLastRequestStatusCode()); 
+        LUG_LOG.info("sendDevice body : {}", _network.getLastRequestBody()); 
+        _isSendingDevice = false; 
+        _isSendingScore = true; 
         sendScore();
     }
-
     if (!_isSendingDevice && _isSendingScore && _network.getLastRequestStatusCode() > 0) {
         LUG_LOG.info("sendScore status code : {}", _network.getLastRequestStatusCode());
         LUG_LOG.info("sendScore body : {}", _network.getLastRequestBody());
