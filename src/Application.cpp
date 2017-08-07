@@ -172,7 +172,7 @@ void Application::sendScore() {
             score["nbFrames"] = _nbFrames;
             score["averageFps"] = _nbFrames / 10.0f;
 
-            _network.putScore(score);
+            _network.putScore(score.dump());
        }
 }
 
@@ -182,12 +182,16 @@ void Application::onFrame(const lug::System::Time& elapsedTime) {
         return;
     }
     if (_isSendingDevice && _network.getLastResquestStatusCode() > 0) {
+        LUG_LOG.info("sendDevice status code : {}", _network.getLastResquestStatusCode());
+        LUG_LOG.info("sendDevice body : {}", _network.getLastRequestBody());
         _isSendingDevice = false;
         _isSendingScore = true;
         sendScore();
     }
 
     if (_isSendingScore && _network.getLastResquestStatusCode() > 0) {
+        LUG_LOG.info("sendScore status code : {}", _network.getLastResquestStatusCode());
+        LUG_LOG.info("sendScore body : {}", _network.getLastRequestBody());
         _isSendingScore = false;
     }
 

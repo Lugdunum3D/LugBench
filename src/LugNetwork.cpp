@@ -8,6 +8,9 @@
 #if defined(LUG_SYSTEM_ANDROID)
     #include <jni.h>
     #include <lug/Window/Android/WindowImplAndroid.hpp>
+#else
+    #include <restclient-cpp/restclient.h>
+    #include <restclient-cpp/connection.h>
 #endif
 
 namespace LugBench {
@@ -25,11 +28,17 @@ LugNetwork::~LugNetwork() {
 }
 
 void LugNetwork::putDevice(const std::string& json) {
+    _lastResquestBody = {};
+    _lastResquestStatusCode = 0;
+
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putDevice), json);
     networkThread.detach();
 }
 
 void LugNetwork::putScore(const std::string& json) {
+    _lastResquestBody = {};
+    _lastResquestStatusCode = 0;
+
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putScore), json);
     networkThread.detach();
 }
@@ -80,6 +89,8 @@ std::string LugNetwork::getUrlString(Route route, const std::string& id) {
         case Route::putScore:
             return std::string(baseNetworkUri) + "/" + "scores";
 
+        default:
+            return "";
     }
 }
 
@@ -91,9 +102,6 @@ void LugNetwork::get(const std::string&) {
 
 void LugNetwork::put(const std::string& url, const std::string& json) {
     LUG_LOG.info("url is : {}", url);
-
-    _lastResquestBody = {};
-    _lastResquestStatusCode = 0;
 
     JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
 
@@ -167,13 +175,13 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 
 #else
 
-void Network::get(const std::string& url) {
+void LugNetwork::get(const std::string&) {
     // RestClient::Response r = RestClient::get(url);
     // nlohmann::json json = nlohmann::json::parse(r.body);
     // _response = std::make_tuple(r.code, json);
 }
 
-void Network::put(const std::string& url, const std::string& json) {
+void LugNetwork::put(const std::string& url, const std::string& json) {
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
     conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
