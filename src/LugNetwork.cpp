@@ -28,16 +28,16 @@ LugNetwork::~LugNetwork() {
 }
 
 void LugNetwork::putDevice(const std::string& json) {
-    _lastResquestBody = {};
-    _lastResquestStatusCode = 0;
+    _lastRequestBody = {};
+    _lastRequestStatusCode = 0;
 
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putDevice), json);
     networkThread.detach();
 }
 
 void LugNetwork::putScore(const std::string& json) {
-    _lastResquestBody = {};
-    _lastResquestStatusCode = 0;
+    _lastRequestBody = {};
+    _lastRequestStatusCode = 0;
 
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putScore), json);
     networkThread.detach();
@@ -148,7 +148,7 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 
             jstring rv = (jstring)jni->CallObjectMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
             if (rv) {
-                _lastResquestBody = jni->GetStringUTFChars(rv, 0);
+                _lastRequestBody = jni->GetStringUTFChars(rv, 0);
 
                 javamethod = jni->GetMethodID(clazz, "getLastRequestStatusCode", "()I");
                 if (!javamethod) {
@@ -159,7 +159,9 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 
                 int statusCode = (int)jni->CallIntMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
 
-                _lastResquestStatusCode = statusCode;
+                _lastRequestStatusCode = statusCode;
+                LUG_LOG.info("statusCode {}", statusCode);
+                LUG_LOG.info("_lastResquestBody {}", _lastRequestBody);
 
                 lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
                 return;

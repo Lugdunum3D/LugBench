@@ -8,6 +8,7 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -28,18 +29,18 @@ public class LugBenchNativeActivity extends NativeActivity {
     private final static String TAG = "LugBenchNativeActivity";
     private RequestQueue queue;
     private String mLastRequestBody;
-    private int mLastStatusCode;
+    private int mLastRequestStatusCode;
     private String mUrl;
     private String mJson;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         queue = Volley.newRequestQueue(this);
-        mLastStatusCode = 0;
+        mLastRequestStatusCode = 0;
     }
 
     private int getLastRequestStatusCode() {
-        return mLastStatusCode;
+        return mLastRequestStatusCode;
     }
 
     private String getLastRequestBody() {
@@ -64,6 +65,7 @@ public class LugBenchNativeActivity extends NativeActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     if (error instanceof NetworkError || error instanceof NoConnectionError) {
+                        Log.v(TAG, "No internet...");
                         put(mUrl, mJson);
                     }
                     if (error == null || error.networkResponse == null) {
@@ -71,9 +73,10 @@ public class LugBenchNativeActivity extends NativeActivity {
                         return;
                     }
                     if (error.networkResponse.statusCode == 409) {
-                        mLastStatusCode = error.networkResponse.statusCode;
-                        mLastRequestBody = new String(error.networkResponse.data);  
-                        return;                      
+                        mLastRequestStatusCode = error.networkResponse.statusCode;
+                        mLastRequestBody = new String(error.networkResponse.data);
+                        Log.v(TAG, "Received 409");
+                        return;
                     }
                     Log.v(TAG, "Unhandled Status Code " + Integer.toString(error.networkResponse.statusCode));
                 }
@@ -89,6 +92,12 @@ public class LugBenchNativeActivity extends NativeActivity {
                 headers.put("Content-Type","application/json");
                 headers.put("User-agent", "LugBench/0.1.0");
                 return headers;
+            }
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                mLastRequestStatusCode = response.statusCode;
+                Log.v(TAG, Integer.toString(response.statusCode));
+                return super.parseNetworkResponse(response);
             }
 
         };

@@ -38,12 +38,12 @@ public:
     void getScenario(const std::string& id);
     void getScenarios();
 
-    int getLastResquestStatusCode() {
-        return _lastResquestStatusCode;
+    int getLastRequestStatusCode() {
+        return _lastRequestStatusCode;
     }
 
     std::string getLastRequestBody() {
-        return _lastResquestBody;
+        return _lastRequestBody;
     }
 
 private:
@@ -54,8 +54,8 @@ private:
 #if !defined(LUG_SYSTEM_ANDROID)
     std::mutex _mutex;
 #endif
-    std::string _lastResquestBody{};
-    int _lastResquestStatusCode{0};
+    std::string _lastRequestBody{};
+    int _lastRequestStatusCode{0};
 };
 
 } // LugBench
