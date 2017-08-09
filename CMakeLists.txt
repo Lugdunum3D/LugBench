@@ -8,6 +8,10 @@ include(${CMAKE_SOURCE_DIR}/cmake/Macros.cmake)
 # determine the build type
 lug_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
 
+# set the path of thirdparty
+lug_set_option(LUGBENCH_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choose the path for the thirdparty directory")
+
+
 if(ANDROID)
     populate_android_infos()
 endif()
@@ -32,22 +36,22 @@ include_directories(${VULKAN_INCLUDE_DIR})
 find_package(Fmt)
 
 if (NOT FMT_INCLUDE_DIR)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/fmt")
+    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/fmt")
         message(FATAL_ERROR "Can't find fmt, call `git submodule update --recursive`")
     endif()
 
-    set(FMT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fmt/include)
+    set(FMT_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/fmt/include)
     message(STATUS "Found Fmt: ${FMT_INCLUDE_DIR}")
 endif()
 
 include_directories(${FMT_INCLUDE_DIR})
 
 # find json (it's not a well known library, so just find it in thirdparty)
-if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/json")
+if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/json")
     message(FATAL_ERROR "Can't find json, call `git submodule update --recursive`")
 endif()
 
-set(JSON_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/json/include)
+set(JSON_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/json/include)
 message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
@@ -75,11 +79,11 @@ if(NOT LUG_OS_ANDROID)
     # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
     find_package(CURL)
     if (NOT CURL_FOUND AND LUG_OS_WINDOWS)
-        if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/curl")
+        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
             message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
         endif()
 
-        set(CURL_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/curl/windows)
+        set(CURL_ROOT ${LUGBENCH_THIRDPARTY_DIR}/curl/windows)
         find_package(CURL REQUIRED)
     elseif(NOT CURL_FOUND)
         message(FATAL_ERROR "Can't find curl")
@@ -114,14 +118,14 @@ set(INC
 )
 
 # find imgui
-if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/imgui")
+if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/imgui")
     message(FATAL_ERROR "Can't find imgui, call `git submodule update --recursive`")
 endif()
 
-set(IMGUI_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/imgui/include)
+set(IMGUI_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/include)
 message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
 
-set(IMGUI_SOURCE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/imgui/src)
+set(IMGUI_SOURCE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/src)
 message(STATUS "Found Imgui: ${IMGUI_SOURCE_DIR}")
 
 include_directories(${IMGUI_INCLUDE_DIR})
