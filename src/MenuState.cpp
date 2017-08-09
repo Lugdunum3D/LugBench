@@ -635,12 +635,12 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
             nlohmann::json highestScoreDevice = _devices[0];
             float bigestStore = highestScoreDevice["averageFps"].get<float>();
-            GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f); 
+            GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
 
 			ImGui::BeginChild("Score list");
-			for (int i = 0; i < deviceCount; i++) {
+			for (uint32_t i = 0; i < deviceCount; i++) {
 				ImGui::PushID(i);
-                nlohmann::json device = _devices[i]; 
+                nlohmann::json device = _devices[i];
                 GUI::displayScoreInCell(_devices[i]["device"].get<std::string>().c_str(), 68.7f, bigestStore / _devices[i]["averageFps"].get<float>() );
 //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
 				ImGui::PopID();
@@ -666,7 +666,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImVec2 buttonSize{windowSize.x - 10.0f , windowSize.y - 10.0f};
 
             if (_application.isSending()) {
-                ImGui::Button("Sending data in progress...", buttonSize);                   
+                ImGui::Button("Sending data in progress...", buttonSize);
             }
         }
         display_sending_screen = false;
