@@ -59,22 +59,19 @@ include_directories(${JSON_INCLUDE_DIR})
 # find restclient-cpp (it's not a well known library, so just find it in thirdparty)
 # we don't use it on android
 if(NOT LUG_OS_ANDROID)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp")
-        message(FATAL_ERROR "Can't find restclient-cpp, call `git submodule update --recursive`")
+    find_package(RestClientCpp)
+    if (NOT RESTCLIENTCPP_FOUND)
+        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
+            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+        endif()
+
+        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/curl/windows)
+        find_package(RestClientCpp REQUIRED)
+    elseif(NOT RESTCLIENTCPP_FOUND)
+        message(FATAL_ERROR "Can't find curl")
     endif()
 
-    set(RESTCLIENT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/include)
-
-    if (LUG_OS_WINDOWS)
-        set(RESTCLIENT_LIBRARIES "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/lib/windows/${ARCH_DIR}/librestclient.lib")
-    else ()
-        set(RESTCLIENT_LIBRARIES "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/lib/linux/librestclient.a")
-    endif()
-
-    message(STATUS "Found Restclient-cpp includes: ${RESTCLIENT_INCLUDE_DIR}")
-    message(STATUS "Found Restclient-cpp library: ${RESTCLIENT_LIBRARIES}")
-
-    include_directories(${RESTCLIENT_INCLUDE_DIR})
+    include_directories(${RESTCLIENTCPP_INCLUDE_DIR})
 
     # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
     find_package(CURL)
@@ -90,7 +87,7 @@ if(NOT LUG_OS_ANDROID)
     endif()
 
     include_directories(${CURL_INCLUDE_DIR})
-    list(APPEND RESTCLIENT_LIBRARIES ${CURL_LIBRARIES})
+    list(APPEND RESTCLIENTCPP_LIBRARIES ${CURL_LIBRARIES})
 endif()
 
 # find Lugdunum
@@ -170,10 +167,13 @@ endif()
 include_directories(include)
 lug_add_compile_options(${EXECUTABLE_NAME})
 
-target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-if(RESTCLIENT_LIBRARIES)
-    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENT_LIBRARIES})
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads)
+
+if(RESTCLIENTCPP_LIBRARIES)
+    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})
 endif()
 
 # copy / build shaders
