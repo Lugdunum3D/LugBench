@@ -204,11 +204,11 @@ void LugNetwork::get(const std::string& url) {
 
 void LugNetwork::put(const std::string& url, const std::string& json) {
     _mutex.lock();
-    RestClient::Connection* conn = new RestClient::Connection("http://lugbench-api-dev.herokuapp.com");
+    RestClient::Connection* conn = new RestClient::Connection(url);
     conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
     conn->AppendHeader("Content-Type", "application/json");
     while (1) {
-        RestClient::Response r = conn->post("/devices", json);
+        RestClient::Response r = conn->post("", json);
         if (r.code != -1) {
             _lastRequestBody = r.body;
             _lastRequestStatusCode = r.code;
