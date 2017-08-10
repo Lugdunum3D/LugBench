@@ -83,6 +83,7 @@ if(NOT LUG_OS_ANDROID)
 
         set(CMAKE_PREFIX_PATH ${LUGBENCH_THIRDPARTY_DIR}/curl)
         find_package(CURL REQUIRED)
+        message(STATUS "Found Curl: ${CURL_INCLUDE_DIR}")
     endif()
 
     include_directories(${CURL_INCLUDE_DIR})
