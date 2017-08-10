@@ -65,7 +65,7 @@ if(NOT LUG_OS_ANDROID)
     find_package(RestClientCpp)
     if (NOT RESTCLIENTCPP_FOUND)
         if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
-            message(FATAL_ERROR "Can't restclient fmt in the thirdparty directory")
+            message(FATAL_ERROR "Can't restclient in the thirdparty directory")
         endif()
 
         set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
@@ -116,14 +116,11 @@ set(INC
 
 # find imgui
 if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/imgui")
-    message(FATAL_ERROR "Can't find imgui, call `git submodule update --recursive`")
+    message(FATAL_ERROR "Can't find imgui in the thirdparty directory")
 endif()
 
 set(IMGUI_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/include)
 message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
-
-set(IMGUI_SOURCE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/src)
-message(STATUS "Found Imgui: ${IMGUI_SOURCE_DIR}")
 
 include_directories(${IMGUI_INCLUDE_DIR})
 
