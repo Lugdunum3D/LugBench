@@ -11,7 +11,6 @@ lug_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug 
 # set the path of thirdparty
 lug_set_option(LUGBENCH_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choose the path for the thirdparty directory")
 
-
 if(ANDROID)
     populate_android_infos()
 endif()
@@ -25,11 +24,17 @@ set(EXECUTABLE_NAME "lugbench")
 # use config
 include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
-# find vulkan
+# find Vulkan
 find_package(Vulkan)
 if (NOT VULKAN_INCLUDE_DIR)
-    message(FATAL_ERROR "Can't find vulkan headers")
+    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/vulkan")
+        message(FATAL_ERROR "Can't find vulkan in the thirdparty directory")
+    endif()
+
+    set(VULKAN_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/vulkan/include)
+    message(STATUS "Found Vulkan: ${VULKAN_INCLUDE_DIR}")
 endif()
+
 include_directories(${VULKAN_INCLUDE_DIR})
 
 # find fmt
@@ -37,7 +42,7 @@ find_package(Fmt)
 
 if (NOT FMT_INCLUDE_DIR)
     if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/fmt")
-        message(FATAL_ERROR "Can't find fmt, call `git submodule update --recursive`")
+        message(FATAL_ERROR "Can't find fmt in the thirdparty directory")
     endif()
 
     set(FMT_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/fmt/include)
@@ -46,9 +51,8 @@ endif()
 
 include_directories(${FMT_INCLUDE_DIR})
 
-# find json (it's not a well known library, so just find it in thirdparty)
 if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/json")
-    message(FATAL_ERROR "Can't find json, call `git submodule update --recursive`")
+    message(FATAL_ERROR "Can't find json in the thirdparty directory")
 endif()
 
 set(JSON_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/json/include)
@@ -56,34 +60,29 @@ message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
 
-# find restclient-cpp (it's not a well known library, so just find it in thirdparty)
-# we don't use it on android
+# we don't use RestClientCpp on android
 if(NOT LUG_OS_ANDROID)
     find_package(RestClientCpp)
     if (NOT RESTCLIENTCPP_FOUND)
-        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
-            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
+            message(FATAL_ERROR "Can't restclient fmt in the thirdparty directory")
         endif()
 
-        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/curl/windows)
+        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
         find_package(RestClientCpp REQUIRED)
-    elseif(NOT RESTCLIENTCPP_FOUND)
-        message(FATAL_ERROR "Can't find curl")
     endif()
 
     include_directories(${RESTCLIENTCPP_INCLUDE_DIR})
 
-    # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
+    # restclient-cpp depends of curl
     find_package(CURL)
-    if (NOT CURL_FOUND AND LUG_OS_WINDOWS)
+    if (NOT CURL_FOUND)
         if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
-            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+            message(FATAL_ERROR "Can't find curl in the thirdparty directory")
         endif()
 
-        set(CURL_ROOT ${LUGBENCH_THIRDPARTY_DIR}/curl/windows)
+        set(CMAKE_PREFIX_PATH ${LUGBENCH_THIRDPARTY_DIR}/curl)
         find_package(CURL REQUIRED)
-    elseif(NOT CURL_FOUND)
-        message(FATAL_ERROR "Can't find curl")
     endif()
 
     include_directories(${CURL_INCLUDE_DIR})
