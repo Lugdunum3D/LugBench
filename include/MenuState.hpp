@@ -5,6 +5,7 @@
 
 #include <lug/Graphics/Scene/Scene.hpp>
 #include <json/json.hpp>
+#include <imgui.h>
 
 class MenuState : public AState {
 public:
@@ -22,24 +23,28 @@ private:
 
     float _rotation{0.0f};
 
-    // Variables for "Sample Window" (temporary)
-    bool isOpen{false};
-
-    bool no_menu_bar{false};
-    bool no_titlebar{true};
-    bool no_border{true};
-    bool no_resize{true};
-    bool no_move{true};
-    bool no_scrollbar{false};
-    bool no_collapse{true};
-    bool no_menu{true};
-
-    bool display_info_screen{false};
-    bool display_result_screen{false};
-    bool display_sending_screen{false};
+    bool _display_info_screen{false};
+    bool _display_result_screen{false};
+    bool _display_sending_screen{false};
 
     nlohmann::json _devices{};
     bool _isReceiving{false};
     bool _isStarted{false};
+
+    float _sending_log_timer;
+    float _sending_end_log_timer;
+
+    // TEMP:(Stuart) Variables for "Window Editor" (temporary)
+
+    bool _isOpen{ false };
+
+    bool _no_menu_bar;
+    bool _no_titlebar;
+    bool _no_border;
+    bool _no_resize;
+    bool _no_move;
+    bool _no_scrollbar;
+    bool _no_collapse;
+    bool _no_menu;
 
 };
