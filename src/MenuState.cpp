@@ -305,17 +305,18 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     } else if (_display_result_screen == true) {
         if (_isStarted == false) {
             _isReceiving = true;
-            _application.getNetwork().getScores();
+            LugBench::LugNetwork::getInstance().getScores();
             _isStarted = true;
             return true;
         }
         if (_isReceiving) {
-            if (_application.getNetwork().getLastRequestStatusCode() > 0) {
+            if (LugBench::LugNetwork::getInstance().getMutex().try_lock())
                 _isReceiving = false;
-                LUG_LOG.info("statuscode: {}", _application.getNetwork().getLastRequestStatusCode());
-                LUG_LOG.info("body: {}", _application.getNetwork().getLastRequestBody());
-                nlohmann::json response = nlohmann::json::parse(_application.getNetwork().getLastRequestBody());
+                LUG_LOG.info("statuscode: {}", LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
+                LUG_LOG.info("body: {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
+                nlohmann::json response = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
                 _devices = response["data"];
+                LugBench::LugNetwork::getInstance().getMutex().unlock();
             }
             return true;
         }
@@ -324,7 +325,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         if (_isOpen == false) {
             _display_result_screen = !_display_result_screen;
         }
-    }
     ImGui::ShowTestWindow();
     return true;
 }

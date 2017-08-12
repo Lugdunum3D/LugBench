@@ -45,10 +45,6 @@ public:
         return false;
     }
 
-    LugBench::LugNetwork& getNetwork() {
-        return _network;
-    }
-
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
     std::stack<std::shared_ptr<AState>> _states;
@@ -56,7 +52,6 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
-    LugBench::LugNetwork _network;
     std::string _deviceID{};
     uint32_t _nbFrames{0};
     bool _isSendingDevice{false};

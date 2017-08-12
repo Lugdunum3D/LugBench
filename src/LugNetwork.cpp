@@ -13,6 +13,13 @@
     #include <restclient-cpp/connection.h>
 #endif
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_lugdunum_lugbench_LugBenchNativeActivity_nativeCallback(JNIEnv* env, jobject, jint statusCode, jstring body) {
+    LugBench::LugNetwork::getInstance()._lastRequestStatusCode = (int)statusCode;
+    LugBench::LugNetwork::getInstance()._lastRequestBody = env->GetStringUTFChars(body, 0);
+    LugBench::LugNetwork::getInstance().getMutex().unlock();
+}
+
 namespace LugBench {
 
 LugNetwork::LugNetwork() {
@@ -27,10 +34,13 @@ LugNetwork::~LugNetwork() {
 #endif
 }
 
-void LugNetwork::putDevice(const std::string& json) {
-    _lastRequestBody = {};
-    _lastRequestStatusCode = 0;
+LugNetwork &LugNetwork::getInstance()
+{
+    static LugNetwork lugNetwork;
+    return lugNetwork;
+}
 
+void LugNetwork::putDevice(const std::string& json) {
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putDevice), json);
     networkThread.detach();
 }
@@ -59,7 +69,6 @@ void LugNetwork::getScores() {
     _lastRequestBody = {};
     _lastRequestStatusCode = 0;
 
-    LUG_LOG.info("s url : {}", getUrlString(Route::getScores));
     std::thread networkThread = std::thread(&LugNetwork::get, this, getUrlString(Route::getScores));
     networkThread.detach();
 }
@@ -106,6 +115,7 @@ void LugNetwork::get(const std::string&) {
 }
 
 void LugNetwork::put(const std::string& url, const std::string& json) {
+    _mutex.lock();
     LUG_LOG.info("url is : {}", url);
 
     JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
@@ -131,53 +141,6 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
     jni->CallVoidMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod, nativeUrl, nativeJson);
 
     lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-
-    {
-        while (1) {
-            JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
-            lug::Window::priv::WindowImpl::activity->vm->AttachCurrentThread(&jni, NULL);
-
-            jclass clazz = jni->GetObjectClass(lug::Window::priv::WindowImpl::activity->clazz);
-            if (!clazz) {
-                LUG_LOG.error("FindClass error");
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            jmethodID javamethod = jni->GetMethodID(clazz, "getLastRequestBody", "()Ljava/lang/String;");
-            if (!javamethod) {
-                LUG_LOG.error("GetMethodID error");
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            jstring rv = (jstring)jni->CallObjectMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
-            if (rv) {
-                _lastRequestBody = jni->GetStringUTFChars(rv, 0);
-
-                javamethod = jni->GetMethodID(clazz, "getLastRequestStatusCode", "()I");
-                if (!javamethod) {
-                    LUG_LOG.error("GetMethodID error");
-                    lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                    return;
-                }
-
-                int statusCode = (int)jni->CallIntMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
-
-                _lastRequestStatusCode = statusCode;
-                LUG_LOG.info("statusCode {}", statusCode);
-                LUG_LOG.info("_lastResquestBody {}", _lastRequestBody);
-
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
-
-    }
-
 }
 
 #else

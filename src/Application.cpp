@@ -141,7 +141,7 @@ bool Application::sendDevice(uint32_t nbFrames) {
         device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
         _nbFrames = nbFrames;
-        _network.putDevice(device.dump());
+        LugBench::LugNetwork::getInstance().putDevice(device.dump());
         _isSendingDevice = true;
     }
     return true;
@@ -165,14 +165,14 @@ void Application::sendScore() {
             nlohmann::json score;
             nlohmann::json lastResquestBody;
 
-            lastResquestBody = nlohmann::json::parse(_network.getLastRequestBody());
+            lastResquestBody = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
 
             score["device"] = lastResquestBody["id"].get<std::string>();
             score["scenario"] = "595ed69c734d1d25634280b0";
             score["nbFrames"] = _nbFrames;
             score["averageFps"] = _nbFrames / 10.0f;
 
-            _network.putScore(score.dump());
+            LugBench::LugNetwork::getInstance().putScore(score.dump());
        }
 }
 
@@ -181,21 +181,20 @@ void Application::onFrame(const lug::System::Time& elapsedTime) {
     if (_states.empty()) {
         return;
     }
-    if (_isSendingDevice) {
-        LUG_LOG.info("_isSendingDevice is true");
-        LUG_LOG.info(" plop status code {}", _network.getLastRequestStatusCode());
-    }
-    if (_isSendingDevice && _network.getLastRequestStatusCode() > 0) { 
-        LUG_LOG.info("sendDevice status code : {}", _network.getLastRequestStatusCode()); 
-        LUG_LOG.info("sendDevice body : {}", _network.getLastRequestBody()); 
-        _isSendingDevice = false; 
-        _isSendingScore = true; 
-        sendScore();
-    }
-    if (!_isSendingDevice && _isSendingScore && _network.getLastRequestStatusCode() > 0) {
-        LUG_LOG.info("sendScore status code : {}", _network.getLastRequestStatusCode());
-        LUG_LOG.info("sendScore body : {}", _network.getLastRequestBody());
-        _isSendingScore = false;
+
+    if ((_isSendingDevice || _isSendingScore) && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
+        LUG_LOG.info("wattt");
+        LUG_LOG.info("status code : {}", LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
+        LUG_LOG.info("body : {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
+        LugBench::LugNetwork::getInstance().getMutex().unlock();
+
+        if (_isSendingDevice) {
+            _isSendingDevice = false;
+            _isSendingScore = true;
+            sendScore();
+        } else {
+            _isSendingScore = false;
+        }
     }
 
     std::shared_ptr<AState> tmpState = _states.top(); // Needed to prevent fault if popping a state

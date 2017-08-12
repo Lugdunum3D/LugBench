@@ -1,16 +1,14 @@
 #pragma once
 
 #include <string>
-#if !defined(LUG_SYSTEM_ANDROID)
-    #include <mutex>
-#endif
+#include <mutex>
 
 static constexpr const char* baseNetworkUri = LUGBENCH_API_URI;
 static constexpr const char* NetworkVersion = LUGBENCH_API_VERSION;
 
 namespace LugBench {
 
-enum  Route : uint8_t {
+enum class Route : uint8_t {
     getDevice,
     getDevices,
     getScore,
@@ -46,16 +44,20 @@ public:
         return _lastRequestBody;
     }
 
+    std::mutex &getMutex() {
+        return _mutex;
+    }
+
+    static LugNetwork                     &getInstance();
+    std::string _lastRequestBody{};
+    int _lastRequestStatusCode{0};
+
 private:
     void get(const std::string& url);
     void put(const std::string& url, const std::string& json);
     std::string getUrlString(Route route, const std::string& id = "");
 
-#if !defined(LUG_SYSTEM_ANDROID)
     std::mutex _mutex;
-#endif
-    std::string _lastRequestBody{};
-    int _lastRequestStatusCode{0};
 };
 
 } // LugBench

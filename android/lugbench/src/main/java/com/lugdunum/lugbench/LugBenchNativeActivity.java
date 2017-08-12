@@ -39,17 +39,6 @@ public class LugBenchNativeActivity extends NativeActivity {
         mLastRequestStatusCode = 0;
     }
 
-    private int getLastRequestStatusCode() {
-        return mLastRequestStatusCode;
-    }
-
-    private String getLastRequestBody() {
-        return mLastRequestBody;
-    }
-
-    private void get(final String url) {
-    }
-
     private void put(final String url, final String json) {
         mUrl = url;
         mJson = json;
@@ -58,7 +47,7 @@ public class LugBenchNativeActivity extends NativeActivity {
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    mLastRequestBody = response;
+                    nativeCallback(mLastRequestStatusCode, response);
                 }
             },
             new Response.ErrorListener() {
@@ -75,7 +64,7 @@ public class LugBenchNativeActivity extends NativeActivity {
                     if (error.networkResponse.statusCode == 409) {
                         mLastRequestStatusCode = error.networkResponse.statusCode;
                         mLastRequestBody = new String(error.networkResponse.data);
-                        Log.v(TAG, "Received 409");
+                        nativeCallback(error.networkResponse.statusCode, mLastRequestBody);
                         return;
                     }
                     Log.v(TAG, "Unhandled Status Code " + Integer.toString(error.networkResponse.statusCode));
@@ -108,5 +97,10 @@ public class LugBenchNativeActivity extends NativeActivity {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         queue.add(stringRequest);
+    }
+
+    public native void nativeCallback(int statusCode, String body);
+    static {
+        System.loadLibrary("lugbench");
     }
 }
