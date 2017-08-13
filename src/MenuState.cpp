@@ -303,28 +303,30 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             _display_info_screen = !_display_info_screen;
         }
     } else if (_display_result_screen == true) {
-        if (_isStarted == false) {
+        if (_devices.size() == 0 && !_isReceiving) {
             _isReceiving = true;
             LugBench::LugNetwork::getInstance().getScores();
-            _isStarted = true;
             return true;
         }
-        if (_isReceiving) {
-            if (LugBench::LugNetwork::getInstance().getMutex().try_lock())
-                _isReceiving = false;
-                LUG_LOG.info("statuscode: {}", LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
-                LUG_LOG.info("body: {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
-                nlohmann::json response = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
-                _devices = response["data"];
-                LugBench::LugNetwork::getInstance().getMutex().unlock();
-            }
+        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
+            _isReceiving = false;
+            LUG_LOG.info("statuscode: {}",
+                         LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
+            LUG_LOG.info("body: {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
+            nlohmann::json response = nlohmann::json::parse(
+                    LugBench::LugNetwork::getInstance().getLastRequestBody());
+            _devices = response["data"];
+            LugBench::LugNetwork::getInstance().getMutex().unlock();
             return true;
         }
-        
-        GUI::displayResultScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo, &_devices);
+
+        GUI::displayResultScreen(&_isOpen, window_flags,
+                                 _application.getGraphics().getRenderer()->getWindow(),
+                                 _physicalDeviceInfo, &_devices);
         if (_isOpen == false) {
             _display_result_screen = !_display_result_screen;
         }
+    }
     ImGui::ShowTestWindow();
     return true;
 }

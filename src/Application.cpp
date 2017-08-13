@@ -89,7 +89,7 @@ bool Application::init(int argc, char* argv[]) {
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<BenchmarkingState>(*this);
+    menuState = std::make_shared<MenuState>(*this);
     pushState(menuState);
 
     return true;

@@ -48,7 +48,6 @@ void LugNetwork::putDevice(const std::string& json) {
 void LugNetwork::putScore(const std::string& json) {
     _lastRequestBody = {};
     _lastRequestStatusCode = 0;
-
     std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putScore), json);
     networkThread.detach();
 }
@@ -68,7 +67,6 @@ void LugNetwork::getScore(const std::string& id) {
 void LugNetwork::getScores() {
     _lastRequestBody = {};
     _lastRequestStatusCode = 0;
-
     std::thread networkThread = std::thread(&LugNetwork::get, this, getUrlString(Route::getScores));
     networkThread.detach();
 }
@@ -110,13 +108,35 @@ std::string LugNetwork::getUrlString(Route route, const std::string& id) {
 
 #if defined(LUG_SYSTEM_ANDROID)
 
-void LugNetwork::get(const std::string&) {
-    // TODO
+void LugNetwork::get(const std::string& url) {
+    _mutex.lock();
+
+    JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
+
+    lug::Window::priv::WindowImpl::activity->vm->AttachCurrentThread(&jni, NULL);
+
+    jclass clazz = jni->GetObjectClass(lug::Window::priv::WindowImpl::activity->clazz);
+    if (clazz == 0) {
+        LUG_LOG.error("FindClass error");
+        lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
+        return;
+    }
+    jmethodID javamethod = jni->GetMethodID(clazz, "get", "(Ljava/lang/String;)V");
+    if (javamethod == 0) {
+        LUG_LOG.info("GetMethodID error");
+        lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
+        return;
+    }
+
+    jstring nativeUrl = jni->NewStringUTF(url.c_str());
+
+    jni->CallVoidMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod, nativeUrl);
+
+    lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
 }
 
 void LugNetwork::put(const std::string& url, const std::string& json) {
     _mutex.lock();
-    LUG_LOG.info("url is : {}", url);
 
     JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
 
@@ -146,7 +166,6 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 #else
 
 void LugNetwork::get(const std::string& url) {
-    LUG_LOG.info("url : {}", url);
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
     conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
@@ -161,8 +180,6 @@ void LugNetwork::get(const std::string& url) {
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
-
 }
 
 void LugNetwork::put(const std::string& url, const std::string& json) {

@@ -29,7 +29,6 @@ private:
 
     nlohmann::json _devices{};
     bool _isReceiving{false};
-    bool _isStarted{false};
 
     float _sending_log_timer;
     float _sending_end_log_timer;
