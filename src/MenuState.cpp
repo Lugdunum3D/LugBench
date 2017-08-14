@@ -290,9 +290,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         }
         if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
             _isReceiving = false;
-            LUG_LOG.info("statuscode: {}",
-                         LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
-            LUG_LOG.info("body: {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
             nlohmann::json response = nlohmann::json::parse(
                     LugBench::LugNetwork::getInstance().getLastRequestBody());
             _devices = response["data"];
