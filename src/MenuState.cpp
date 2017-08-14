@@ -15,6 +15,8 @@
 #include <json/json.hpp>
 #include "LugNetwork.hpp"
 
+#include <IconsFontAwesome.h>
+
 MenuState::MenuState(Application &application) : AState(application) {
     _no_menu_bar = false;
     _no_titlebar = true;
@@ -219,7 +221,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         ImGui::Begin("Sample Window", &_isOpen, window_flags);
         {
             ImGui::Checkbox("No Menu Bar", &_no_menu_bar);
-//            ImGui::Text("%s Search", u8"\uf002");
+            ImGui::Text("%s Search", u8"\uf002");
             ImGui::NewLine();
             ImGui::Checkbox("No Titlebar", &_no_titlebar);
             ImGui::Checkbox("No Border", &_no_border);
@@ -249,9 +251,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             // Start tests button
             {
                 // Centers the button and keeps it square at all times
-                ImVec2 buttonSize;
-                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 2.f), (windowSize.y / 2.f) }; }
-                else { buttonSize = { (windowSize.x / 2.f), (windowSize.x / 2.f) }; }
+                ImVec2 buttonSize = (windowSize.x > windowSize.y) ? ImVec2{ (windowSize.y / 2.f), (windowSize.y / 2.f) } : ImVec2{ (windowSize.x / 2.f), (windowSize.x / 2.f) };
                 centerButtonPos = { (windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f) };
                 ImGui::SetCursorPos(centerButtonPos);
                 if (ImGui::Button("START\nTESTS", buttonSize)) {
@@ -328,4 +328,3 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     ImGui::ShowTestWindow();
     return true;
 }
-

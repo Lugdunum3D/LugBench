@@ -124,6 +124,16 @@ message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
 
 include_directories(${IMGUI_INCLUDE_DIR})
 
+# find IconFontCppHeaders
+if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/IconFontCppHeaders")
+    message(FATAL_ERROR "Can't find IconFontCppHeaders in the thirdparty directory")
+endif()
+
+set(ICON_FONT_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/IconFontCppHeaders)
+message(STATUS "Found IconFontCppHeaders: ${ICON_FONT_INCLUDE_DIR}")
+
+include_directories(${ICON_FONT_INCLUDE_DIR})
+
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS
     gui.vert
