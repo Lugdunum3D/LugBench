@@ -8,6 +8,9 @@ include(${CMAKE_SOURCE_DIR}/cmake/Macros.cmake)
 # determine the build type
 lug_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
 
+# set the path of thirdparty
+lug_set_option(LUGBENCH_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choose the path for the thirdparty directory")
+
 if(ANDROID)
     populate_android_infos()
 endif()
@@ -21,72 +24,70 @@ set(EXECUTABLE_NAME "lugbench")
 # use config
 include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
-# find vulkan
+# find Vulkan
 find_package(Vulkan)
 if (NOT VULKAN_INCLUDE_DIR)
-    message(FATAL_ERROR "Can't find vulkan headers")
+    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/vulkan")
+        message(FATAL_ERROR "Can't find vulkan in the thirdparty directory")
+    endif()
+
+    set(VULKAN_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/vulkan/include)
+    message(STATUS "Found Vulkan: ${VULKAN_INCLUDE_DIR}")
 endif()
+
 include_directories(${VULKAN_INCLUDE_DIR})
 
 # find fmt
 find_package(Fmt)
 
 if (NOT FMT_INCLUDE_DIR)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/fmt")
-        message(FATAL_ERROR "Can't find fmt, call `git submodule update --recursive`")
+    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/fmt")
+        message(FATAL_ERROR "Can't find fmt in the thirdparty directory")
     endif()
 
-    set(FMT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/fmt/include)
+    set(FMT_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/fmt/include)
     message(STATUS "Found Fmt: ${FMT_INCLUDE_DIR}")
 endif()
 
 include_directories(${FMT_INCLUDE_DIR})
 
-# find json (it's not a well known library, so just find it in thirdparty)
-if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/json")
-    message(FATAL_ERROR "Can't find json, call `git submodule update --recursive`")
+if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/json")
+    message(FATAL_ERROR "Can't find json in the thirdparty directory")
 endif()
 
-set(JSON_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/json/include)
+set(JSON_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/json/include)
 message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
 
-# find restclient-cpp (it's not a well known library, so just find it in thirdparty)
-# we don't use it on android
+# we don't use RestClientCpp on android
 if(NOT LUG_OS_ANDROID)
-    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp")
-        message(FATAL_ERROR "Can't find restclient-cpp, call `git submodule update --recursive`")
-    endif()
-
-    set(RESTCLIENT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/include)
-
-    if (LUG_OS_WINDOWS)
-        set(RESTCLIENT_LIBRARIES "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/lib/windows/${ARCH_DIR}/librestclient.lib")
-    else ()
-        set(RESTCLIENT_LIBRARIES "${CMAKE_SOURCE_DIR}/thirdparty/restclient-cpp/lib/linux/librestclient.a")
-    endif()
-
-    message(STATUS "Found Restclient-cpp includes: ${RESTCLIENT_INCLUDE_DIR}")
-    message(STATUS "Found Restclient-cpp library: ${RESTCLIENT_LIBRARIES}")
-
-    include_directories(${RESTCLIENT_INCLUDE_DIR})
-
-    # restclient-cpp depends of curl, and we link it statically, so we had to link with curl too
-    find_package(CURL)
-    if (NOT CURL_FOUND AND LUG_OS_WINDOWS)
-        if (NOT EXISTS "${CMAKE_SOURCE_DIR}/thirdparty/curl")
-            message(FATAL_ERROR "Can't find curl, call `git submodule update --recursive`")
+    find_package(RestClientCpp)
+    if (NOT RESTCLIENTCPP_FOUND)
+        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
+            message(FATAL_ERROR "Can't restclient in the thirdparty directory")
         endif()
 
-        set(CURL_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/curl/windows)
+        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
+        find_package(RestClientCpp REQUIRED)
+    endif()
+
+    include_directories(${RESTCLIENTCPP_INCLUDE_DIR})
+
+    # restclient-cpp depends of curl
+    find_package(CURL)
+    if (NOT CURL_FOUND)
+        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
+            message(FATAL_ERROR "Can't find curl in the thirdparty directory")
+        endif()
+
+        set(CMAKE_PREFIX_PATH ${LUGBENCH_THIRDPARTY_DIR}/curl)
         find_package(CURL REQUIRED)
-    elseif(NOT CURL_FOUND)
-        message(FATAL_ERROR "Can't find curl")
+        message(STATUS "Found Curl: ${CURL_INCLUDE_DIR}")
     endif()
 
     include_directories(${CURL_INCLUDE_DIR})
-    list(APPEND RESTCLIENT_LIBRARIES ${CURL_LIBRARIES})
+    list(APPEND RESTCLIENTCPP_LIBRARIES ${CURL_LIBRARIES})
 endif()
 
 # find Lugdunum
@@ -94,38 +95,59 @@ find_package(LUG REQUIRED core graphics system window math)
 include_directories(${LUG_INCLUDE_DIR})
 
 set(SRC
-    src/APIClient/Common.cpp
-    src/APIClient/GPU.cpp
-    src/APIClient/Router.cpp
     src/Application.cpp
     src/GPUInfoProvider.cpp
+    src/GUI.cpp
     src/main.cpp
+    src/MenuState.cpp
+    src/BenchmarkingState.cpp
+    src/LugNetwork.cpp
 )
 
 set(INC
-    include/APIClient/Common.hpp
-    include/APIClient/GPU.hpp
-    include/APIClient/Router.hpp
     include/Application.hpp
     include/GPUInfoProvider.hpp
+    include/GUI.hpp
+    include/AState.hpp
+    include/MenuState.hpp
+    include/BenchmarkingState.hpp
+    include/LugNetwork.hpp
 )
+
+# find imgui
+if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/imgui")
+    message(FATAL_ERROR "Can't find imgui in the thirdparty directory")
+endif()
+
+set(IMGUI_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/include)
+message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
+
+include_directories(${IMGUI_INCLUDE_DIR})
 
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS
-    shader.vert
-    shader-directional.frag
-    shader-point.frag
-    shader-spot.frag
+    gui.vert
+    gui.frag
 )
-
 # List of resources in the directory ${LUG_RESOURCES_DIR}
 set(LUG_RESOURCES
     # Nothing for the moment
+    shaders/forward/shader.vert
+    shaders/forward/shader.frag
+    models/DamagedHelmet/DamagedHelmet.bin
+    models/DamagedHelmet/DamagedHelmet.gltf
+    models/DamagedHelmet/textures/Default_albedo.jpg
+    models/DamagedHelmet/textures/Default_AO.jpg
+    models/DamagedHelmet/textures/Default_emissive.jpg
+    models/DamagedHelmet/textures/Default_metallic_roughness.jpg
+    models/DamagedHelmet/textures/Default_normal.jpg
 )
 
 # List of resources in the directory ${CMAKE_SOURCE_DIR}/resources
 set(OTHER_RESOURCES
-    # Nothing for the moment
+    models/Duck/Duck0.bin
+    models/Duck/Duck.gltf
+    models/Duck/DuckCM.png
 )
 
 # create target
@@ -142,10 +164,13 @@ endif()
 include_directories(include)
 lug_add_compile_options(${EXECUTABLE_NAME})
 
-target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES})
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-if(RESTCLIENT_LIBRARIES)
-    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENT_LIBRARIES})
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads)
+
+if(RESTCLIENTCPP_LIBRARIES)
+    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})
 endif()
 
 # copy / build shaders
@@ -158,11 +183,7 @@ add_resources(${EXECUTABLE_NAME} lug_resources ${LUG_RESOURCES_DIR} ${LUG_RESOUR
 add_resources(${EXECUTABLE_NAME} sample_resources "${CMAKE_SOURCE_DIR}/resources" ${OTHER_RESOURCES})
 
 # add api uri
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api-dev.herokuapp.com")
-else()
-    set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api.herokuapp.com")
-endif()
+set(DEFAULT_LUGBENCH_API_URI "http://lugbench-api-dev.herokuapp.com")
 
 lug_set_option(LUGBENCH_API_URI ${DEFAULT_LUGBENCH_API_URI} STRING "URI of the Lugbench API")
 add_definitions(/DLUGBENCH_API_URI="${LUGBENCH_API_URI}")

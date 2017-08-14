@@ -6,3 +6,7 @@ android/.idea/
 *.iml
 .vs/LugBench/v15/Browse.VC.db
 .vs/
+.gradle
+thirdparty
+assets
+shaders

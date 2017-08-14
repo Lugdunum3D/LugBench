@@ -1,4 +1,4 @@
-#include <GPUInfoProvider.hpp>
+#include "GPUInfoProvider.hpp"
 
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Core/Version.hpp>
@@ -12,11 +12,7 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
             {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(physicalDeviceInfo.properties.apiVersion).minor)},
             {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(physicalDeviceInfo.properties.apiVersion).patch)}
         }},
-        {"driverVersion", {
-            {"major", static_cast<uint32_t>(lug::Core::Version::fromInt(physicalDeviceInfo.properties.driverVersion).major)},
-            {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(physicalDeviceInfo.properties.driverVersion).minor)},
-            {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(physicalDeviceInfo.properties.driverVersion).patch)}
-        }},
+        {"driverVersion", physicalDeviceInfo.properties.driverVersion},
         {"vendorID", physicalDeviceInfo.properties.vendorID},
         {"deviceID", physicalDeviceInfo.properties.deviceID},
         {"deviceType", lug::Graphics::Vulkan::API::RTTI::toStr(physicalDeviceInfo.properties.deviceType)},
@@ -197,16 +193,11 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
         {"inheritedQueries", static_cast<bool>(physicalDeviceInfo.features.inheritedQueries)},
     };
 
-    json["memory"] = {
-        {"memoryTypeCount", physicalDeviceInfo.memoryProperties.memoryTypeCount},
-        {"memoryHeapCount", physicalDeviceInfo.memoryProperties.memoryHeapCount}
-    };
-
     for (size_t i = 0; i < physicalDeviceInfo.memoryProperties.memoryTypeCount; ++i) {
         json["memory"]["memoryTypes"].push_back(
         {
-            {"propertyFlags", lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(physicalDeviceInfo.memoryProperties.memoryTypes[i].propertyFlags)},
             {"heapIndex", physicalDeviceInfo.memoryProperties.memoryTypes[i].heapIndex},
+            {"propertyFlags", lug::Graphics::Vulkan::API::RTTI::VkMemoryPropertyFlagsToStrVec(physicalDeviceInfo.memoryProperties.memoryTypes[i].propertyFlags)},
         }
         );
     }
@@ -234,14 +225,10 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
     }
 
     for (auto extension : physicalDeviceInfo.extensions) {
-        json["extension"].push_back(
+        json["extensions"].push_back(
         {
             {"extensionName", extension.extensionName},
-            {"specVersion", {
-                {"major", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).major)},
-                {"minor", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).minor)},
-                {"patch", static_cast<uint32_t>(lug::Core::Version::fromInt(extension.specVersion).patch)}
-            }},
+            {"specVersion", extension.specVersion},
         }
         );
     }
@@ -259,25 +246,38 @@ nlohmann::json GPUInfoProvider::get(const lug::Graphics::Vulkan::PhysicalDeviceI
         );
     }
 
-    json["SwapChainInfo"].push_back(
-    {
+    json["swapchain"] = {
+        {"maxImageArrayLayers", physicalDeviceInfo.swapchain.capabilities.maxImageArrayLayers},
         {"minImageCount", physicalDeviceInfo.swapchain.capabilities.minImageCount},
         {"maxImageCount", physicalDeviceInfo.swapchain.capabilities.maxImageCount},
-        {"currentExtent", {
-            {"width", physicalDeviceInfo.swapchain.capabilities.currentExtent.width},
-            {"height", physicalDeviceInfo.swapchain.capabilities.currentExtent.height}
-        }},
-        {"minImageExtent",{
-            {"width", physicalDeviceInfo.swapchain.capabilities.minImageExtent.width},
-            {"height", physicalDeviceInfo.swapchain.capabilities.minImageExtent.height}
-        }},
-        {"maxImageExtent", {
-            {"width", physicalDeviceInfo.swapchain.capabilities.maxImageExtent.width},
-            {"height", physicalDeviceInfo.swapchain.capabilities.maxImageExtent.height}
-        }},
-        {"maxImageArrayLayers", physicalDeviceInfo.swapchain.capabilities.maxImageArrayLayers},
-    }
-    );
-
+        {"formats", [](const auto& formats)  {
+                std::vector<std::string> res{};
+                for (const auto& tmp : formats) {
+                    res.push_back(lug::Graphics::Vulkan::API::RTTI::toStr(tmp.format));
+                }
+                return res;
+            } (physicalDeviceInfo.swapchain.formats)
+        },
+        {"presentModes", [](const auto& presentModes)  {
+                std::vector<std::string> res{};
+                for (const auto& tmp : presentModes) {
+                    res.push_back(lug::Graphics::Vulkan::API::RTTI::toStr(tmp));
+                }
+                return res;
+            } (physicalDeviceInfo.swapchain.presentModes)
+        },
+        {"supportedTransforms", lug::Graphics::Vulkan::API::RTTI::VkSurfaceTransformFlagsKHRToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedTransforms)},
+        {"supportedCompositeAlpha", lug::Graphics::Vulkan::API::RTTI::VkCompositeAlphaFlagsKHRToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedCompositeAlpha)},
+        {"supportedUsageFlags", lug::Graphics::Vulkan::API::RTTI::VkImageUsageFlagsToStrVec(physicalDeviceInfo.swapchain.capabilities.supportedUsageFlags)},
+#if defined(LUG_SYSTEM_ANDROID)
+        {"surfaceExtension", "VK_KHR_android_surface"},
+#elif defined(LUG_SYSTEM_WINDOWS)
+        {"surfaceExtension", "VK_KHR_win32_surface"},
+#elif defined(LUG_SYSTEM_LINUX)
+        {"surfaceExtension", "VK_KHR_xcb_surface"},
+#else
+        {"surfaceExtension", "Unknown"},
+#endif
+    };
     return json;
 }
