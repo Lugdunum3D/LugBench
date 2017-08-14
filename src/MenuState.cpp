@@ -284,7 +284,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     } else if (_display_result_screen == true) {
         if (_devices.size() == 0 && !_isReceiving) {
             _isReceiving = true;
-            LugBench::LugNetwork::getInstance().getScores();
+            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
+                                                            LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
             return true;
         }
         if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {

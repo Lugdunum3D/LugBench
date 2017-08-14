@@ -15,5 +15,5 @@ inline void LugNetwork::setLastRequestStatusCode(int code) {
 }
 
 inline void LugNetwork::setLastRequestBody(std::string body) {
-    _lastRequestBody = body;   
+    _lastRequestBody = body;
 }

@@ -15,8 +15,13 @@ enum class Route : uint8_t {
     getScores,
     getScenario,
     getScenarios,
-    putDevice,
-    putScore
+    sendDevice,
+    sendScore
+};
+
+enum class Method : uint8_t {
+    POST,
+    GET
 };
 
 class LugNetwork {
@@ -24,17 +29,7 @@ public:
     LugNetwork();
     ~LugNetwork();
 
-    void putDevice(const std::string& json);
-    void putScore(const std::string& json);
-
-    void getDevice(const std::string& id);
-    void getDevices();
-
-    void getScore(const std::string& id);
-    void getScores();
-
-    void getScenario(const std::string& id);
-    void getScenarios();
+    void makeRequest(Method method, std::string url, const std::string& json = "");
 
     int getLastRequestStatusCode();
     std::string getLastRequestBody();
@@ -44,14 +39,14 @@ public:
     std::mutex &getMutex();
 
     static LugNetwork &getInstance();
+    static std::string urlToString(Route route, const std::string& id = "");
 
     std::string _lastRequestBody{};
     int _lastRequestStatusCode{0};
 
 private:
     void get(const std::string& url);
-    void put(const std::string& url, const std::string& json);
-    std::string getUrlString(Route route, const std::string& id = "");
+    void post(const std::string& url, const std::string& json);
 
     std::mutex _mutex;
 };
