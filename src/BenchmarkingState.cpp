@@ -74,7 +74,7 @@ bool BenchmarkingState::onPush() {
 }
 
 bool BenchmarkingState::onPop() {
-    _application.sendDevice(_frames);
+    _application.sendDevice(_frames, _elapsed);
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();

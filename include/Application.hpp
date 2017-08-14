@@ -35,7 +35,7 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    bool sendDevice(uint32_t frames);
+    bool sendDevice(uint32_t frames, float elapsed);
     void sendScore();
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
@@ -49,6 +49,7 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
     uint32_t _nbFrames{0};
+    float _elapsed{0.0f};
     bool _isSendingDevice{false};
     bool _isSendingScore{false};
 

@@ -106,7 +106,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-bool Application::sendDevice(uint32_t nbFrames) {
+bool Application::sendDevice(uint32_t nbFrames, float elapsed) {
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
@@ -133,6 +133,7 @@ bool Application::sendDevice(uint32_t nbFrames) {
     device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
     _nbFrames = nbFrames;
+    _elapsed = elapsed;
     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendDevice),
                                                     device.dump());
@@ -149,7 +150,7 @@ void Application::sendScore() {
     score["device"] = lastResquestBody["id"].get<std::string>();
     score["scenario"] = "595ed69c734d1d25634280b0";
     score["nbFrames"] = _nbFrames;
-    score["averageFps"] = _nbFrames / 10.0f;
+    score["averageFps"] = _nbFrames / _elapsed;
 
     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendScore),
