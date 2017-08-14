@@ -1,4 +1,4 @@
-#include <GPUInfoProvider.hpp>
+#include "GPUInfoProvider.hpp"
 
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Core/Version.hpp>

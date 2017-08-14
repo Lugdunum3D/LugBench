@@ -2,18 +2,14 @@
 
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
-#include <lug/Graphics/Renderer.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
-#include <lug/System/Logger/Logger.hpp>
-#include <lug/Graphics/Graphics.hpp>
-#include <lug/System/Time.hpp>
 
 #include <imgui.h>
 
 #include "MenuState.hpp"
 
-BenchmarkingState::BenchmarkingState(Application &application) : AState(application) {
+BenchmarkingState::BenchmarkingState(LugBench::Application &application) : AState(application) {
     LUG_LOG.info("BenchmarkingState constructor");
 }
 
@@ -79,16 +75,10 @@ bool BenchmarkingState::onPush() {
 
 bool BenchmarkingState::onPop() {
     _application.sendDevice(_frames);
-
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
-
-    // auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
-    // LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-
     _scene = nullptr;
-
    return true;
 }
 

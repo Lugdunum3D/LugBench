@@ -10,7 +10,7 @@
 class MenuState : public AState {
 public:
     MenuState() = delete;
-    MenuState(Application &application);
+    MenuState(LugBench::Application &application);
     ~MenuState();
 
     void onEvent(const lug::Window::Event& event) override;

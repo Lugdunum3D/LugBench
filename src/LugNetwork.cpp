@@ -15,8 +15,8 @@
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_lugdunum_lugbench_LugBenchNativeActivity_nativeCallback(JNIEnv* env, jobject, jint statusCode, jstring body) {
-    LugBench::LugNetwork::getInstance()._lastRequestStatusCode = (int)statusCode;
-    LugBench::LugNetwork::getInstance()._lastRequestBody = env->GetStringUTFChars(body, 0);
+    LugBench::LugNetwork::getInstance().setLastRequestStatusCode((int)statusCode);
+    LugBench::LugNetwork::getInstance().setLastRequestBody(env->GetStringUTFChars(body, 0));
     LugBench::LugNetwork::getInstance().getMutex().unlock();
 }
 
@@ -168,7 +168,7 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
 void LugNetwork::get(const std::string& url) {
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
-    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+    conn->SetUserAgent("LugBench/0.1.0");
 
     while (1) {
         RestClient::Response r = conn->get("");
@@ -185,7 +185,7 @@ void LugNetwork::get(const std::string& url) {
 void LugNetwork::put(const std::string& url, const std::string& json) {
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
-    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+    conn->SetUserAgent("LugBench/0.1.0");
     conn->AppendHeader("Content-Type", "application/json");
     while (1) {
         RestClient::Response r = conn->post("", json);

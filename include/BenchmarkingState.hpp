@@ -11,7 +11,7 @@
 class BenchmarkingState : public AState {
 public:
     BenchmarkingState() = delete;
-    BenchmarkingState(Application &application);
+    BenchmarkingState(LugBench::Application &application);
     ~BenchmarkingState();
 
     void onEvent(const lug::Window::Event& event) override;

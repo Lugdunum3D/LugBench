@@ -36,19 +36,15 @@ public:
     void getScenario(const std::string& id);
     void getScenarios();
 
-    int getLastRequestStatusCode() {
-        return _lastRequestStatusCode;
-    }
+    int getLastRequestStatusCode();
+    std::string getLastRequestBody();
+    void setLastRequestStatusCode(int code);
+    void setLastRequestBody(std::string body);
 
-    std::string getLastRequestBody() {
-        return _lastRequestBody;
-    }
+    std::mutex &getMutex();
 
-    std::mutex &getMutex() {
-        return _mutex;
-    }
+    static LugNetwork &getInstance();
 
-    static LugNetwork                     &getInstance();
     std::string _lastRequestBody{};
     int _lastRequestStatusCode{0};
 
@@ -59,5 +55,7 @@ private:
 
     std::mutex _mutex;
 };
+
+#include "LugNetwork.inl"
 
 } // LugBench
