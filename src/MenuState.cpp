@@ -276,7 +276,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                 else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
                 ImVec2 buttonPos{ centerButtonPos.x - (buttonSize.x * 1.5f), centerButtonPos.y + (buttonSize.y / 4.f) };
                 ImGui::SetCursorPos(buttonPos);
-                if (ImGui::Button("Config\nInfo", buttonSize)) {
+                if (ImGui::Button(ICON_FA_COGS"\nConfig\n Info", buttonSize)) {
                     LUG_LOG.debug("Config button pressed");
                     _display_info_screen = !_display_info_screen;
                 }
