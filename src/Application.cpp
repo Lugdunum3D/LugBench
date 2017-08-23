@@ -16,6 +16,7 @@
 #include <LugNetwork.hpp>
 
 #include <json/json.hpp>
+#include <IconsFontAwesome.h>
 
 Application::Application() : lug::Core::Application::Application{{"lugbench", {0, 1, 0}}} {
     std::srand((uint32_t)std::time(0));
@@ -87,9 +88,23 @@ bool Application::init(int argc, char* argv[]) {
         }
     }
 
+    // Generating custom font texture
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        // merge in icons from Font Awesome
+        io.Fonts->AddFontDefault();
+        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+        ImFontConfig icons_config;
+        icons_config.MergeMode = true;
+        icons_config.PixelSnapH = true;
+        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 16.0f, &icons_config, icons_ranges);
+    }
+
+    static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
+
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<BenchmarkingState>(*this);
+    menuState = std::make_shared<MenuState>(*this);
     pushState(menuState);
 
     return true;
