@@ -92,12 +92,17 @@ bool Application::init(int argc, char* argv[]) {
     {
         ImGuiIO& io = ImGui::GetIO();
         // merge in icons from Font Awesome
-        io.Fonts->AddFontDefault();
-        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
         ImFontConfig icons_config;
+//        icons_config.SizePixels = 20;
+//        icons_config.OversampleH *= 4;
+
+//        io.Fonts->AddFontDefault(&icons_config);
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
+
+        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
         icons_config.MergeMode = true;
         icons_config.PixelSnapH = true;
-        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 16.0f, &icons_config, icons_ranges);
+        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
     }
 
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
