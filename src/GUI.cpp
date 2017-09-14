@@ -334,12 +334,8 @@ void GUI::displayInfoScreen(bool* isOpen, ImGuiWindowFlags windowFlags, lug::Gra
             ImGui::Unindent();
         }
         ImGui::EndChild(); // Info
-        ImGui::Separator();
-        ImGui::NewLine();
-        if (ImGui::Button(ICON_FA_ARROW_LEFT " RETURN", ImVec2{ 160, 50 })) {
+        if (GUI::displayReturnButton() == true) {
             *isOpen = false;
-            displayFeatures = false;
-            displayExtraDeviceInfo = false;
         }
     }
     ImGui::End(); // Info Display
@@ -358,6 +354,7 @@ void GUI::displayResultScreen(bool * isOpen, ImGuiWindowFlags windowFlags, lug::
         windowSize.y -= 150;
         ImGui::BeginChild("Result", windowSize);
         {
+            ImGui::SetWindowFontScale(.67f);
             size_t deviceCount = devices->size();
             if (deviceCount > 0) {
                 //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
@@ -367,6 +364,7 @@ void GUI::displayResultScreen(bool * isOpen, ImGuiWindowFlags windowFlags, lug::
 
                 ImGui::BeginChild("Score list");
                 {
+                    ImGui::SetWindowFontScale(.54f);
                     for (uint32_t i = 0; i < deviceCount; i++) {
                         ImGui::PushID(i);
                         nlohmann::json device = (*devices)[i];
@@ -379,9 +377,7 @@ void GUI::displayResultScreen(bool * isOpen, ImGuiWindowFlags windowFlags, lug::
             }
         }
         ImGui::EndChild();
-        ImGui::Separator();
-        ImGui::NewLine();
-        if (ImGui::Button(ICON_FA_ARROW_LEFT " RETURN", ImVec2{ 140, 50 })) {
+        if (GUI::displayReturnButton() == true) {
             *isOpen = false;
         }
     }
@@ -562,4 +558,14 @@ ImVec2 GUI::centerButton(ImVec2 windowSize, ImVec2 offset) {
     ImVec2 centerButtonPos = { (windowSize.x / 2.f) - (buttonSize.x * offset.x), /*(windowSize.y / 2.f) - */(buttonSize.y * offset.y) };
     ImGui::SetCursorPos(centerButtonPos);
     return buttonSize;
+}
+
+bool GUI::displayReturnButton() {
+    ImGui::Separator();
+    ImGui::SetWindowFontScale(.67f);
+    ImGui::NewLine();
+    if (ImGui::Button(ICON_FA_ARROW_LEFT " RETURN", ImVec2{ 120, 50 })) {
+        return true;
+    }
+    return false;
 }

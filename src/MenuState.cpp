@@ -3,29 +3,15 @@
 
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
-#include <lug/Graphics/Renderer.hpp>
-#include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
-#include <lug/System/Time.hpp>
-
-#include <lug/System/Logger/Logger.hpp>
 #include "BenchmarkingState.hpp"
-#include <json/json.hpp>
-#include "LugNetwork.hpp"
 
 #include <IconsFontAwesome.h>
-
-MenuState::MenuState(Application &application) : AState(application) {
-    _no_menu_bar = false;
-    _no_titlebar = true;
-    _no_border = true;
-    _no_resize = true;
-    _no_move = true;
-    _no_scrollbar = false;
-    _no_collapse = true;
-    _no_menu = true;
+//
+//MenuState::MenuState(Application &application) : AState(application) {
+MenuState::MenuState(LugBench::Application &application) : AState(application) {
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ChildWindowRounding = 0.f;
@@ -154,7 +140,8 @@ bool MenuState::onPush() {
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
     _physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    if (_physicalDeviceInfo == NULL) {
+
+    if (!_physicalDeviceInfo) {
         return false;
     }
     return true;
@@ -162,17 +149,10 @@ bool MenuState::onPush() {
 
 bool MenuState::onPop() {
     LUG_LOG.info("MenuState onPop");
-
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
-
-    // auto& renderViews = _application.getGraphics().getRenderer()->getWindow()->getRenderViews();
-    // LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-    // _application.setCamera(renderViews[0]->detachCamera());
-
     _scene = nullptr;
-
     return true;
 }
 
@@ -191,8 +171,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (_rotation > 360.0f) {
         _rotation -= 360.0f;
     }
-
-    // _scene->getSceneNode("duck")->setRotation(lug::Math::Geometry::radians(_rotation), {0, 1, 0});
 
     float x = 3.0f * cos(lug::Math::Geometry::radians(_rotation));
     float y = 3.0f * sin(lug::Math::Geometry::radians(_rotation));
@@ -214,12 +192,10 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         _sending_end_log_timer = 0.f;
         _display_sending_screen = true;
     }
-    else {
-        if (_display_sending_screen == true) {
-            _sending_log_timer = 2.f;
-            _sending_end_log_timer = 3.f;
-            _display_sending_screen = false;
-        }
+    else if (_display_sending_screen == true) {
+        _sending_log_timer = 2.f;
+        _sending_end_log_timer = 3.f;
+        _display_sending_screen = false;
     }
 
     if (_sending_log_timer > 0.f) {
@@ -267,7 +243,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
         ImGui::Begin("Sample Window", &_isOpen, window_flags);
         {
             ImGui::Checkbox("No Menu Bar", &_no_menu_bar);
-            ImGui::Text("%s Search", u8"\uf002");
             ImGui::NewLine();
             ImGui::Checkbox("No Titlebar", &_no_titlebar);
             ImGui::Checkbox("No Border", &_no_border);
@@ -304,8 +279,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                         benchmarkingState = std::make_shared<BenchmarkingState>(_application);
                         _application.popState();
                         _application.pushState(benchmarkingState);
-                    }
-                    else {
+                    } else {
                         LUG_LOG.debug("Wait for previous logs to be sent");
                     }
                 }
@@ -338,24 +312,24 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             _display_info_screen = !_display_info_screen;
         }
     } else if (_display_result_screen == true) {
-        if (_isStarted == false) {
+        if (_devices.size() == 0 && !_isReceiving) {
             _isReceiving = true;
-            _application.getNetwork().getScores();
-            _isStarted = true;
+            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
+                                                            LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
             return true;
         }
-        if (_isReceiving) {
-            if (_application.getNetwork().getLastRequestStatusCode() > 0) {
-                _isReceiving = false;
-                LUG_LOG.info("statuscode: {}", _application.getNetwork().getLastRequestStatusCode());
-                LUG_LOG.info("body: {}", _application.getNetwork().getLastRequestBody());
-                nlohmann::json response = nlohmann::json::parse(_application.getNetwork().getLastRequestBody());
-                _devices = response["data"];
-            }
+        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
+            _isReceiving = false;
+            nlohmann::json response = nlohmann::json::parse(
+                    LugBench::LugNetwork::getInstance().getLastRequestBody());
+            _devices = response["data"];
+            LugBench::LugNetwork::getInstance().getMutex().unlock();
             return true;
         }
-        
-        GUI::displayResultScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo, &_devices);
+
+        GUI::displayResultScreen(&_isOpen, window_flags,
+                                 _application.getGraphics().getRenderer()->getWindow(),
+                                 _physicalDeviceInfo, &_devices);
         if (_isOpen == false) {
             _display_result_screen = !_display_result_screen;
         }

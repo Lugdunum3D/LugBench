@@ -7,10 +7,10 @@
     #include <lug/System/Logger/LogCatHandler.hpp>
 #else
     #include <lug/System/Logger/OstreamHandler.hpp>
+    #include <lug/Window/Window.hpp>
 #endif
-#include <lug/Window/Window.hpp>
 
-#include <Application.hpp>
+#include "Application.hpp"
 
 int main(int argc, char* argv[]) {
 #if defined(LUG_SYSTEM_ANDROID)
@@ -19,13 +19,11 @@ int main(int argc, char* argv[]) {
     LUG_LOG.addHandler(lug::System::Logger::makeHandler<lug::System::Logger::StdoutHandler>("stdout"));
 #endif
 
-    Application app;
+    LugBench::Application app;
 
     if (!app.init(argc, argv)) {
         return 1;
     }
 
     return app.run() ? 0 : 1;
-
-    return 0;
 }

@@ -1,16 +1,19 @@
 #pragma once
 
-class Application;
-
 #include <lug/Graphics/Resource.hpp>
 #include <lug/Graphics/Scene/Scene.hpp>
 #include <lug/System/Time.hpp>
 #include <lug/Window/Event.hpp>
+#include "Application.hpp"
+
+namespace LugBench {
+    class Application;
+} // LugBench
 
 class AState {
 public:
     AState() = delete;
-    AState(Application& application) : _application(application) {}
+    AState(LugBench::Application& application) : _application(application) {}
     virtual ~AState() {};
 
     virtual void onEvent(const lug::Window::Event& event) = 0;
@@ -22,6 +25,6 @@ public:
     virtual bool onPush() { return true; };
 
 protected:
-    Application                                                     &_application;
+    LugBench::Application &_application;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
 };

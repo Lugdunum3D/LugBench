@@ -13,6 +13,15 @@
     #include <restclient-cpp/connection.h>
 #endif
 
+#if defined(LUG_SYSTEM_ANDROID)
+extern "C" JNIEXPORT void JNICALL
+Java_com_lugdunum_lugbench_LugBenchNativeActivity_nativeCallback(JNIEnv* env, jobject, jint statusCode, jstring body) {
+    LugBench::LugNetwork::getInstance().setLastRequestStatusCode((int)statusCode);
+    LugBench::LugNetwork::getInstance().setLastRequestBody(env->GetStringUTFChars(body, 0));
+    LugBench::LugNetwork::getInstance().getMutex().unlock();
+}
+#endif
+
 namespace LugBench {
 
 LugNetwork::LugNetwork() {
@@ -27,52 +36,13 @@ LugNetwork::~LugNetwork() {
 #endif
 }
 
-void LugNetwork::putDevice(const std::string& json) {
-    _lastRequestBody = {};
-    _lastRequestStatusCode = 0;
-
-    std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putDevice), json);
-    networkThread.detach();
+LugNetwork &LugNetwork::getInstance()
+{
+    static LugNetwork lugNetwork;
+    return lugNetwork;
 }
 
-void LugNetwork::putScore(const std::string& json) {
-    _lastRequestBody = {};
-    _lastRequestStatusCode = 0;
-
-    std::thread networkThread = std::thread(&LugNetwork::put, this, getUrlString(Route::putScore), json);
-    networkThread.detach();
-}
-
-void LugNetwork::getDevice(const std::string& id) {
-    return get(getUrlString(Route::getDevice, id));
-}
-
-void LugNetwork::getDevices() {
-    return get(getUrlString(Route::getDevices));
-}
-
-void LugNetwork::getScore(const std::string& id) {
-    return get(getUrlString(Route::getScore, id));
-}
-
-void LugNetwork::getScores() {
-    _lastRequestBody = {};
-    _lastRequestStatusCode = 0;
-
-    LUG_LOG.info("s url : {}", getUrlString(Route::getScores));
-    std::thread networkThread = std::thread(&LugNetwork::get, this, getUrlString(Route::getScores));
-    networkThread.detach();
-}
-
-void LugNetwork::getScenario(const std::string& id) {
-    return get(getUrlString(Route::getScenario, id));
-}
-
-void LugNetwork::getScenarios() {
-    return get(getUrlString(Route::getScenarios));
-}
-
-std::string LugNetwork::getUrlString(Route route, const std::string& id) {
+std::string LugNetwork::urlToString(Route route, const std::string& id) {
     switch (route) {
         case Route::getDevice:
             return std::string(baseNetworkUri) + "/" + "devices" + "/" + id;
@@ -89,9 +59,9 @@ std::string LugNetwork::getUrlString(Route route, const std::string& id) {
         case Route::getScenarios:
             return std::string(baseNetworkUri) + "/" + "scenarios";
 
-        case Route::putDevice:
+        case Route::sendDevice:
             return std::string(baseNetworkUri) + "/" + "devices";
-        case Route::putScore:
+        case Route::sendScore:
             return std::string(baseNetworkUri) + "/" + "scores";
 
         default:
@@ -99,14 +69,55 @@ std::string LugNetwork::getUrlString(Route route, const std::string& id) {
     }
 }
 
-#if defined(LUG_SYSTEM_ANDROID)
-
-void LugNetwork::get(const std::string&) {
-    // TODO
+void LugNetwork::makeRequest(Method method, std::string url, const std::string& json) {
+    if (!_mutex.try_lock()) {
+        LUG_LOG.error("Already performing a request");
+        return;
+    }
+    _lastRequestBody = {};
+    _lastRequestStatusCode = 0;
+    _mutex.unlock();
+    LUG_LOG.info("sending {} request with url {}", method == Method::POST ? "POST" : "GET", url);
+    std::thread networkThread;
+    if (method == Method::POST) {
+        networkThread = std::thread(&LugNetwork::post, this, url, json);
+    } else {
+        networkThread = std::thread(&LugNetwork::get, this, url);
+    }
+    networkThread.detach();
 }
 
-void LugNetwork::put(const std::string& url, const std::string& json) {
-    LUG_LOG.info("url is : {}", url);
+#if defined(LUG_SYSTEM_ANDROID)
+
+void LugNetwork::get(const std::string& url) {
+    _mutex.lock();
+
+    JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
+
+    lug::Window::priv::WindowImpl::activity->vm->AttachCurrentThread(&jni, NULL);
+
+    jclass clazz = jni->GetObjectClass(lug::Window::priv::WindowImpl::activity->clazz);
+    if (clazz == 0) {
+        LUG_LOG.error("FindClass error");
+        lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
+        return;
+    }
+    jmethodID javamethod = jni->GetMethodID(clazz, "get", "(Ljava/lang/String;)V");
+    if (javamethod == 0) {
+        LUG_LOG.info("GetMethodID error");
+        lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
+        return;
+    }
+
+    jstring nativeUrl = jni->NewStringUTF(url.c_str());
+
+    jni->CallVoidMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod, nativeUrl);
+
+    lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
+}
+
+void LugNetwork::post(const std::string& url, const std::string& json) {
+    _mutex.lock();
 
     JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
 
@@ -131,62 +142,15 @@ void LugNetwork::put(const std::string& url, const std::string& json) {
     jni->CallVoidMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod, nativeUrl, nativeJson);
 
     lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-
-    {
-        while (1) {
-            JNIEnv *jni = lug::Window::priv::WindowImpl::activity->env;
-            lug::Window::priv::WindowImpl::activity->vm->AttachCurrentThread(&jni, NULL);
-
-            jclass clazz = jni->GetObjectClass(lug::Window::priv::WindowImpl::activity->clazz);
-            if (!clazz) {
-                LUG_LOG.error("FindClass error");
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            jmethodID javamethod = jni->GetMethodID(clazz, "getLastRequestBody", "()Ljava/lang/String;");
-            if (!javamethod) {
-                LUG_LOG.error("GetMethodID error");
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            jstring rv = (jstring)jni->CallObjectMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
-            if (rv) {
-                _lastRequestBody = jni->GetStringUTFChars(rv, 0);
-
-                javamethod = jni->GetMethodID(clazz, "getLastRequestStatusCode", "()I");
-                if (!javamethod) {
-                    LUG_LOG.error("GetMethodID error");
-                    lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                    return;
-                }
-
-                int statusCode = (int)jni->CallIntMethod(lug::Window::priv::WindowImpl::activity->clazz, javamethod);
-
-                _lastRequestStatusCode = statusCode;
-                LUG_LOG.info("statusCode {}", statusCode);
-                LUG_LOG.info("_lastResquestBody {}", _lastRequestBody);
-
-                lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-                return;
-            }
-
-            lug::Window::priv::WindowImpl::activity->vm->DetachCurrentThread();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
-
-    }
-
 }
 
 #else
 
 void LugNetwork::get(const std::string& url) {
-    LUG_LOG.info("url : {}", url);
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
-    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+    conn->SetUserAgent("LugBench/0.1.0");
+    conn->AppendHeader("Content-Type", "application/json"); // TODO(Yoann) : to remove when API is fixed
 
     while (1) {
         RestClient::Response r = conn->get("");
@@ -198,14 +162,12 @@ void LugNetwork::get(const std::string& url) {
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
-
 }
 
-void LugNetwork::put(const std::string& url, const std::string& json) {
+void LugNetwork::post(const std::string& url, const std::string& json) {
     _mutex.lock();
     RestClient::Connection* conn = new RestClient::Connection(url);
-    conn->SetUserAgent("LugBench/0.1.0"); // TODO(Yoann) better version handling
+    conn->SetUserAgent("LugBench/0.1.0");
     conn->AppendHeader("Content-Type", "application/json");
     while (1) {
         RestClient::Response r = conn->post("", json);

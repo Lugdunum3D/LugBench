@@ -10,7 +10,7 @@
 class MenuState : public AState {
 public:
     MenuState() = delete;
-    MenuState(Application &application);
+    MenuState(LugBench::Application &application);
     ~MenuState();
 
     void onEvent(const lug::Window::Event& event) override;
@@ -29,7 +29,6 @@ private:
 
     nlohmann::json _devices{};
     bool _isReceiving{false};
-    bool _isStarted{false};
 
     float _sending_log_timer;
     float _sending_end_log_timer;

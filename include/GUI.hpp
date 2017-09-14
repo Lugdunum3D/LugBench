@@ -33,4 +33,6 @@ void displayDeviceFeatures(lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDe
 
 ImVec2 centerButton(ImVec2 windowSize, ImVec2 offset);
 
+bool displayReturnButton();
+
 } // GUI

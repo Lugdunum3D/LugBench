@@ -1,24 +1,27 @@
 #pragma once
 
 #include <string>
-#if !defined(LUG_SYSTEM_ANDROID)
-    #include <mutex>
-#endif
+#include <mutex>
 
 static constexpr const char* baseNetworkUri = LUGBENCH_API_URI;
 static constexpr const char* NetworkVersion = LUGBENCH_API_VERSION;
 
 namespace LugBench {
 
-enum  Route : uint8_t {
+enum class Route : uint8_t {
     getDevice,
     getDevices,
     getScore,
     getScores,
     getScenario,
     getScenarios,
-    putDevice,
-    putScore
+    sendDevice,
+    sendScore
+};
+
+enum class Method : uint8_t {
+    POST,
+    GET
 };
 
 class LugNetwork {
@@ -26,36 +29,28 @@ public:
     LugNetwork();
     ~LugNetwork();
 
-    void putDevice(const std::string& json);
-    void putScore(const std::string& json);
+    void makeRequest(Method method, std::string url, const std::string& json = "");
 
-    void getDevice(const std::string& id);
-    void getDevices();
+    int getLastRequestStatusCode();
+    std::string getLastRequestBody();
+    void setLastRequestStatusCode(int code);
+    void setLastRequestBody(std::string body);
 
-    void getScore(const std::string& id);
-    void getScores();
+    std::mutex &getMutex();
 
-    void getScenario(const std::string& id);
-    void getScenarios();
+    static LugNetwork &getInstance();
+    static std::string urlToString(Route route, const std::string& id = "");
 
-    int getLastRequestStatusCode() {
-        return _lastRequestStatusCode;
-    }
-
-    std::string getLastRequestBody() {
-        return _lastRequestBody;
-    }
+    std::string _lastRequestBody{};
+    int _lastRequestStatusCode{0};
 
 private:
     void get(const std::string& url);
-    void put(const std::string& url, const std::string& json);
-    std::string getUrlString(Route route, const std::string& id = "");
+    void post(const std::string& url, const std::string& json);
 
-#if !defined(LUG_SYSTEM_ANDROID)
     std::mutex _mutex;
-#endif
-    std::string _lastRequestBody{};
-    int _lastRequestStatusCode{0};
 };
+
+#include "LugNetwork.inl"
 
 } // LugBench

@@ -11,6 +11,8 @@
 
 class AState;
 
+namespace LugBench {
+
 class Application : public ::lug::Core::Application {
 public:
     Application();
@@ -33,21 +35,11 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    bool sendDevice(uint32_t frames);
+    bool sendDevice(uint32_t frames, float elapsed);
     void sendScore();
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
-
-    bool isSending() {
-        if (_isSendingDevice || _isSendingScore) {
-            return true;
-        }
-        return false;
-    }
-
-    LugBench::LugNetwork& getNetwork() {
-        return _network;
-    }
+    bool isSending() const;
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
@@ -56,12 +48,13 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
-    LugBench::LugNetwork _network;
-    std::string _deviceID{};
     uint32_t _nbFrames{0};
+    float _elapsed{0.0f};
     bool _isSendingDevice{false};
     bool _isSendingScore{false};
 
 };
 
 #include "Application.inl"
+
+} // LugBench
