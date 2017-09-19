@@ -4,7 +4,7 @@ fmt:
 
 imgui:
     repository:
-        tag: 1094afc6bef39080b60cbc7f44bb3eb52cd597d8
+        tag: 479e532f184061fee6af9a295a84bc6f5f263852
 
 vulkan:
     repository:
@@ -16,8 +16,9 @@ json:
 
 curl:
     repository:
-        tag: 7e949de1d23e2cc40df68160bb19e9c0b3c6bb4c
+        tag: 729e9d3ad5df1d75dbb3e3fae09cda9fe9d89acc
 
 restclient:
     repository:
-        tag: 8af5b2a5463da68edb996be03e278737a911c82d
+        tag: 3ea71f069665717e972851ab495927f948c1ce9b
+    
