@@ -12,7 +12,7 @@ vulkan:
 
 json:
     repository:
-        tag: 6e5b895f87e2de3136179fb177b8da5fbb1f6678
+        tag: 8f169c9930d3dcba0e487c55e7a9139d6bea5dc9
 
 curl:
     repository:
