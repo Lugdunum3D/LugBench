@@ -12,6 +12,12 @@
 //#include <json/json.hpp>
 #include <IconsFontAwesome.h>
 
+#if defined(LUG_SYSTEM_ANDROID)
+    #include <android/asset_manager.h>
+
+    #include <lug/Window/Android/WindowImplAndroid.hpp>
+#endif
+
 namespace LugBench {
 
 Application::Application() : lug::Core::Application::Application{{"lugbench", {0, 1, 0}}} {
@@ -93,12 +99,59 @@ bool Application::init(int argc, char* argv[]) {
 //        icons_config.OversampleH *= 4;
 
 //        io.Fonts->AddFontDefault(&icons_config);
+
+#if defined(LUG_SYSTEM_ANDROID)
+    {        
+        AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
+
+        if (!asset) {
+            LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/Roboto-Bold.ttf");
+            return false;
+        }
+
+        size_t size = AAsset_getLength(asset);
+
+        if (size <= 0) {
+            LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/Roboto-Bold.ttf");
+            return false;
+        }
+        char* buff(new char[size]);
+
+        AAsset_read(asset, buff, size);
+        AAsset_close(asset);
+        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
+    }
+#else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
+#endif
 
         static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
         icons_config.MergeMode = true;
         icons_config.PixelSnapH = true;
+#if defined(LUG_SYSTEM_ANDROID)
+    {
+        AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
+
+        if (!asset) {
+            LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/fontawesome-webfont.ttf");
+            return false;
+        }
+
+        size_t size = AAsset_getLength(asset);
+
+        if (size <= 0) {
+            LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/fontawesome-webfont.ttf");
+            return false;
+        }
+        char* buff(new char[size]);
+
+        AAsset_read(asset, buff, size);
+        AAsset_close(asset);
+        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config, icons_ranges);
+    }
+#else
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
+#endif
     }
 
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();

@@ -158,6 +158,7 @@ set(OTHER_RESOURCES
 # create target
 if(LUG_OS_ANDROID)
     add_library(${EXECUTABLE_NAME} SHARED ${SRC} ${INC})
+    set(EXT_LIBRARIES android)
 
     set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/${EXECUTABLE_NAME})
     set(ANDROID_PROJECT_ASSETS ${ANDROID_PROJECT_PATH}/src/main/assets)
@@ -172,7 +173,7 @@ lug_add_compile_options(${EXECUTABLE_NAME})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads)
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads ${EXT_LIBRARIES})
 
 if(RESTCLIENTCPP_LIBRARIES)
     target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})
