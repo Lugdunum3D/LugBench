@@ -65,7 +65,7 @@ if(NOT LUG_OS_ANDROID)
     find_package(RestClientCpp)
     if (NOT RESTCLIENTCPP_FOUND)
         if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
-            message(FATAL_ERROR "Can't restclient in the thirdparty directory")
+            message(FATAL_ERROR "Can't find restclient in the thirdparty directory")
         endif()
 
         set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
@@ -124,6 +124,9 @@ message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
 
 include_directories(${IMGUI_INCLUDE_DIR})
 
+# IconFontAwesome
+include_directories(ext/)
+
 # List of shaders in the directory ${LUG_RESOURCES_DIR}/shader
 set(SHADERS
     gui.vert
@@ -148,11 +151,14 @@ set(OTHER_RESOURCES
     models/Duck/Duck0.bin
     models/Duck/Duck.gltf
     models/Duck/DuckCM.png
+    fonts/fontawesome-webfont.ttf
+    fonts/Roboto-Bold.ttf
 )
 
 # create target
 if(LUG_OS_ANDROID)
     add_library(${EXECUTABLE_NAME} SHARED ${SRC} ${INC})
+    set(EXT_LIBRARIES android)
 
     set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/${EXECUTABLE_NAME})
     set(ANDROID_PROJECT_ASSETS ${ANDROID_PROJECT_PATH}/src/main/assets)
@@ -167,7 +173,7 @@ lug_add_compile_options(${EXECUTABLE_NAME})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads)
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads ${EXT_LIBRARIES})
 
 if(RESTCLIENTCPP_LIBRARIES)
     target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})

@@ -8,15 +8,55 @@
 
 #include "BenchmarkingState.hpp"
 
+#include <IconsFontAwesome.h>
+//
+//MenuState::MenuState(Application &application) : AState(application) {
 MenuState::MenuState(LugBench::Application &application) : AState(application) {
-    _no_menu_bar = false;
-    _no_titlebar = true;
-    _no_border = true;
-    _no_resize = true;
-    _no_move = true;
-    _no_scrollbar = false;
-    _no_collapse = true;
-    _no_menu = true;
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ChildWindowRounding = 0.f;
+    style.WindowRounding = 0.f;
+    style.WindowPadding.x = 5.f;
+    style.Colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.00f);
+    style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f); //
+    style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.34f, 0.34f, 0.34f, 1.00f); //
+    style.Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+    style.Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+    style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style.Colors[ImGuiCol_ComboBg] = ImVec4(0.19f, 0.18f, 0.21f, 1.00f);
+    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.64f, 0.87f, 0.25f, 1.00f); //
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.58f, 0.58f, 0.58f, 1.f); //
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style.Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
+    style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style.Colors[ImGuiCol_CloseButton] = ImVec4(0.40f, 0.39f, 0.38f, 0.16f);
+    style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.40f, 0.39f, 0.38f, 0.39f);
+    style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.40f, 0.39f, 0.38f, 1.00f);
+    style.Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+    style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+    style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+    style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
 MenuState::~MenuState() {
@@ -219,7 +259,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
             // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 3.f };
+            ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) / 4.f };
             ImVec2 windowPos = { 0, static_cast<float>(window->getHeight() - windowSize.y) };
             ImGui::SetWindowSize(windowSize);
             ImGui::SetWindowPos(windowPos);
@@ -228,13 +268,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
 
             // Start tests button
             {
-                // Centers the button and keeps it square at all times
-                ImVec2 buttonSize;
-                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 2.f), (windowSize.y / 2.f) }; }
-                else { buttonSize = { (windowSize.x / 2.f), (windowSize.x / 2.f) }; }
-                centerButtonPos = { (windowSize.x / 2.f) - (buttonSize.x / 2.f), (windowSize.y / 2.f) - (buttonSize.y / 2.f) };
-                ImGui::SetCursorPos(centerButtonPos);
-                if (ImGui::Button("START\nTESTS", buttonSize)) {
+                ImVec2 buttonSize = GUI::centerButton(windowSize, { .5f, 0.f });
+                if (ImGui::Button(" RUN \nTESTS", buttonSize)) {
                     if (_display_sending_screen == false) {
                         LUG_LOG.debug("Start button pressed");
                         std::shared_ptr<AState> benchmarkingState;
@@ -250,28 +285,20 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             // Config button
             {
                 // Centers the button and keeps it square at all times
-                ImVec2 buttonSize;
-                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
-                else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
-                ImVec2 buttonPos{ centerButtonPos.x - (buttonSize.x * 1.5f), centerButtonPos.y + (buttonSize.y / 4.f) };
-                ImGui::SetCursorPos(buttonPos);
-                if (ImGui::Button("Config\nInfo", buttonSize)) {
+                ImVec2 buttonSize = GUI::centerButton(windowSize, { 1.5f, 0.f });
+                if (ImGui::Button(u8" " ICON_FA_COGS "\nINFO", buttonSize)) {
                     LUG_LOG.debug("Config button pressed");
-                    _display_info_screen = !_display_info_screen;
+                    _display_info_screen = true;
                 }
             }
 
             // Result button
             {
                 // Centers the button and keeps it square at all times
-                ImVec2 buttonSize;
-                if (windowSize.x > windowSize.y) { buttonSize = { (windowSize.y / 3.f), (windowSize.y / 3.f) }; }
-                else { buttonSize = { (windowSize.x / 3.f), (windowSize.x / 3.f) }; }
-                ImVec2 buttonPos{ centerButtonPos.x + (buttonSize.x * 2.f), centerButtonPos.y + (buttonSize.y / 4.f) };
-                ImGui::SetCursorPos(buttonPos);
-                if (ImGui::Button("Results", buttonSize)) {
+                ImVec2 buttonSize = GUI::centerButton(windowSize, { -.5f, 0.f });
+                if (ImGui::Button("RESULTS", buttonSize)) {
                     LUG_LOG.debug("Results button pressed");
-                    _display_result_screen = !_display_result_screen;
+                    _display_result_screen = true;
                 }
             }
         }
@@ -307,4 +334,3 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     ImGui::ShowTestWindow();
     return true;
 }
-
