@@ -20,5 +20,4 @@ curl:
 
 restclient:
     repository:
-        tag: 3ea71f069665717e972851ab495927f948c1ce9b
-    
+        tag: 8142fc8fc1e89b79225a0d09d6a430c04b7317ca
