@@ -194,20 +194,21 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
 
     if (_display_info_screen == false && _display_result_screen == false) {
+        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+        float mainMenuHeight = static_cast<float>(window->getHeight()) / 8.f;
+        mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+
         ImGui::Begin("Main Menu", &_isOpen, window_flags);
         {
-            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
             ImVec2 mainMenuPos = { 0, 0 };
 
             ImGui::SetWindowSize(mainMenuSize);
             ImGui::SetWindowPos(mainMenuPos);
             ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
 
-            float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
-            headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
-            ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
+            ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuSize.y };
             ImGui::BeginChild("header", headerSize);
             {
                 {
@@ -288,35 +289,34 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::EndChild();
         }
         ImGui::End();
-    }
-    else if (_display_info_screen == true) {
-        GUI::displayInfoScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo);
-        if (_isOpen == false) {
-            _display_info_screen = !_display_info_screen;
-        }
-    }
-    else if (_display_result_screen == true) {
-        if (_devices.size() == 0 && !_isReceiving) {
-            _isReceiving = true;
-            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
-                LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
-            return true;
-        }
-        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
-            _isReceiving = false;
-            nlohmann::json response = nlohmann::json::parse(
-                LugBench::LugNetwork::getInstance().getLastRequestBody());
-            _devices = response["data"];
-            LugBench::LugNetwork::getInstance().getMutex().unlock();
-            return true;
-        }
 
-        GUI::displayResultScreen(&_isOpen, window_flags,
-            _application.getGraphics().getRenderer()->getWindow(),
-            _physicalDeviceInfo, &_devices);
-        if (_isOpen == false) {
-            _display_result_screen = !_display_result_screen;
+        window_flags |= ImGuiWindowFlags_ShowBorders;
+
+        ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
+        {
+            float modelMenuWidth = static_cast<float>(window->getWidth()) / 8.f;
+            modelMenuWidth = (modelMenuWidth < 180.f) ? 180.f : modelMenuWidth;
+            ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) };
+
+            ImGui::SetWindowSize(modelMenuSize);
+            ImGui::SetWindowPos(ImVec2{0.f, mainMenuHeight});
+            ImGui::SetWindowFontScale(0.67f);
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            {
+                float buttonWidth = ImGui::GetWindowWidth() - 10.f;
+
+                ImGui::Button("Duck", ImVec2{ buttonWidth, 50.f });
+                ImGui::Button("Helmet", ImVec2{ buttonWidth, 50.f });
+                ImGui::Button("Monkey", ImVec2{ buttonWidth, 50.f });
+                ImGui::Button("Repunzel", ImVec2{ buttonWidth, 50.f });
+            }
+            ImGui::PopStyleColor(4);
         }
+        ImGui::End();
     }
     return true;
 }
