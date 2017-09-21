@@ -321,44 +321,48 @@ bool ResultsState::onFrame(const lug::System::Time& elapsedTime) {
 
                     ImGui::SetCursorPos(ImVec2{ 15.f, headerHeight });
 
-                    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.00f));
-                    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(.31f, .67f, .98f, 1.00f));
-                    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.f);
                     {
-                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(.31f, .67f, .98f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(.88f, .88f, .88f, 1.00f));
                         {
-                            ImGui::BeginChild("Result", windowSize);
+                            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                             {
-                                size_t deviceCount = _devices.size();
-                                if (deviceCount > 0) {
-                                    //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
-                                    nlohmann::json highestScoreDevice = _devices[0];
-                                    float biggestStore = highestScoreDevice["averageFps"].get<float>();
-                                    GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
+                                ImGui::BeginChild("Result", windowSize);
+                                {
+                                    size_t deviceCount = _devices.size();
+                                    if (deviceCount > 0) {
+                                        //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
+                                        nlohmann::json highestScoreDevice = _devices[0];
+                                        float biggestStore = highestScoreDevice["averageFps"].get<float>();
+                                        GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
 
-                                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
-                                    {
-                                        ImGui::BeginChild("Score list");
+                                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
                                         {
-                                            for (uint32_t i = 0; i < deviceCount; i++) {
-                                                ImGui::PushID(i);
-                                                nlohmann::json device = _devices[i];
-                                                GUI::displayScoreInCell(device["device"].get<std::string>().c_str(), 68.7f, biggestStore / device["averageFps"].get<float>());
-                                                //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
-                                                ImGui::PopID();
+                                            ImGui::BeginChild("Score list");
+                                            {
+                                                for (uint32_t i = 0; i < deviceCount; i++) {
+                                                    ImGui::PushID(i);
+                                                    nlohmann::json device = _devices[i];
+                                                    GUI::displayScoreInCell(device["device"].get<std::string>().c_str(), 68.7f, biggestStore / device["averageFps"].get<float>());
+                                                    //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
+                                                    ImGui::PopID();
+                                                }
                                             }
+                                            ImGui::EndChild();
                                         }
-                                        ImGui::EndChild();
+                                        ImGui::PopFont();
                                     }
-                                    ImGui::PopFont();
                                 }
+                                ImGui::EndChild();
                             }
-                            ImGui::EndChild();
+                            ImGui::PopFont();
                         }
-                        ImGui::PopFont();
+                        ImGui::PopStyleColor(4);
                     }
-                    ImGui::PopStyleColor(4);
+                    ImGui::PopStyleVar();
                 }
             }
         }

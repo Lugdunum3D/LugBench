@@ -568,6 +568,7 @@ void GUI::setDefaultStyle()
     ImGuiStyle& style = ImGui::GetStyle();
     style.ChildWindowRounding = 0.f;
     style.WindowRounding = 0.f;
+    style.FrameRounding = 0.f;
     style.WindowPadding.x = 0.f;
     style.WindowPadding.y = 0.f;
     style.FramePadding.x = 0.f;
