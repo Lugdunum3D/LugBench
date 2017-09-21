@@ -208,84 +208,89 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
             headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
             ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
-            ImGui::BeginChild("header", headerSize);
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
+                ImGui::BeginChild("header", headerSize);
                 {
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
                     {
-                        ImVec2 buttonSize{ 170.f, headerSize.y };
-                        ImGui::Button("LUGBENCH", buttonSize);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+                        {
+                            ImVec2 buttonSize{ 170.f, headerSize.y };
+                            ImGui::Button("LUGBENCH", buttonSize);
+                        }
+                        ImGui::PopStyleColor(2);
                     }
-                    ImGui::PopStyleColor(2);
-                }
 
-                ImGui::SameLine();
-                ImGui::BeginChild("clickable buttons", headerSize);
-                {
-                    ImGui::SetWindowFontScale(0.67f);
+                    ImGui::SameLine();
+                    ImGui::BeginChild("clickable buttons", headerSize);
+                    {
+                        ImGui::SetWindowFontScale(0.67f);
 
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                    {
-                        ImVec2 buttonSize{ 150.f, headerSize.y };
-                        ImGui::SameLine();
-                        ImGui::Button("BENCHMARKS", buttonSize);
-                    }
-                    ImGui::PopStyleColor(2);
-                    
-                    {
-                        ImVec2 buttonSize{ 100.f, headerSize.y };
-                        ImGui::SameLine();
-                        if (ImGui::Button("MODELS", buttonSize)) {
-                            if (_display_sending_screen == false) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                        {
+                            ImVec2 buttonSize{ 150.f, headerSize.y };
+                            ImGui::SameLine();
+                            ImGui::Button("BENCHMARKS", buttonSize);
+                        }
+                        ImGui::PopStyleColor(2);
+
+                        {
+                            ImVec2 buttonSize{ 100.f, headerSize.y };
+                            ImGui::SameLine();
+                            if (ImGui::Button("MODELS", buttonSize)) {
+                                if (_display_sending_screen == false) {
+                                    std::shared_ptr<AState> benchmarkingState;
+                                    benchmarkingState = std::make_shared<ModelsState>(_application);
+                                    _application.popState();
+                                    _application.pushState(benchmarkingState);
+                                }
+                                else {
+                                    LUG_LOG.debug("Wait for previous logs to be sent");
+                                }
+                            }
+                        }
+
+                        {
+                            ImVec2 buttonSize{ 60.f, headerSize.y };
+                            ImGui::SameLine();
+                            if (ImGui::Button("INFO", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<ModelsState>(_application);
+                                benchmarkingState = std::make_shared<InfoState>(_application);
                                 _application.popState();
                                 _application.pushState(benchmarkingState);
                             }
-                            else {
-                                LUG_LOG.debug("Wait for previous logs to be sent");
+                        }
+
+                        {
+                            ImVec2 buttonSize{ 110.f, headerSize.y };
+                            ImGui::SameLine();
+                            if (ImGui::Button("RESULTS", buttonSize)) {
+                                std::shared_ptr<AState> benchmarkingState;
+                                benchmarkingState = std::make_shared<ResultsState>(_application);
+                                _application.popState();
+                                _application.pushState(benchmarkingState);
+                            }
+                        }
+
+                        {
+                            ImVec2 buttonSize{ 110.f, headerSize.y };
+                            ImGui::SameLine();
+                            if (ImGui::Button("CONTACT", buttonSize)) {
+                                std::shared_ptr<AState> benchmarkingState;
+                                benchmarkingState = std::make_shared<ContactState>(_application);
+                                _application.popState();
+                                _application.pushState(benchmarkingState);
                             }
                         }
                     }
-                    
-                    {
-                        ImVec2 buttonSize{ 60.f, headerSize.y };
-                        ImGui::SameLine();
-                        if (ImGui::Button("INFO", buttonSize)) {
-                            std::shared_ptr<AState> benchmarkingState;
-                            benchmarkingState = std::make_shared<InfoState>(_application);
-                            _application.popState();
-                            _application.pushState(benchmarkingState);
-                        }
-                    }
-                    
-                    {
-                        ImVec2 buttonSize{ 110.f, headerSize.y };
-                        ImGui::SameLine();
-                        if (ImGui::Button("RESULTS", buttonSize)) {
-                            std::shared_ptr<AState> benchmarkingState;
-                            benchmarkingState = std::make_shared<ResultsState>(_application);
-                            _application.popState();
-                            _application.pushState(benchmarkingState);
-                        }
-                    }
-
-                    {
-                        ImVec2 buttonSize{ 110.f, headerSize.y };
-                        ImGui::SameLine();
-                        if (ImGui::Button("CONTACT", buttonSize)) {
-                            std::shared_ptr<AState> benchmarkingState;
-                            benchmarkingState = std::make_shared<ContactState>(_application);
-                            _application.popState();
-                            _application.pushState(benchmarkingState);
-                        }
-                    }
+                    ImGui::EndChild();
                 }
                 ImGui::EndChild();
             }
-            ImGui::EndChild();
+            ImGui::PopStyleVar();
         }
         ImGui::End();
     } else if (_display_info_screen == true) {

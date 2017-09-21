@@ -195,18 +195,19 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         float mainMenuHeight = static_cast<float>(window->getHeight()) / 8.f;
         mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
 
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+        ImGui::Begin("Main Menu", &_isOpen, window_flags);
         {
-            ImGui::Begin("Main Menu", &_isOpen, window_flags);
+            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
+            ImVec2 mainMenuPos = { 0, 0 };
+
+            ImGui::SetWindowSize(mainMenuSize);
+            ImGui::SetWindowPos(mainMenuPos);
+            ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
+
+            ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuSize.y };
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
-                ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
-                ImVec2 mainMenuPos = { 0, 0 };
-
-                ImGui::SetWindowSize(mainMenuSize);
-                ImGui::SetWindowPos(mainMenuPos);
-                ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
-
-                ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuSize.y };
                 ImGui::BeginChild("header", headerSize);
                 {
                     {
@@ -286,9 +287,9 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 }
                 ImGui::EndChild();
             }
-            ImGui::End();
+            ImGui::PopStyleVar();
         }
-        ImGui::PopStyleVar();
+        ImGui::End();
 
         window_flags |= ImGuiWindowFlags_ShowBorders;
 
@@ -309,13 +310,14 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
                 {
-                    float buttonWidth = ImGui::GetWindowWidth();
-                    float buttonHeight = 80.f;
 
-                    ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
+                float buttonWidth = ImGui::GetWindowWidth();
+                float buttonHeight = 80.f;
+
+                ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
                 }
                 ImGui::PopStyleVar();
             }
