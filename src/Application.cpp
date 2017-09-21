@@ -118,7 +118,7 @@ bool Application::init(int argc, char* argv[]) {
         io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config);
     }
 #else
-        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 72, &icons_config);
 #endif
 
         static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
@@ -146,7 +146,7 @@ bool Application::init(int argc, char* argv[]) {
         io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config, icons_ranges);
     }
 #else
-        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
+        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 72, &icons_config, icons_ranges);
 #endif
 
         icons_config.MergeMode = false;
@@ -173,7 +173,7 @@ bool Application::init(int argc, char* argv[]) {
             io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
         }
 #else
-        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 18, &icons_config);
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 36, &icons_config);
 #endif
 
 #if defined(LUG_SYSTEM_ANDROID)
@@ -198,7 +198,7 @@ bool Application::init(int argc, char* argv[]) {
             io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
         }
 #else
-        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 18, &icons_config);
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
 #endif
 
     }

@@ -208,7 +208,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
 
 #if defined(LUG_SYSTEM_ANDROID)
-            headerHeight = (headerHeight < 60.f * 4.f) ? 60.f * 4.f : headerHeight;
+            headerHeight = (headerHeight < 60.f * 2.f) ? 60.f * 2.f : headerHeight;
 #else
             headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
 #endif
@@ -219,6 +219,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 ImGui::BeginChild("header", headerSize);
                 {
+                    ImGui::SetWindowFontScale(1.5f);
                     {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
@@ -236,7 +237,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     ImGui::BeginChild("clickable buttons", headerSize);
                     {
-                        ImGui::SetWindowFontScale(0.67f);
+                        //ImGui::SetWindowFontScale(0.67f);
 
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
