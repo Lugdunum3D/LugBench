@@ -4,6 +4,7 @@
 #include "Application.hpp"
 
 #include <lug/Graphics/Scene/Scene.hpp>
+#include <lug/Core/FreeMovement.hpp>
 #include <json/json.hpp>
 #include <imgui.h>
 
@@ -37,4 +38,5 @@ private:
 
     bool _isOpen{ false };
 
+    lug::Core::FreeMovement _cameraMover;
 };

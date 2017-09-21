@@ -568,7 +568,11 @@ void GUI::setDefaultStyle()
     ImGuiStyle& style = ImGui::GetStyle();
     style.ChildWindowRounding = 0.f;
     style.WindowRounding = 0.f;
-    style.WindowPadding.x = 5.f;
+    style.WindowPadding.x = 0.f;
+    style.WindowPadding.y = 0.f;
+    style.FramePadding.x = 0.f;
+    style.FramePadding.y = 0.f;
+
     style.Colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.00f);
     style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
     style.Colors[ImGuiCol_WindowBg] = ImVec4(1.f, 1.f, 1.f, 1.00f); //

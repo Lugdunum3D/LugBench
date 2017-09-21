@@ -312,15 +312,17 @@ bool ResultsState::onFrame(const lug::System::Time& elapsedTime) {
                 if (displayResults == true) {
                     // Sets the window to be at the bottom of the screen (1/3rd of the height)
                     ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
-                    windowSize.x -= 12;
-                    windowSize.y -= 150;
+                    windowSize.x -= 30.f;
+                    windowSize.y -= headerHeight;
 
-                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+                    ImGui::SetCursorPos(ImVec2{ 15.f, headerHeight });
+
+                    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
                     {
-                        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(.31f, .67f, .98f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.f, 1.f,1.f, 1.00f));
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                         {
                             ImGui::BeginChild("Result", windowSize);
                             {
@@ -331,24 +333,28 @@ bool ResultsState::onFrame(const lug::System::Time& elapsedTime) {
                                     float biggestStore = highestScoreDevice["averageFps"].get<float>();
                                     GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
 
-                                    ImGui::BeginChild("Score list");
+                                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
                                     {
-                                        for (uint32_t i = 0; i < deviceCount; i++) {
-                                            ImGui::PushID(i);
-                                            nlohmann::json device = _devices[i];
-                                            GUI::displayScoreInCell(_devices[i]["device"].get<std::string>().c_str(), 68.7f, biggestStore / _devices[i]["averageFps"].get<float>());
-                                            //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
-                                            ImGui::PopID();
+                                        ImGui::BeginChild("Score list");
+                                        {
+                                            for (uint32_t i = 0; i < deviceCount; i++) {
+                                                ImGui::PushID(i);
+                                                nlohmann::json device = _devices[i];
+                                                GUI::displayScoreInCell(_devices[i]["device"].get<std::string>().c_str(), 68.7f, biggestStore / _devices[i]["averageFps"].get<float>());
+                                                //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
+                                                ImGui::PopID();
+                                            }
                                         }
+                                        ImGui::EndChild();
                                     }
-                                    ImGui::EndChild();
+                                    ImGui::PopFont();
                                 }
                             }
                             ImGui::EndChild();
                         }
-                        ImGui::PopStyleColor(4);
+                        ImGui::PopFont();
                     }
-                    ImGui::PopFont();
+                    ImGui::PopStyleColor(4);
                 }
             }
         }

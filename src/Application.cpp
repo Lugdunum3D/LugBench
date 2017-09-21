@@ -176,6 +176,31 @@ bool Application::init(int argc, char* argv[]) {
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 18, &icons_config);
 #endif
 
+#if defined(LUG_SYSTEM_ANDROID)
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
+
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/Roboto-Bold.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/Roboto-Bold.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 18, &icons_config);
+        }
+#else
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 18, &icons_config);
+#endif
+
     }
 
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
