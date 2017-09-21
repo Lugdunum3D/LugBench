@@ -1,4 +1,4 @@
-#include "MenuState.hpp"
+#include "BenchmarksState.hpp"
 #include "GUI.hpp"
 
 #include <lug/Graphics/Builder/Light.hpp>
@@ -8,10 +8,15 @@
 
 #include "BenchmarkingState.hpp"
 
+#include "ModelsState.hpp"
+#include "ContactState.hpp"
+#include "ResultsState.hpp"
+#include "InfoState.hpp"
+
+
 #include <IconsFontAwesome.h>
-//
-//MenuState::MenuState(Application &application) : AState(application) {
-MenuState::MenuState(LugBench::Application &application) : AState(application) {
+
+BenchmarksState::BenchmarksState(LugBench::Application &application) : AState(application) {
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ChildWindowRounding = 0.f;
@@ -59,11 +64,11 @@ MenuState::MenuState(LugBench::Application &application) : AState(application) {
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
-MenuState::~MenuState() {
-    LUG_LOG.info("MenuState destructor");
+BenchmarksState::~BenchmarksState() {
+    LUG_LOG.info("BenchmarksState destructor");
 }
 
-bool MenuState::onPush() {
+bool BenchmarksState::onPush() {
 
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
@@ -144,8 +149,8 @@ bool MenuState::onPush() {
     return true;
 }
 
-bool MenuState::onPop() {
-    LUG_LOG.info("MenuState onPop");
+bool BenchmarksState::onPop() {
+    LUG_LOG.info("BenchmarksState onPop");
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
@@ -153,7 +158,7 @@ bool MenuState::onPop() {
     return true;
 }
 
-void MenuState::onEvent(const lug::Window::Event& event) {
+void BenchmarksState::onEvent(const lug::Window::Event& event) {
     if (_application.isSending()) {
         return;
     }
@@ -162,7 +167,7 @@ void MenuState::onEvent(const lug::Window::Event& event) {
     }
 }
 
-bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
+bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
     _rotation += 0.05f * elapsedTime.getMilliseconds<float>();
 
     if (_rotation > 360.0f) {
@@ -262,35 +267,23 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::BeginChild("clickable buttons", headerSize);
                 {
                     ImGui::SetWindowFontScale(0.67f);
-                    // Start tests button
+
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     {
                         ImVec2 buttonSize{ 150.f, headerSize.y };
                         ImGui::SameLine();
-                        if (ImGui::Button("BENCHMARKS", buttonSize)) {
-                            if (_display_sending_screen == false) {
-                                LUG_LOG.debug("Start button pressed");
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<BenchmarkingState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                            else {
-                                LUG_LOG.debug("Wait for previous logs to be sent");
-                            }
-                        }
+                        ImGui::Button("BENCHMARKS", buttonSize);
                     }
-                    ImGui::PopStyleColor();
+                    ImGui::PopStyleColor(2);
                     
-                    // Models button
                     {
                         ImVec2 buttonSize{ 100.f, headerSize.y };
                         ImGui::SameLine();
                         if (ImGui::Button("MODELS", buttonSize)) {
                             if (_display_sending_screen == false) {
-                                LUG_LOG.debug("Start button pressed");
                                 std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<BenchmarkingState>(_application);
+                                benchmarkingState = std::make_shared<ModelsState>(_application);
                                 _application.popState();
                                 _application.pushState(benchmarkingState);
                             }
@@ -300,23 +293,36 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                         }
                     }
                     
-                    // Config button
                     {
                         ImVec2 buttonSize{ 60.f, headerSize.y };
                         ImGui::SameLine();
                         if (ImGui::Button("INFO", buttonSize)) {
-                            LUG_LOG.debug("Config button pressed");
-                            _display_info_screen = true;
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<InfoState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
                     }
                     
-                    // Result button
                     {
                         ImVec2 buttonSize{ 110.f, headerSize.y };
                         ImGui::SameLine();
                         if (ImGui::Button("RESULTS", buttonSize)) {
-                            LUG_LOG.debug("Results button pressed");
-                            _display_result_screen = true;
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ResultsState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
+                        }
+                    }
+
+                    {
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+                        ImGui::SameLine();
+                        if (ImGui::Button("CONTACT", buttonSize)) {
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ContactState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
                     }
                 }

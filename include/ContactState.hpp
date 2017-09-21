@@ -7,11 +7,11 @@
 #include <json/json.hpp>
 #include <imgui.h>
 
-class MenuState : public AState {
+class ContactState : public AState {
 public:
-    MenuState() = delete;
-    MenuState(LugBench::Application &application);
-    ~MenuState();
+    ContactState() = delete;
+    ContactState(LugBench::Application &application);
+    ~ContactState();
 
     void onEvent(const lug::Window::Event& event) override;
     bool onFrame(const lug::System::Time& elapsedTime) override;

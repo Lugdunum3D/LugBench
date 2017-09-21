@@ -8,6 +8,7 @@
 #include "BenchmarkingState.hpp"
 #include "GPUInfoProvider.hpp"
 #include "MenuState.hpp"
+#include "BenchmarksState.hpp"
 
 //#include <json/json.hpp>
 #include <IconsFontAwesome.h>
@@ -93,12 +94,7 @@ bool Application::init(int argc, char* argv[]) {
     // Generating custom font texture
     {
         ImGuiIO& io = ImGui::GetIO();
-        // merge in icons from Font Awesome
         ImFontConfig icons_config;
-//        icons_config.SizePixels = 20;
-//        icons_config.OversampleH *= 4;
-
-//        io.Fonts->AddFontDefault(&icons_config);
 
 #if defined(LUG_SYSTEM_ANDROID)
     {        
@@ -152,13 +148,41 @@ bool Application::init(int argc, char* argv[]) {
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
 #endif
+
+        icons_config.MergeMode = false;
+
+#if defined(LUG_SYSTEM_ANDROID)
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Light.ttf", AASSET_MODE_STREAMING);
+
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/Roboto-Light.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/Roboto-Light.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 18, &icons_config);
+        }
+#else
+        io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 18, &icons_config);
+#endif
+
     }
 
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<MenuState>(*this);
+    menuState = std::make_shared<BenchmarksState>(*this);
     pushState(menuState);
 
     return true;

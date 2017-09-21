@@ -102,6 +102,11 @@ set(SRC
     src/MenuState.cpp
     src/BenchmarkingState.cpp
     src/LugNetwork.cpp
+    src/BenchmarksState.cpp
+    src/ModelsState.cpp
+    src/ResultsState.cpp
+    src/InfoState.cpp
+    src/ContactState.cpp
 )
 
 set(INC
@@ -112,6 +117,11 @@ set(INC
     include/MenuState.hpp
     include/BenchmarkingState.hpp
     include/LugNetwork.hpp
+    include/BenchmarksState.hpp
+    include/ModelsState.hpp
+    include/ResultsState.hpp
+    include/InfoState.hpp
+    include/ContactState.hpp
 )
 
 # find imgui
@@ -153,6 +163,7 @@ set(OTHER_RESOURCES
     models/Duck/DuckCM.png
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
+    fonts/Roboto-Light.ttf
 )
 
 # create target

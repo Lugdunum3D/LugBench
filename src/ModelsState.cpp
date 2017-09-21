@@ -1,4 +1,4 @@
-#include "MenuState.hpp"
+#include "ModelsState.hpp"
 #include "GUI.hpp"
 
 #include <lug/Graphics/Builder/Light.hpp>
@@ -8,10 +8,15 @@
 
 #include "BenchmarkingState.hpp"
 
+#include "ContactState.hpp"
+#include "ResultsState.hpp"
+#include "InfoState.hpp"
+#include "BenchmarksState.hpp"
+
+
 #include <IconsFontAwesome.h>
-//
-//MenuState::MenuState(Application &application) : AState(application) {
-MenuState::MenuState(LugBench::Application &application) : AState(application) {
+
+ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ChildWindowRounding = 0.f;
@@ -59,11 +64,11 @@ MenuState::MenuState(LugBench::Application &application) : AState(application) {
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
-MenuState::~MenuState() {
-    LUG_LOG.info("MenuState destructor");
+ModelsState::~ModelsState() {
+    LUG_LOG.info("ModelsState destructor");
 }
 
-bool MenuState::onPush() {
+bool ModelsState::onPush() {
 
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
@@ -84,8 +89,8 @@ bool MenuState::onPush() {
         lug::Graphics::Builder::Light lightBuilder(*renderer);
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
-        lightBuilder.setColor({1.0f, 1.0f, 1.0f, 1.0f});
-        lightBuilder.setDirection({0.0f, 4.0f, -5.0f});
+        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+        lightBuilder.setDirection({ 0.0f, 4.0f, -5.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -101,7 +106,7 @@ bool MenuState::onPush() {
         lug::Graphics::Builder::Light lightBuilder(*renderer);
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Ambient);
-        lightBuilder.setColor({0.05f, 0.05f, 0.05f, 0.05f});
+        lightBuilder.setColor({ 0.05f, 0.05f, 0.05f, 0.05f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -120,9 +125,9 @@ bool MenuState::onPush() {
         node->attachCamera(_application.getCamera());
 
         // Set initial position of the camera
-        node->setPosition({3.0f, 4.0f, 3.0f}, lug::Graphics::Node::TransformSpace::World);
+        node->setPosition({ 3.0f, 4.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
         // Look at once
-        node->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
 
         // Attach camera to RenderView
         {
@@ -144,8 +149,8 @@ bool MenuState::onPush() {
     return true;
 }
 
-bool MenuState::onPop() {
-    LUG_LOG.info("MenuState onPop");
+bool ModelsState::onPop() {
+    LUG_LOG.info("ModelsState onPop");
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
@@ -153,7 +158,7 @@ bool MenuState::onPop() {
     return true;
 }
 
-void MenuState::onEvent(const lug::Window::Event& event) {
+void ModelsState::onEvent(const lug::Window::Event& event) {
     if (_application.isSending()) {
         return;
     }
@@ -162,7 +167,7 @@ void MenuState::onEvent(const lug::Window::Event& event) {
     }
 }
 
-bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
+bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     _rotation += 0.05f * elapsedTime.getMilliseconds<float>();
 
     if (_rotation > 360.0f) {
@@ -172,8 +177,8 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     float x = 3.0f * cos(lug::Math::Geometry::radians(_rotation));
     float y = 3.0f * sin(lug::Math::Geometry::radians(_rotation));
 
-    _scene->getSceneNode("camera")->setPosition({x, 4.0f, y}, lug::Graphics::Node::TransformSpace::World);
-    _scene->getSceneNode("camera")->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+    _scene->getSceneNode("camera")->setPosition({ x, 4.0f, y }, lug::Graphics::Node::TransformSpace::World);
+    _scene->getSceneNode("camera")->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -195,16 +200,16 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (_sending_log_timer > 0.f) {
         ImGui::Begin("Send Display", &_isOpen, window_flags);
         {
-//            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-        
-//            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-//            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-//            ImVec2 windowPos = { 0, 0 };
-//            ImGui::SetWindowSize(windowSize);
-//            ImGui::SetWindowPos(windowPos);
-//            // Centers the button and keeps it square at all times
-//            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };        
-//            ImGui::Button("Sending data in progress...", buttonSize);
+            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+            //            // Sets the window to be at the bottom of the screen (1/3rd of the height)
+            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
+            //            ImVec2 windowPos = { 0, 0 };
+            //            ImGui::SetWindowSize(windowSize);
+            //            ImGui::SetWindowPos(windowPos);
+            //            // Centers the button and keeps it square at all times
+            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };        
+            //            ImGui::Button("Sending data in progress...", buttonSize);
         }
         ImGui::End();
         _sending_log_timer -= elapsedTime.getSeconds();
@@ -212,20 +217,20 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
     if (_sending_end_log_timer > 0.f) {
         ImGui::Begin("Send End Display", &_isOpen, window_flags);
         {
-//            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
             // Sets the window to be at the bottom of the screen (1/3rd of the height)
             float height = 0;
             if (_sending_log_timer > 0.f) {
                 height += 25.f;
             }
-//            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-//            ImVec2 windowPos = { 0, height };
-//            ImGui::SetWindowSize(windowSize);
-//            ImGui::SetWindowPos(windowPos);
-//            // Centers the button and keeps it square at all times
-//            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };
-//            ImGui::Button("Sending data completed!", buttonSize);
+            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
+            //            ImVec2 windowPos = { 0, height };
+            //            ImGui::SetWindowSize(windowSize);
+            //            ImGui::SetWindowPos(windowPos);
+            //            // Centers the button and keeps it square at all times
+            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };
+            //            ImGui::Button("Sending data completed!", buttonSize);
         }
         ImGui::End();
         _sending_end_log_timer -= elapsedTime.getSeconds();
@@ -262,8 +267,6 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::BeginChild("clickable buttons", headerSize);
                 {
                     ImGui::SetWindowFontScale(0.67f);
-                    // Start tests button
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                     {
                         ImVec2 buttonSize{ 150.f, headerSize.y };
                         ImGui::SameLine();
@@ -271,7 +274,7 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                             if (_display_sending_screen == false) {
                                 LUG_LOG.debug("Start button pressed");
                                 std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<BenchmarkingState>(_application);
+                                benchmarkingState = std::make_shared<BenchmarksState>(_application);
                                 _application.popState();
                                 _application.pushState(benchmarkingState);
                             }
@@ -280,43 +283,46 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
                             }
                         }
                     }
-                    ImGui::PopStyleColor();
-                    
-                    // Models button
+
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                     {
                         ImVec2 buttonSize{ 100.f, headerSize.y };
                         ImGui::SameLine();
-                        if (ImGui::Button("MODELS", buttonSize)) {
-                            if (_display_sending_screen == false) {
-                                LUG_LOG.debug("Start button pressed");
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<BenchmarkingState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                            else {
-                                LUG_LOG.debug("Wait for previous logs to be sent");
-                            }
-                        }
+                        ImGui::Button("MODELS", buttonSize);
                     }
-                    
-                    // Config button
+                    ImGui::PopStyleColor(2);
+
                     {
                         ImVec2 buttonSize{ 60.f, headerSize.y };
                         ImGui::SameLine();
                         if (ImGui::Button("INFO", buttonSize)) {
-                            LUG_LOG.debug("Config button pressed");
-                            _display_info_screen = true;
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<InfoState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
                     }
-                    
-                    // Result button
+
                     {
                         ImVec2 buttonSize{ 110.f, headerSize.y };
                         ImGui::SameLine();
                         if (ImGui::Button("RESULTS", buttonSize)) {
-                            LUG_LOG.debug("Results button pressed");
-                            _display_result_screen = true;
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ResultsState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
+                        }
+                    }
+
+                    {
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+                        ImGui::SameLine();
+                        if (ImGui::Button("CONTACT", buttonSize)) {
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ContactState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
                     }
                 }
@@ -325,30 +331,32 @@ bool MenuState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::EndChild();
         }
         ImGui::End();
-    } else if (_display_info_screen == true) {
+    }
+    else if (_display_info_screen == true) {
         GUI::displayInfoScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo);
         if (_isOpen == false) {
             _display_info_screen = !_display_info_screen;
         }
-    } else if (_display_result_screen == true) {
+    }
+    else if (_display_result_screen == true) {
         if (_devices.size() == 0 && !_isReceiving) {
             _isReceiving = true;
             LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
-                                                            LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
+                LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
             return true;
         }
         if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
             _isReceiving = false;
             nlohmann::json response = nlohmann::json::parse(
-                    LugBench::LugNetwork::getInstance().getLastRequestBody());
+                LugBench::LugNetwork::getInstance().getLastRequestBody());
             _devices = response["data"];
             LugBench::LugNetwork::getInstance().getMutex().unlock();
             return true;
         }
 
         GUI::displayResultScreen(&_isOpen, window_flags,
-                                 _application.getGraphics().getRenderer()->getWindow(),
-                                 _physicalDeviceInfo, &_devices);
+            _application.getGraphics().getRenderer()->getWindow(),
+            _physicalDeviceInfo, &_devices);
         if (_isOpen == false) {
             _display_result_screen = !_display_result_screen;
         }
