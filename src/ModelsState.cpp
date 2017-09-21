@@ -193,7 +193,12 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
         float mainMenuHeight = static_cast<float>(window->getHeight()) / 8.f;
+
+#if defined(LUG_SYSTEM_ANDROID)
+        mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
+#else
         mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+#endif
 
         ImGui::Begin("Main Menu", &_isOpen, window_flags);
         {
@@ -210,11 +215,20 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 ImGui::BeginChild("header", headerSize);
                 {
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::SetWindowFontScale(1.5f);
+#else
+                    //ImGui::SetWindowFontScale(1.f);
+#endif
                     {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
                             ImGui::Button("LUGBENCH", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
@@ -223,9 +237,17 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     ImGui::BeginChild("clickable buttons", headerSize);
                     {
+#if defined(LUG_SYSTEM_ANDROID)
+                        //ImGui::SetWindowFontScale(1.f);
+#else
                         ImGui::SetWindowFontScale(0.67f);
+#endif
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 150.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("BENCHMARKS", buttonSize)) {
                                 if (_display_sending_screen == false) {
@@ -244,14 +266,22 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 100.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             ImGui::Button("MODELS", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("INFO", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -262,7 +292,11 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("RESULTS", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -273,7 +307,11 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("CONTACT", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -296,8 +334,12 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
         {
             float modelMenuWidth = static_cast<float>(window->getWidth()) / 8.f;
+#if defined(LUG_SYSTEM_ANDROID)
+            modelMenuWidth = (modelMenuWidth < 165.f * 2.75f) ? 165.f * 2.75f : modelMenuWidth;
+#else
             modelMenuWidth = (modelMenuWidth < 165.f) ? 165.f : modelMenuWidth;
-            ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) };
+#endif
+            ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - mainMenuHeight };
 
             ImGui::SetWindowSize(modelMenuSize);
             ImGui::SetWindowPos(ImVec2{0.f, mainMenuHeight});
@@ -312,12 +354,18 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 {
 
                 float buttonWidth = ImGui::GetWindowWidth();
-                float buttonHeight = 80.f;
+                float buttonHeight;
+#if defined(LUG_SYSTEM_ANDROID)
+                buttonHeight = 80.f * 2.75f;
+#else
+                buttonHeight = 80.f;
+#endif
 
                 ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
                 ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
                 ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
                 ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
                 }
                 ImGui::PopStyleVar();
             }

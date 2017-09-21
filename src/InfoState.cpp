@@ -213,11 +213,20 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 ImGui::BeginChild("header", headerSize);
                 {
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::SetWindowFontScale(1.5f);
+#else
+                    //ImGui::SetWindowFontScale(1.f);
+#endif
                     {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
                             ImGui::Button("LUGBENCH", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
@@ -226,9 +235,17 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     ImGui::BeginChild("clickable buttons", headerSize);
                     {
+#if defined(LUG_SYSTEM_ANDROID)
+                        //ImGui::SetWindowFontScale(1.f);
+#else
                         ImGui::SetWindowFontScale(0.67f);
+#endif
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 150.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("BENCHMARKS", buttonSize)) {
                                 if (_display_sending_screen == false) {
@@ -245,7 +262,11 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 100.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("MODELS", buttonSize)) {
                                 if (_display_sending_screen == false) {
@@ -263,14 +284,22 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             ImGui::Button("INFO", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("RESULTS", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -281,7 +310,11 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("CONTACT", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -298,35 +331,6 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::PopStyleVar();
         }
         ImGui::End();
-    }
-    else if (_display_info_screen == true) {
-        GUI::displayInfoScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo);
-        if (_isOpen == false) {
-            _display_info_screen = !_display_info_screen;
-        }
-    }
-    else if (_display_result_screen == true) {
-        if (_devices.size() == 0 && !_isReceiving) {
-            _isReceiving = true;
-            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
-                LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
-            return true;
-        }
-        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
-            _isReceiving = false;
-            nlohmann::json response = nlohmann::json::parse(
-                LugBench::LugNetwork::getInstance().getLastRequestBody());
-            _devices = response["data"];
-            LugBench::LugNetwork::getInstance().getMutex().unlock();
-            return true;
-        }
-
-        GUI::displayResultScreen(&_isOpen, window_flags,
-            _application.getGraphics().getRenderer()->getWindow(),
-            _physicalDeviceInfo, &_devices);
-        if (_isOpen == false) {
-            _display_result_screen = !_display_result_screen;
-        }
     }
     return true;
 }

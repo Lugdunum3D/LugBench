@@ -219,7 +219,11 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 ImGui::BeginChild("header", headerSize);
                 {
+#if defined(LUG_SYSTEM_ANDROID)
                     ImGui::SetWindowFontScale(1.5f);
+#else
+                    //ImGui::SetWindowFontScale(1.f);
+#endif
                     {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
@@ -237,7 +241,11 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     ImGui::BeginChild("clickable buttons", headerSize);
                     {
-                        //ImGui::SetWindowFontScale(0.67f);
+#if defined(LUG_SYSTEM_ANDROID)
+                        //ImGui::SetWindowFontScale(1.f);
+#else
+                        ImGui::SetWindowFontScale(0.67f);
+#endif
 
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
