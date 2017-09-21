@@ -17,51 +17,7 @@
 #include <IconsFontAwesome.h>
 
 ResultsState::ResultsState(LugBench::Application &application) : AState(application) {
-
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.ChildWindowRounding = 0.f;
-    style.WindowRounding = 0.f;
-    style.WindowPadding.x = 5.f;
-    style.Colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.00f);
-    style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(1.f, 1.f, 1.f, 1.00f); //
-    style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(.31f, .67f, .98f, 1.00f); //
-    style.Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
-    style.Colors[ImGuiCol_Border] = ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
-    style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
-    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
-    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-    style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-    style.Colors[ImGuiCol_ComboBg] = ImVec4(0.19f, 0.18f, 0.21f, 1.00f);
-    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-    style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-    style.Colors[ImGuiCol_Button] = ImVec4(.31f, .67f, .98f, 1.00f); //
-    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.58f, 0.58f, 0.58f, 1.f); //
-    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-    style.Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
-    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
-    style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
-    style.Colors[ImGuiCol_CloseButton] = ImVec4(0.40f, 0.39f, 0.38f, 0.16f);
-    style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.40f, 0.39f, 0.38f, 0.39f);
-    style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.40f, 0.39f, 0.38f, 1.00f);
-    style.Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
-    style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
-    style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
-    style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
-    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
-    style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
+    GUI::setDefaultStyle();
 }
 
 ResultsState::~ResultsState() {
@@ -256,11 +212,12 @@ bool ResultsState::onFrame(const lug::System::Time& elapsedTime) {
             {
                 {
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
                     {
                         ImVec2 buttonSize{ 170.f, headerSize.y };
                         ImGui::Button("LUGBENCH", buttonSize);
                     }
-                    ImGui::PopStyleColor();
+                    ImGui::PopStyleColor(2);
                 }
 
                 ImGui::SameLine();
@@ -334,37 +291,69 @@ bool ResultsState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::EndChild();
             }
             ImGui::EndChild();
+
+            {
+                bool displayResults = true;
+                if (_devices.size() == 0 && !_isReceiving) {
+                    _isReceiving = true;
+                    LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
+                        LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
+                    displayResults = false;
+                }
+                if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
+                    _isReceiving = false;
+                    nlohmann::json response = nlohmann::json::parse(
+                        LugBench::LugNetwork::getInstance().getLastRequestBody());
+                    _devices = response["data"];
+                    LugBench::LugNetwork::getInstance().getMutex().unlock();
+                    displayResults = false;
+                }
+
+                if (displayResults == true) {
+                    // Sets the window to be at the bottom of the screen (1/3rd of the height)
+                    ImVec2 windowSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+                    windowSize.x -= 12;
+                    windowSize.y -= 150;
+
+                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 0.f, 0.f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(.31f, .67f, .98f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(1.f, 1.f,1.f, 1.00f));
+                        {
+                            ImGui::BeginChild("Result", windowSize);
+                            {
+                                size_t deviceCount = _devices.size();
+                                if (deviceCount > 0) {
+                                    //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
+                                    nlohmann::json highestScoreDevice = _devices[0];
+                                    float biggestStore = highestScoreDevice["averageFps"].get<float>();
+                                    GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
+
+                                    ImGui::BeginChild("Score list");
+                                    {
+                                        for (uint32_t i = 0; i < deviceCount; i++) {
+                                            ImGui::PushID(i);
+                                            nlohmann::json device = _devices[i];
+                                            GUI::displayScoreInCell(_devices[i]["device"].get<std::string>().c_str(), 68.7f, biggestStore / _devices[i]["averageFps"].get<float>());
+                                            //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
+                                            ImGui::PopID();
+                                        }
+                                    }
+                                    ImGui::EndChild();
+                                }
+                            }
+                            ImGui::EndChild();
+                        }
+                        ImGui::PopStyleColor(4);
+                    }
+                    ImGui::PopFont();
+                }
+            }
         }
         ImGui::End();
     }
-    else if (_display_info_screen == true) {
-        GUI::displayInfoScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo);
-        if (_isOpen == false) {
-            _display_info_screen = !_display_info_screen;
-        }
-    }
-    else if (_display_result_screen == true) {
-        if (_devices.size() == 0 && !_isReceiving) {
-            _isReceiving = true;
-            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
-                LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
-            return true;
-        }
-        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
-            _isReceiving = false;
-            nlohmann::json response = nlohmann::json::parse(
-                LugBench::LugNetwork::getInstance().getLastRequestBody());
-            _devices = response["data"];
-            LugBench::LugNetwork::getInstance().getMutex().unlock();
-            return true;
-        }
 
-        GUI::displayResultScreen(&_isOpen, window_flags,
-            _application.getGraphics().getRenderer()->getWindow(),
-            _physicalDeviceInfo, &_devices);
-        if (_isOpen == false) {
-            _display_result_screen = !_display_result_screen;
-        }
-    }
     return true;
 }

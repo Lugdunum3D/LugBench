@@ -31,8 +31,8 @@ void displayResultScreen(bool* isOpen, ImGuiWindowFlags windowFlags, lug::Graphi
 void displayDeviceLimits(lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDeviceInfo);
 void displayDeviceFeatures(lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDeviceInfo);
 
-ImVec2 centerButton(ImVec2 windowSize, ImVec2 offset);
-
 bool displayReturnButton();
+
+void setDefaultStyle();
 
 } // GUI
