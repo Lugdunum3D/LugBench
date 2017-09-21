@@ -115,7 +115,7 @@ bool Application::init(int argc, char* argv[]) {
 
         AAsset_read(asset, buff, size);
         AAsset_close(asset);
-        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
+        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config);
     }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
@@ -143,7 +143,7 @@ bool Application::init(int argc, char* argv[]) {
 
         AAsset_read(asset, buff, size);
         AAsset_close(asset);
-        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config, icons_ranges);
+        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config, icons_ranges);
     }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
@@ -170,7 +170,7 @@ bool Application::init(int argc, char* argv[]) {
 
             AAsset_read(asset, buff, size);
             AAsset_close(asset);
-            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 18, &icons_config);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
         }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 18, &icons_config);
@@ -195,7 +195,7 @@ bool Application::init(int argc, char* argv[]) {
 
             AAsset_read(asset, buff, size);
             AAsset_close(asset);
-            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 18, &icons_config);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config);
         }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 18, &icons_config);

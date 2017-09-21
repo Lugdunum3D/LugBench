@@ -206,7 +206,13 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
 
             float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
+
+#if defined(LUG_SYSTEM_ANDROID)
+            headerHeight = (headerHeight < 60.f * 2.5f) ? 60.f * 2.5f : headerHeight;
+#else
             headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
+#endif
+
             ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
@@ -217,7 +223,11 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 170.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
                             ImGui::Button("LUGBENCH", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
@@ -231,14 +241,22 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 150.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 150.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             ImGui::Button("BENCHMARKS", buttonSize);
                         }
                         ImGui::PopStyleColor(2);
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 100.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 100.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("MODELS", buttonSize)) {
                                 if (_display_sending_screen == false) {
@@ -254,7 +272,11 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 60.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("INFO", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -265,7 +287,11 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
                             ImGui::SameLine();
                             if (ImGui::Button("RESULTS", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
@@ -276,7 +302,12 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
                         }
 
                         {
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImVec2 buttonSize{ 110.f * 2.5f, headerSize.y };
+#else
                             ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+
                             ImGui::SameLine();
                             if (ImGui::Button("CONTACT", buttonSize)) {
                                 std::shared_ptr<AState> benchmarkingState;
