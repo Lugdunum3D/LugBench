@@ -291,7 +291,11 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowSize(infoWindowSize);
             ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
 
+#if defined(LUG_SYSTEM_ANDROID)
+            ImVec2 deviceWindowSize{ GUI::Utilities::getPercentage(ImGui::GetWindowWidth(), 0.9f), 250.f };
+#else
             ImVec2 deviceWindowSize{ GUI::Utilities::getPercentage(ImGui::GetWindowWidth(), 0.9f), 150.f };
+#endif
             float padding = (ImGui::GetWindowWidth() - deviceWindowSize.x) / 2.f;
             ImGui::SetCursorPos(ImVec2{ padding , 20.f });
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
@@ -320,12 +324,19 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
 
                     ImVec2 uiSize = ImGui::GetWindowSize();
                     ImVec2 childWindowHeaderSize;
+#if defined(LUG_SYSTEM_ANDROID)
+                    const float childHeaderHeight = 70.f;
+                    const float childHeight = 400.f;
+                    const float childSpacing = 30.f;
+                    ImGui::SetCursorPos(ImVec2{ padding , 310.f });
+#else
                     const float childHeaderHeight = 40.f;
                     const float childHeight = 300.f;
                     const float childSpacing = 20.f;
+                    ImGui::SetCursorPos(ImVec2{ padding , 190.f });
+#endif
 
                     childWindowHeaderSize = ImVec2{ deviceWindowSize.x, childHeaderHeight };
-                    ImGui::SetCursorPos(ImVec2{ padding , 190.f });
 
                     ImVec2 childWindowSize{ childWindowHeaderSize.x , childHeight };
 
@@ -389,11 +400,27 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                 {
                     ImVec2 uiSize = ImGui::GetWindowSize();
                     ImVec2 childWindowHeaderSize;
+#if defined(LUG_SYSTEM_ANDROID)
+                    const float childMinWidth = 1000.f;
+                    const float childHeaderHeight = 70.f;
+                    const float childHeight = 400.f;
+                    const float childSpacing = 30.f;
+                    const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
+#else
                     const float childMinWidth = 405.f;
                     const float childHeaderHeight = 40.f;
                     const float childHeight = 400.f;
                     const float childSpacing = 20.f;
                     const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
+#endif
+
+#if defined(LUG_SYSTEM_ANDROID)
+                    {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, 20.f });
+                    }
+#else
 
                     if (uiSize.x >= minSizeDoubleElements) {
                         childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), childHeaderHeight };
@@ -403,6 +430,7 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                         float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
                         ImGui::SetCursorPos(ImVec2{ cursorPos, 20.f });
                     }
+#endif
 
                     ImVec2 childWindowSize{ childWindowHeaderSize.x, childHeight };
 
@@ -485,14 +513,23 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                     }
                     ImGui::EndGroup();
 
-                    if (uiSize.x >= minSizeDoubleElements) {
-                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
-                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), 20.f });
-                    } else {
-                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+#if defined(LUG_SYSTEM_ANDROID)
+                    {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
                         float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
                         ImGui::SetCursorPos(ImVec2{ cursorPos, childHeaderHeight + childHeight + (childSpacing * 2.f) });
                     }
+#else
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), childHeaderHeight };
+                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), 20.f });
+                    }
+                    else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    }
+#endif
 
                     ImGui::BeginGroup();
                     {
@@ -533,14 +570,23 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                     }
                     ImGui::EndGroup();
 
-                    if (uiSize.x >= minSizeDoubleElements) {
-                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
-                        ImGui::SetCursorPos(ImVec2{ childSpacing, childHeaderHeight + childHeight + (childSpacing * 2.f) });
-                    } else {
-                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+#if defined(LUG_SYSTEM_ANDROID)
+                    {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
                         float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
                         ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 2.f) + (childSpacing * 3.f) });
                     }
+#else
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), childHeaderHeight };
+                        ImGui::SetCursorPos(ImVec2{ childSpacing, childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    }
+                    else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 2.f) + (childSpacing * 3.f) });
+                    }
+#endif
 
                     ImGui::BeginGroup();
                     {
@@ -581,14 +627,23 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                     }
                     ImGui::EndGroup();
 
-                    if (uiSize.x >= minSizeDoubleElements) {
-                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
-                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), childHeaderHeight + childHeight + (childSpacing * 2.f) });
-                    } else {
-                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+#if defined(LUG_SYSTEM_ANDROID)
+                    {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
                         float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
                         ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 3.f) + (childSpacing * 4.f) });
                     }
+#else
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), childHeaderHeight };
+                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    }
+                    else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 3.f) + (childSpacing * 4.f) });
+                    }
+#endif
 
                     ImGui::BeginGroup();
                     {
