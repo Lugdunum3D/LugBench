@@ -36,5 +36,4 @@ private:
     // TEMP:(Stuart) Variables for "Window Editor" (temporary)
 
     bool _isOpen{ false };
-
 };

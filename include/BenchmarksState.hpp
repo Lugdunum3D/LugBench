@@ -37,4 +37,6 @@ private:
 
     bool _isOpen{ false };
 
+
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> baseColorTexture;
 };

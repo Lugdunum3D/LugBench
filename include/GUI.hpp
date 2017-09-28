@@ -35,4 +35,9 @@ bool displayReturnButton();
 
 void setDefaultStyle();
 
+namespace Utilities {
+
+float getPercentage(float fullSize, float percentage, float minSize = 0);
+
+} // Utilities
 } // GUI

@@ -571,8 +571,6 @@ void GUI::setDefaultStyle()
     style.FrameRounding = 0.f;
     style.WindowPadding.x = 0.f;
     style.WindowPadding.y = 0.f;
-    style.FramePadding.x = 0.f;
-    style.FramePadding.y = 0.f;
 
     style.Colors[ImGuiCol_Text] = ImVec4(1.f, 1.f, 1.f, 1.00f);
     style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
@@ -599,7 +597,7 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_Button] = ImVec4(.31f, .67f, .98f, 1.00f); //
     style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f); //
     style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.33f, 0.33f, 0.33f, 1.00f);
-    style.Colors[ImGuiCol_Header] = ImVec4(0.10f, 0.09f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_Header] = ImVec4(.31f, .67f, .98f, 1.00f);
     style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.56f, 0.56f, 0.58f, 1.00f);
     style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
     style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
@@ -614,4 +612,14 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
     style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
+}
+
+float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
+{
+    float retVal;
+
+    retVal = fullSize * percentage;
+    if (retVal < minSize) { retVal = minSize;  }
+
+    return retVal;
 }

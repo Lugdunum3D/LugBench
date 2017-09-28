@@ -28,7 +28,8 @@ bool ModelsState::onPush() {
 
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
+//    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/DamagedHelmet/DamagedHelmet.gltf");
     if (!sceneResource) {
         return false;
     }
@@ -37,7 +38,7 @@ bool ModelsState::onPush() {
 
     // Scale duck
     {
-        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
+//        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
     }
 
     // Attach directional light to the root node
@@ -61,16 +62,18 @@ bool ModelsState::onPush() {
     {
         lug::Graphics::Builder::Light lightBuilder(*renderer);
 
-        lightBuilder.setType(lug::Graphics::Render::Light::Type::Ambient);
-        lightBuilder.setColor({ 0.05f, 0.05f, 0.05f, 0.05f });
+        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+        lightBuilder.setDirection({ 0.0f, -4.0f, 5.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
-            LUG_LOG.error("Application::init Can't create ambient light");
+            LUG_LOG.error("Application::init Can't create directional light");
             return false;
         }
 
-        _scene->getSceneNode("duck")->attachLight(light);
+        //_scene->getSceneNode("duck")->attachLight(light);
+        _scene->getRoot().attachLight(light);
     }
 
     // Attach camera
@@ -192,7 +195,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     if (_display_info_screen == false && _display_result_screen == false) {
         lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
-        float mainMenuHeight = static_cast<float>(window->getHeight()) / 8.f;
+        float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
 
 #if defined(LUG_SYSTEM_ANDROID)
         mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;

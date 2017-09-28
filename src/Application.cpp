@@ -95,7 +95,9 @@ bool Application::init(int argc, char* argv[]) {
     {
         ImGuiIO& io = ImGui::GetIO();
         ImFontConfig icons_config;
+        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
+        // FONT 0
 #if defined(LUG_SYSTEM_ANDROID)
     {        
         AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
@@ -120,10 +122,7 @@ bool Application::init(int argc, char* argv[]) {
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
 #endif
-
-        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
         icons_config.MergeMode = true;
-        icons_config.PixelSnapH = true;
 #if defined(LUG_SYSTEM_ANDROID)
     {
         AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
@@ -149,8 +148,8 @@ bool Application::init(int argc, char* argv[]) {
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
 #endif
 
+        // FONT 1
         icons_config.MergeMode = false;
-
 #if defined(LUG_SYSTEM_ANDROID)
         {
             AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Light.ttf", AASSET_MODE_STREAMING);
@@ -175,7 +174,34 @@ bool Application::init(int argc, char* argv[]) {
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Light.ttf", 18, &icons_config);
 #endif
+        icons_config.MergeMode = true;
+#if defined(LUG_SYSTEM_ANDROID)
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
 
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config, icons_ranges);
+    }
+#else
+        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 18, &icons_config, icons_ranges);
+#endif
+
+        // FONT 2
+        icons_config.MergeMode = false;
 #if defined(LUG_SYSTEM_ANDROID)
         {
             AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
@@ -199,6 +225,31 @@ bool Application::init(int argc, char* argv[]) {
         }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 18, &icons_config);
+#endif
+        icons_config.MergeMode = true;
+#if defined(LUG_SYSTEM_ANDROID)
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
+
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config, icons_ranges);
+        }
+#else
+        io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 18, &icons_config, icons_ranges);
 #endif
 
     }

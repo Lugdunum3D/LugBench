@@ -142,72 +142,24 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
     window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
-    if (_application.isSending()) {
-        _sending_log_timer = 1.f;
-        _sending_end_log_timer = 0.f;
-        _display_sending_screen = true;
-    }
-    else if (_display_sending_screen == true) {
-        _sending_log_timer = 2.f;
-        _sending_end_log_timer = 3.f;
-        _display_sending_screen = false;
-    }
-
-    if (_sending_log_timer > 0.f) {
-        ImGui::Begin("Send Display", &_isOpen, window_flags);
-        {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            //            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, 0 };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };        
-            //            ImGui::Button("Sending data in progress...", buttonSize);
-        }
-        ImGui::End();
-        _sending_log_timer -= elapsedTime.getSeconds();
-    }
-    if (_sending_end_log_timer > 0.f) {
-        ImGui::Begin("Send End Display", &_isOpen, window_flags);
-        {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            float height = 0;
-            if (_sending_log_timer > 0.f) {
-                height += 25.f;
-            }
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, height };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };
-            //            ImGui::Button("Sending data completed!", buttonSize);
-        }
-        ImGui::End();
-        _sending_end_log_timer -= elapsedTime.getSeconds();
-    }
-
-
     if (_display_info_screen == false && _display_result_screen == false) {
+        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+        float mainMenuHeight;
+#if defined(LUG_SYSTEM_ANDROID)
+        mainMenuHeight = GUI::Utilities::getPercentage(window->getHeight(), 0.05f, 120.f);
+#else
+        mainMenuHeight = GUI::Utilities::getPercentage(window->getHeight(), 0.05f, 60.f);
+#endif
         ImGui::Begin("Main Menu", &_isOpen, window_flags);
         {
-            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
             ImVec2 mainMenuPos = { 0, 0 };
 
             ImGui::SetWindowSize(mainMenuSize);
             ImGui::SetWindowPos(mainMenuPos);
             ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
 
-            float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
-            headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
-            ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
+            ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuHeight };
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
@@ -240,6 +192,7 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
 #else
                         ImGui::SetWindowFontScale(0.67f);
 #endif
+
                         {
 #if defined(LUG_SYSTEM_ANDROID)
                             ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
@@ -258,8 +211,7 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                                 else {
                                     LUG_LOG.debug("Wait for previous logs to be sent");
                                 }
-                            }
-                        }
+                            }                        }
 
                         {
 #if defined(LUG_SYSTEM_ANDROID)
@@ -281,8 +233,8 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
                             }
                         }
 
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                         {
 #if defined(LUG_SYSTEM_ANDROID)
                             ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
@@ -331,6 +283,359 @@ bool InfoState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::PopStyleVar();
         }
         ImGui::End();
+
+        ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(window->getWidth(), 0.35f, 300.f), static_cast<float>(window->getHeight()) - mainMenuHeight };
+
+        ImGui::Begin("Info Window", &_isOpen, window_flags);
+        {
+            ImGui::SetWindowSize(infoWindowSize);
+            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+
+            ImVec2 deviceWindowSize{ GUI::Utilities::getPercentage(ImGui::GetWindowWidth(), 0.9f), 150.f };
+            float padding = (ImGui::GetWindowWidth() - deviceWindowSize.x) / 2.f;
+            ImGui::SetCursorPos(ImVec2{ padding , 20.f });
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 5.f, 2.f });
+                {
+                    ImGui::BeginChild("Device Window", deviceWindowSize);
+                    {
+                        ImGui::SetCursorPos(ImVec2{ 20.f , 0.f });
+                        ImGui::BeginChild("Device Info");
+                        {
+                            ImGui::Text("Device");
+                            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+                            {
+                                ImGui::Text("Name: Geforce gtx 960M");
+                                ImGui::Text("Driver Version: 385.164.0");
+                                ImGui::Text("API Version: 41953667");
+                            }
+                            ImGui::PopFont();
+                        }
+                        ImGui::EndChild();
+                    }
+                    ImGui::EndChild();
+
+                    ImVec2 uiSize = ImGui::GetWindowSize();
+                    ImVec2 childWindowHeaderSize;
+                    const float childHeaderHeight = 40.f;
+                    const float childHeight = 300.f;
+                    const float childSpacing = 20.f;
+
+                    childWindowHeaderSize = ImVec2{ deviceWindowSize.x, childHeaderHeight };
+                    ImGui::SetCursorPos(ImVec2{ padding , 190.f });
+
+                    ImVec2 childWindowSize{ childWindowHeaderSize.x , childHeight };
+
+                    ImGui::BeginGroup();
+                    {
+                        // First window
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(.31f, .67f, .98f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Title Main", childWindowHeaderSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::SetWindowFontScale(0.87f);
+                                    ImGui::Text("DEVICE");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor(2);
+                        }
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Info Main", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::Text("Plop");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopFont();
+                    }
+                    ImGui::EndGroup();
+                }
+                ImGui::PopStyleVar(2);
+            }
+            ImGui::PopStyleColor(2);
+        }
+        ImGui::End();
+
+        ImGui::Begin("Info Extra Window", &_isOpen, window_flags);
+        {
+            ImVec2 infoExtraWindowSize{ window->getWidth() - infoWindowSize.x, infoWindowSize.y };
+
+            ImGui::SetWindowSize(infoExtraWindowSize);
+            ImGui::SetWindowPos(ImVec2{ infoWindowSize.x, mainMenuHeight });
+
+            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 5.f, 2.f });
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
+                {
+                    ImVec2 uiSize = ImGui::GetWindowSize();
+                    ImVec2 childWindowHeaderSize;
+                    const float childMinWidth = 405.f;
+                    const float childHeaderHeight = 40.f;
+                    const float childHeight = 400.f;
+                    const float childSpacing = 20.f;
+                    const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
+
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), childHeaderHeight };
+                        ImGui::SetCursorPos(ImVec2{ childSpacing, 20.f });
+                    } else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, 20.f });
+                    }
+
+                    ImVec2 childWindowSize{ childWindowHeaderSize.x, childHeight };
+
+                    ImGui::BeginGroup();
+                    {
+                        // First window
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(.31f, .67f, .98f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Title 1", childWindowHeaderSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::SetWindowFontScale(0.87f);
+                                    ImGui::Text("DEVICE");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor(2);
+                        }
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Info 1", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    static bool displayExtraDeviceInfo = false;
+                                    static bool displayFeatures = false;
+
+                                    if (displayExtraDeviceInfo == false) {
+                                        if (ImGui::Button(ICON_FA_PLUS_SQUARE)) {
+                                            displayExtraDeviceInfo = true;
+                                        }
+                                    }
+                                    else {
+                                        if (ImGui::Button(ICON_FA_MINUS_SQUARE)) {
+                                            displayExtraDeviceInfo = false;
+                                        }
+                                    }
+                                    GUI::displayConfigInfoString("Name", _physicalDeviceInfo->properties.deviceName);
+                                    GUI::displayConfigInfoVersion("Driver Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.driverVersion));
+                                    GUI::displayConfigInfoValue("API Version", lug::Core::Version::fromInt(_physicalDeviceInfo->properties.apiVersion));
+                                    if (displayExtraDeviceInfo == true) {
+                                        GUI::displayConfigInfoValue("Device ID", _physicalDeviceInfo->properties.deviceID);
+                                        GUI::displayConfigInfoValue("Vendor ID", _physicalDeviceInfo->properties.vendorID);
+                                        GUI::displayConfigInfoString("Device Type", lug::Graphics::Vulkan::API::RTTI::toStr(_physicalDeviceInfo->properties.deviceType));
+                                        GUI::displayConfigInfoArrayUint8("Pipeline Cache UUID", std::vector<uint8_t>(std::begin(_physicalDeviceInfo->properties.pipelineCacheUUID), std::end(_physicalDeviceInfo->properties.pipelineCacheUUID)));
+                                        if (ImGui::CollapsingHeader("Limits")) {
+                                            ImGui::Indent();
+                                            {
+                                                GUI::displayDeviceLimits(_physicalDeviceInfo);
+                                            }
+                                            ImGui::Unindent();
+                                        }
+                                        if (ImGui::CollapsingHeader("Sparse Properties")) {
+                                            ImGui::Indent();
+                                            {
+                                                GUI::displayConfigInfoBool("Residency Standard 2D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DBlockShape);
+                                                GUI::displayConfigInfoBool("Residency Standard 2D Multisample Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard2DMultisampleBlockShape);
+                                                GUI::displayConfigInfoBool("Residency Standard 3D Block Shape", _physicalDeviceInfo->properties.sparseProperties.residencyStandard3DBlockShape);
+                                                GUI::displayConfigInfoBool("Residency Aligned Mip Size", _physicalDeviceInfo->properties.sparseProperties.residencyAlignedMipSize);
+                                                GUI::displayConfigInfoBool("Residency Non Resident Strict", _physicalDeviceInfo->properties.sparseProperties.residencyNonResidentStrict);
+
+                                            }
+                                            ImGui::Unindent();
+                                        }
+                                    }
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopFont();
+                    }
+                    ImGui::EndGroup();
+
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
+                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), 20.f });
+                    } else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    }
+
+                    ImGui::BeginGroup();
+                    {
+                        // First window
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(.31f, .67f, .98f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Title 2", childWindowHeaderSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::SetWindowFontScale(0.87f);
+                                    ImGui::Text("DEVICE");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor(2);
+                        }
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Info 2", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::Text("Plop");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopFont();
+                    }
+                    ImGui::EndGroup();
+
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
+                        ImGui::SetCursorPos(ImVec2{ childSpacing, childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    } else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 2.f) + (childSpacing * 3.f) });
+                    }
+
+                    ImGui::BeginGroup();
+                    {
+                        // First window
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(.31f, .67f, .98f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Title 3", childWindowHeaderSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::SetWindowFontScale(0.87f);
+                                    ImGui::Text("DEVICE");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor(2);
+                        }
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Info 3", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::Text("Plop");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopFont();
+                    }
+                    ImGui::EndGroup();
+
+                    if (uiSize.x >= minSizeDoubleElements) {
+                        childWindowHeaderSize = ImVec2{ GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth), 40.f };
+                        ImGui::SetCursorPos(ImVec2{ childWindowHeaderSize.x + (childSpacing * 2.f), childHeaderHeight + childHeight + (childSpacing * 2.f) });
+                    } else {
+                        childWindowHeaderSize = ImVec2{ childMinWidth, 40.f };
+                        float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
+                        ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 3.f) + (childSpacing * 4.f) });
+                    }
+
+                    ImGui::BeginGroup();
+                    {
+                        // First window
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(.31f, .67f, .98f, 1.00f));
+                            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Title 4", childWindowHeaderSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::SetWindowFontScale(0.87f);
+                                    ImGui::Text("DEVICE");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor(2);
+                        }
+                        ImGui::PopFont();
+
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                        {
+                            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
+                            ImGui::BeginChild("Device Info 4", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            {
+                                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
+                                {
+                                    ImGui::Text("Plop");
+                                }
+                                ImGui::PopStyleVar();
+                            }
+                            ImGui::EndChild();
+                            ImGui::PopStyleColor();
+                        }
+                        ImGui::PopFont();
+                    }
+                    ImGui::EndGroup();
+
+                }
+                ImGui::PopStyleVar(2);
+            }
+            ImGui::PopStyleColor(2);
+        }
+        ImGui::End();
     }
+
     return true;
 }

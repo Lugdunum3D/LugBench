@@ -3,6 +3,7 @@
 
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
+#include <lug/Graphics/Builder/Texture.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
@@ -102,6 +103,21 @@ bool BenchmarksState::onPush() {
     if (!_physicalDeviceInfo) {
         return false;
     }
+
+    // Load the base color texture
+    {
+        lug::Graphics::Builder::Texture textureBuilder(*renderer);
+
+        textureBuilder.addLayer("textures/platy.jpg");
+        textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+        textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+
+        baseColorTexture = textureBuilder.build();
+        if (!baseColorTexture) {
+            LUG_LOG.error("Application: Can't create the base color texture");
+            return false;
+        }
+    }
     return true;
 }
 
@@ -194,26 +210,25 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
 
 
     if (_display_info_screen == false && _display_result_screen == false) {
+        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+        float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
+
+#if defined(LUG_SYSTEM_ANDROID)
+        mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
+#else
+        mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+#endif
         ImGui::Begin("Main Menu", &_isOpen, window_flags);
         {
-            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
             ImVec2 mainMenuPos = { 0, 0 };
 
             ImGui::SetWindowSize(mainMenuSize);
             ImGui::SetWindowPos(mainMenuPos);
             ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
 
-            float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
-
-#if defined(LUG_SYSTEM_ANDROID)
-            headerHeight = (headerHeight < 60.f * 2.f) ? 60.f * 2.f : headerHeight;
-#else
-            headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
-#endif
-
-            ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
+            ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuHeight };
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
@@ -332,34 +347,92 @@ bool BenchmarksState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::PopStyleVar();
         }
         ImGui::End();
-    } else if (_display_info_screen == true) {
-        GUI::displayInfoScreen(&_isOpen, window_flags, _application.getGraphics().getRenderer()->getWindow(), _physicalDeviceInfo);
-        if (_isOpen == false) {
-            _display_info_screen = !_display_info_screen;
-        }
-    } else if (_display_result_screen == true) {
-        if (_devices.size() == 0 && !_isReceiving) {
-            _isReceiving = true;
-            LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::GET,
-                                                            LugBench::LugNetwork::urlToString(LugBench::Route::getScores));
-            return true;
-        }
-        if (_isReceiving && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
-            _isReceiving = false;
-            nlohmann::json response = nlohmann::json::parse(
-                    LugBench::LugNetwork::getInstance().getLastRequestBody());
-            _devices = response["data"];
-            LugBench::LugNetwork::getInstance().getMutex().unlock();
-            return true;
-        }
 
-        GUI::displayResultScreen(&_isOpen, window_flags,
-                                 _application.getGraphics().getRenderer()->getWindow(),
-                                 _physicalDeviceInfo, &_devices);
-        if (_isOpen == false) {
-            _display_result_screen = !_display_result_screen;
+        window_flags |= ImGuiWindowFlags_ShowBorders;
+
+        ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
+        {
+            ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - mainMenuHeight };
+
+            ImGui::SetWindowSize(modelMenuSize);
+            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+//            ImGui::SetWindowFontScale(0.67f);
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+                {
+                    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                    {
+                        ImVec2 buttonSize{ window->getWidth() / 10.f, window->getWidth() / 10.f };
+                        ImVec2 fullSize{ window->getWidth() - buttonSize.x, buttonSize.y };
+                        ImVec2 textSize{ 500.f, buttonSize.y };
+
+                        {
+                            ImGui::BeginChild("Image 1", buttonSize);
+                            {
+                                ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
+                            }
+                            ImGui::EndChild();
+                            ImGui::SameLine();
+                            ImGui::BeginChild("Description 1", fullSize);
+                            {
+                                ImGui::BeginChild("Description Limiter 1", fullSize);
+                                {
+                                    ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", buttonSize);
+                                }
+                                ImGui::EndChild();
+                            }
+                            ImGui::EndChild();
+                        }
+
+                        {
+                            ImGui::BeginChild("Image 2", buttonSize);
+                            {
+                                ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
+                            }
+                            ImGui::EndChild();
+                            ImGui::SameLine();
+                            ImGui::BeginChild("Description 2", fullSize);
+                            {
+                                ImGui::BeginChild("Description Limiter 2", fullSize);
+                                {
+                                    ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", buttonSize);
+                                }
+                                ImGui::EndChild();
+                            }
+                            ImGui::EndChild();
+                        }
+
+                        {
+                            ImGui::BeginChild("Image 3", buttonSize);
+                            {
+                                ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
+                            }
+                            ImGui::EndChild();
+                            ImGui::SameLine();
+                            ImGui::BeginChild("Description 3", fullSize);
+                            {
+                                ImGui::BeginChild("Description Limiter 3", fullSize);
+                                {
+                                    ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", buttonSize);
+                                }
+                                ImGui::EndChild();
+                            }
+                            ImGui::EndChild();
+                        }
+                    }
+                    ImGui::PopFont();
+                }
+                ImGui::PopStyleVar();
+            }
+            ImGui::PopStyleColor(5);
         }
+        ImGui::End();
     }
-
     return true;
 }

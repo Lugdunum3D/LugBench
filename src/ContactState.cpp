@@ -204,7 +204,7 @@ bool ContactState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowPos(mainMenuPos);
             ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
 
-            float headerHeight = static_cast<float>(window->getHeight()) / 8.f;
+            float headerHeight = static_cast<float>(window->getHeight()) / 18.f;
             headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
             ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
 
