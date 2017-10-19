@@ -122,18 +122,7 @@ void ContactState::onEvent(const lug::Window::Event& event) {
     }
 }
 
-bool ContactState::onFrame(const lug::System::Time& elapsedTime) {
-    _rotation += 0.05f * elapsedTime.getMilliseconds<float>();
-
-    if (_rotation > 360.0f) {
-        _rotation -= 360.0f;
-    }
-
-    float x = 3.0f * cos(lug::Math::Geometry::radians(_rotation));
-    float y = 3.0f * sin(lug::Math::Geometry::radians(_rotation));
-
-    _scene->getSceneNode("camera")->setPosition({ x, 4.0f, y }, lug::Graphics::Node::TransformSpace::World);
-    _scene->getSceneNode("camera")->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
+bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -141,195 +130,132 @@ bool ContactState::onFrame(const lug::System::Time& elapsedTime) {
     window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
-    if (_application.isSending()) {
-        _sending_log_timer = 1.f;
-        _sending_end_log_timer = 0.f;
-        _display_sending_screen = true;
-    }
-    else if (_display_sending_screen == true) {
-        _sending_log_timer = 2.f;
-        _sending_end_log_timer = 3.f;
-        _display_sending_screen = false;
-    }
+    ImGui::Begin("Main Menu", &_isOpen, window_flags);
+    {
+        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
-    if (_sending_log_timer > 0.f) {
-        ImGui::Begin("Send Display", &_isOpen, window_flags);
+        ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
+        ImVec2 mainMenuPos = { 0, 0 };
+
+        ImGui::SetWindowSize(mainMenuSize);
+        ImGui::SetWindowPos(mainMenuPos);
+        ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
+
+        float headerHeight = static_cast<float>(window->getHeight()) / 18.f;
+        headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
+        ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
         {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            //            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, 0 };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };        
-            //            ImGui::Button("Sending data in progress...", buttonSize);
-        }
-        ImGui::End();
-        _sending_log_timer -= elapsedTime.getSeconds();
-    }
-    if (_sending_end_log_timer > 0.f) {
-        ImGui::Begin("Send End Display", &_isOpen, window_flags);
-        {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            float height = 0;
-            if (_sending_log_timer > 0.f) {
-                height += 25.f;
-            }
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, height };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };
-            //            ImGui::Button("Sending data completed!", buttonSize);
-        }
-        ImGui::End();
-        _sending_end_log_timer -= elapsedTime.getSeconds();
-    }
-
-
-    if (_display_info_screen == false && _display_result_screen == false) {
-        ImGui::Begin("Main Menu", &_isOpen, window_flags);
-        {
-            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) };
-            ImVec2 mainMenuPos = { 0, 0 };
-
-            ImGui::SetWindowSize(mainMenuSize);
-            ImGui::SetWindowPos(mainMenuPos);
-            ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
-
-            float headerHeight = static_cast<float>(window->getHeight()) / 18.f;
-            headerHeight = (headerHeight < 60.f) ? 60.f : headerHeight;
-            ImVec2 headerSize = { static_cast<float>(window->getWidth()), headerHeight };
-
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+            ImGui::BeginChild("header", headerSize);
             {
-                ImGui::BeginChild("header", headerSize);
+#if defined(LUG_SYSTEM_ANDROID)
+                ImGui::SetWindowFontScale(1.5f);
+#else
+                //ImGui::SetWindowFontScale(1.f);
+#endif
+                {
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
+                        ImGui::Button("LUGBENCH", buttonSize);
+                    }
+                    ImGui::PopStyleColor(2);
+                }
+
+                ImGui::SameLine();
+                ImGui::BeginChild("clickable buttons", headerSize);
                 {
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::SetWindowFontScale(1.5f);
-#else
                     //ImGui::SetWindowFontScale(1.f);
+#else
+                    ImGui::SetWindowFontScale(0.67f);
 #endif
                     {
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-                        {
 #if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+                        ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
 #else
-                            ImVec2 buttonSize{ 170.f, headerSize.y };
+                        ImVec2 buttonSize{ 150.f, headerSize.y };
 #endif
-                            ImGui::Button("LUGBENCH", buttonSize);
+                        ImGui::SameLine();
+                        if (ImGui::Button("BENCHMARKS", buttonSize)) {
+                            LUG_LOG.debug("Start button pressed");
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<BenchmarksState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
-                        ImGui::PopStyleColor(2);
                     }
 
-                    ImGui::SameLine();
-                    ImGui::BeginChild("clickable buttons", headerSize);
                     {
 #if defined(LUG_SYSTEM_ANDROID)
-                        //ImGui::SetWindowFontScale(1.f);
+                        ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
 #else
-                        ImGui::SetWindowFontScale(0.67f);
+                        ImVec2 buttonSize{ 100.f, headerSize.y };
 #endif
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 150.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("BENCHMARKS", buttonSize)) {
-                                if (_display_sending_screen == false) {
-                                    LUG_LOG.debug("Start button pressed");
-                                    std::shared_ptr<AState> benchmarkingState;
-                                    benchmarkingState = std::make_shared<BenchmarksState>(_application);
-                                    _application.popState();
-                                    _application.pushState(benchmarkingState);
-                                }
-                                else {
-                                    LUG_LOG.debug("Wait for previous logs to be sent");
-                                }
-                            }
+                        ImGui::SameLine();
+                        if (ImGui::Button("MODELS", buttonSize)) {
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ModelsState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
                         }
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 100.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("MODELS", buttonSize)) {
-                                if (_display_sending_screen == false) {
-                                    std::shared_ptr<AState> benchmarkingState;
-                                    benchmarkingState = std::make_shared<ModelsState>(_application);
-                                    _application.popState();
-                                    _application.pushState(benchmarkingState);
-                                }
-                                else {
-                                    LUG_LOG.debug("Wait for previous logs to be sent");
-                                }
-                            }
-                        }
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 60.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            ImGui::Button("INFO", buttonSize);
-                        }
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 110.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("RESULTS", buttonSize)) {
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<ResultsState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                        }
-
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 110.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("CONTACT", buttonSize)) {
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<ContactState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                        }
-                        ImGui::PopStyleColor(2);
                     }
-                    ImGui::EndChild();
+
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        ImGui::Button("INFO", buttonSize);
+                    }
+
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("RESULTS", buttonSize)) {
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ResultsState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
+                        }
+                    }
+
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("CONTACT", buttonSize)) {
+                            std::shared_ptr<AState> benchmarkingState;
+                            benchmarkingState = std::make_shared<ContactState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarkingState);
+                        }
+                    }
+                    ImGui::PopStyleColor(2);
                 }
                 ImGui::EndChild();
             }
-            ImGui::PopStyleVar();
+            ImGui::EndChild();
         }
-        ImGui::End();
+        ImGui::PopStyleVar();
     }
+    ImGui::End();
     return true;
 }
