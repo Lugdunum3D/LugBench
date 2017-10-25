@@ -379,7 +379,7 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                 const float childHeaderHeight = 70.f;
                 const float childHeight = 400.f;
                 const float childSpacing = 30.f;
-                const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
+                //const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
 #else
                 const float childMinWidth = 405.f;
                 const float childHeaderHeight = 40.f;
