@@ -19,7 +19,7 @@ public:
     bool onPush() override;
 
 private:
-	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
+//	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
 
     // TEMP:(Stuart) Variables for "Window Editor" (temporary)
 

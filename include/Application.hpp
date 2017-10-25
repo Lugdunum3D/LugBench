@@ -10,6 +10,7 @@
 #include <LugNetwork.hpp>
 
 class AState;
+enum class State : uint8_t;
 
 namespace LugBench {
 
@@ -35,11 +36,14 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    bool sendDevice(uint32_t frames, float elapsed);
-    void sendScore();
+//  bool sendDevice(uint32_t frames, float elapsed);
+//  void sendScore();
+//  bool isSending() const;
+
+    State getCurrentState() const;
+    void setCurrentState(State);
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
-    bool isSending() const;
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
@@ -48,11 +52,10 @@ private:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
 
-    uint32_t _nbFrames{0};
-    float _elapsed{0.0f};
-    bool _isSendingDevice{false};
-    bool _isSendingScore{false};
+    State _currentState;
 
+    // bool _isSendingDevice{false};
+    // bool _isSendingScore{false};
 };
 
 #include "Application.inl"

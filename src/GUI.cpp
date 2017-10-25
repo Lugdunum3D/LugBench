@@ -623,3 +623,180 @@ float GUI::Utilities::getPercentage(float fullSize, float percentage, float minS
 
     return retVal;
 }
+
+void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& window_flags) {
+    bool _isOpen{ false };
+
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+
+    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
+
+#if defined(LUG_SYSTEM_ANDROID)
+    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
+#else
+    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+#endif
+    ImGui::Begin("Main Menu", &_isOpen, window_flags);
+    {
+        ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
+        ImVec2 mainMenuPos = { 0, 0 };
+
+        ImGui::SetWindowSize(mainMenuSize);
+        ImGui::SetWindowPos(mainMenuPos);
+        ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
+
+        ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuHeight };
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+        {
+            ImGui::BeginChild("header", headerSize);
+            {
+#if defined(LUG_SYSTEM_ANDROID)
+                ImGui::SetWindowFontScale(1.5f);
+#else
+                //ImGui::SetWindowFontScale(1.f);
+#endif
+                {
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
+                        ImGui::Button("LUGBENCH", buttonSize);
+                    }
+                    ImGui::PopStyleColor(2);
+                }
+
+                ImGui::SameLine();
+                ImGui::BeginChild("clickable buttons", headerSize);
+                {
+#if defined(LUG_SYSTEM_ANDROID)
+                    //ImGui::SetWindowFontScale(1.f);
+#else
+                    ImGui::SetWindowFontScale(0.67f);
+#endif
+
+                    if (_application.getCurrentState() == State::BENCHMARKS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 150.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("BENCHMARKS", buttonSize) && _application.getCurrentState() != State::BENCHMARKS) {
+                            std::shared_ptr<AState> benchmarksState;
+                            benchmarksState = std::make_shared<ModelsState>(_application);
+                            _application.popState();
+                            _application.pushState(benchmarksState);
+                        }
+                    }
+                    if (_application.getCurrentState() == State::BENCHMARKS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+                    if (_application.getCurrentState() == State::MODELS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 100.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("MODELS", buttonSize) && _application.getCurrentState() != State::MODELS) {
+                            std::shared_ptr<AState> modelsState;
+                            modelsState = std::make_shared<ModelsState>(_application);
+                            _application.popState();
+                            _application.pushState(modelsState);
+                        }
+                    }
+                    if (_application.getCurrentState() == State::MODELS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+
+                    if (_application.getCurrentState() == State::INFO) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("INFO", buttonSize) && _application.getCurrentState() != State::INFO) {
+                            std::shared_ptr<AState> infoState;
+                            infoState = std::make_shared<InfoState>(_application);
+                            _application.popState();
+                            _application.pushState(infoState);
+                        }
+                    }
+                    if (_application.getCurrentState() == State::INFO) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+
+                    if (_application.getCurrentState() == State::RESULTS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("RESULTS", buttonSize) && _application.getCurrentState() != State::RESULTS) {
+                            std::shared_ptr<AState> resultState;
+                            resultState = std::make_shared<ResultsState>(_application);
+                            _application.popState();
+                            _application.pushState(resultState);
+                        }
+                    }
+                    if (_application.getCurrentState() == State::RESULTS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+                    if (_application.getCurrentState() == State::CONTACT) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("CONTACT", buttonSize) && _application.getCurrentState() != State::CONTACT) {
+                            std::shared_ptr<AState> contactState;
+                            contactState = std::make_shared<ContactState>(_application);
+                            _application.popState();
+                            _application.pushState(contactState);
+                        }
+                    }
+                    if (_application.getCurrentState() == State::CONTACT) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+                }
+                ImGui::EndChild();
+            }
+            ImGui::EndChild();
+        }
+        ImGui::PopStyleVar();
+    }
+    ImGui::End();    
+}

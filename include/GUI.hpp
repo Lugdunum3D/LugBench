@@ -5,6 +5,13 @@
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 #include <json/json.hpp>
 #include <imgui.h>
+#include "Application.hpp"
+
+#include "BenchmarksState.hpp"
+#include "ModelsState.hpp"
+#include "ResultsState.hpp"
+#include "InfoState.hpp"
+#include "ContactState.hpp"
 
 #include <vector>
 
@@ -34,6 +41,8 @@ void displayDeviceFeatures(lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDe
 bool displayReturnButton();
 
 void setDefaultStyle();
+
+void displayMenu(LugBench::Application &application, ImGuiWindowFlags&);
 
 namespace Utilities {
 

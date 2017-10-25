@@ -7,7 +7,6 @@
 
 #include "BenchmarkingState.hpp"
 #include "GPUInfoProvider.hpp"
-#include "MenuState.hpp"
 #include "BenchmarksState.hpp"
 #include "InfoState.hpp"
 
@@ -282,73 +281,60 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-bool Application::sendDevice(uint32_t nbFrames, float elapsed) {
-    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+// bool Application::sendDevice(uint32_t nbFrames, float elapsed) {
+//     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+//     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
 
-    lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    if (!physicalDeviceInfo) {
-        return false;
-    }
+//     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+//     if (!physicalDeviceInfo) {
+//         return false;
+//     }
 
-    nlohmann::json device;
+//     nlohmann::json device;
 
-    device["name"] = physicalDeviceInfo->properties.deviceName;
+//     device["name"] = physicalDeviceInfo->properties.deviceName;
 
-#if defined(LUG_SYSTEM_ANDROID)
-    device["os"] = "Android";
-#elif defined(LUG_SYSTEM_WINDOWS)
-    device["os"] = "Windows";
-#else
-    device["os"] = "Linux";
-#endif
+// #if defined(LUG_SYSTEM_ANDROID)
+//     device["os"] = "Android";
+// #elif defined(LUG_SYSTEM_WINDOWS)
+//     device["os"] = "Windows";
+// #else
+//     device["os"] = "Linux";
+// #endif
 
-    device["deviceId"] = physicalDeviceInfo->properties.deviceID;
-    device["vendorId"] = physicalDeviceInfo->properties.vendorID;
-    device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
-    device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
+//     device["deviceId"] = physicalDeviceInfo->properties.deviceID;
+//     device["vendorId"] = physicalDeviceInfo->properties.vendorID;
+//     device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
+//     device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
 
-    _nbFrames = nbFrames;
-    _elapsed = elapsed;
-    LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
-                                                    LugBench::LugNetwork::urlToString(LugBench::Route::sendDevice),
-                                                    device.dump());
-    _isSendingDevice = true;
-    return true;
-}
+//     _nbFrames = nbFrames;
+//     _elapsed = elapsed;
+//     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
+//                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendDevice),
+//                                                     device.dump());
+//     _isSendingDevice = true;
+//     return true;
+// }
 
-void Application::sendScore() {
-    nlohmann::json score;
-    nlohmann::json lastResquestBody;
+// void Application::sendScore() {
+//     nlohmann::json score;
+//     nlohmann::json lastResquestBody;
 
-    lastResquestBody = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
+//     lastResquestBody = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
 
-    score["device"] = lastResquestBody["id"].get<std::string>();
-    score["scenario"] = "595ed69c734d1d25634280b0";
-    score["nbFrames"] = _nbFrames;
-    score["averageFps"] = _nbFrames / _elapsed;
+//     score["device"] = lastResquestBody["id"].get<std::string>();
+//     score["scenario"] = "595ed69c734d1d25634280b0";
+//     score["nbFrames"] = _nbFrames;
+//     score["averageFps"] = _nbFrames / _elapsed;
 
-    LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
-                                                    LugBench::LugNetwork::urlToString(LugBench::Route::sendScore),
-                                                    score.dump());
-}
+//     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
+//                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendScore),
+//                                                     score.dump());
+// }
 
 void Application::onFrame(const lug::System::Time& elapsedTime) {
     if (_states.empty()) {
         return;
-    }
-    if ((_isSendingDevice || _isSendingScore) && LugBench::LugNetwork::getInstance().getMutex().try_lock()) {
-        LUG_LOG.info("status code : {}", LugBench::LugNetwork::getInstance().getLastRequestStatusCode());
-        LUG_LOG.info("body : {}", LugBench::LugNetwork::getInstance().getLastRequestBody());
-        LugBench::LugNetwork::getInstance().getMutex().unlock();
-
-        if (_isSendingDevice) {
-            _isSendingDevice = false;
-            _isSendingScore = true;
-            sendScore();
-        } else {
-            _isSendingScore = false;
-        }
     }
     std::shared_ptr<AState> tmpState = _states.top();
     tmpState->onFrame(elapsedTime);

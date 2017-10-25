@@ -21,7 +21,7 @@ public:
 private:
     // TEMP:(Stuart) Variables for "Window Editor" (temporary)
 
-    bool _isOpen{ false };
+    bool _isOpen{ true };
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> baseColorTexture;
 };

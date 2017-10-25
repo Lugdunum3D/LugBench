@@ -99,7 +99,6 @@ set(SRC
     src/GPUInfoProvider.cpp
     src/GUI.cpp
     src/main.cpp
-    src/MenuState.cpp
     src/BenchmarkingState.cpp
     src/LugNetwork.cpp
     src/BenchmarksState.cpp
@@ -114,7 +113,6 @@ set(INC
     include/GPUInfoProvider.hpp
     include/GUI.hpp
     include/AState.hpp
-    include/MenuState.hpp
     include/BenchmarkingState.hpp
     include/LugNetwork.hpp
     include/BenchmarksState.hpp

@@ -20,21 +20,9 @@ public:
     bool onPush() override;
 
 private:
-	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
-
-    bool _display_info_screen{false};
-    bool _display_result_screen{false};
-    bool _display_sending_screen{false};
-
-//    nlohmann::json _devices{};
-//    bool _isReceiving{false};
-
-    float _sending_log_timer;
-    float _sending_end_log_timer;
-
     // TEMP:(Stuart) Variables for "Window Editor" (temporary)
 
-    bool _isOpen{ false };
+   bool _isOpen{ false };
 
     lug::Core::FreeMovement _cameraMover;
 };

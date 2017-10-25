@@ -6,17 +6,14 @@
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
 #include <imgui.h>
-
-#include "MenuState.hpp"
+#include <InfoState.hpp>
 
 BenchmarkingState::BenchmarkingState(LugBench::Application &application) : AState(application) {
-    LUG_LOG.info("BenchmarkingState constructor");
 }
 
 BenchmarkingState::~BenchmarkingState() {}
 
 bool BenchmarkingState::onPush() {
-    LUG_LOG.info("BenchmarkingState onPush");
 
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
@@ -74,7 +71,7 @@ bool BenchmarkingState::onPush() {
 }
 
 bool BenchmarkingState::onPop() {
-    _application.sendDevice(_frames, _elapsed);
+    // _application.sendDevice(_frames, _elapsed);
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
@@ -89,13 +86,14 @@ void BenchmarkingState::onEvent(const lug::Window::Event& event) {
 }
 
 bool BenchmarkingState::onFrame(const lug::System::Time& elapsedTime) {
+    _application.setCurrentState(State::BENCHMARKING);
 
     _elapsed += elapsedTime.getSeconds<float>();
     _frames++;
 
     if (_elapsed >= 3.0f) {
         std::shared_ptr<AState> menuState;
-        menuState = std::make_shared<MenuState>(_application);
+        menuState = std::make_shared<InfoState>(_application);
         _application.popState();
         _application.pushState(menuState);
         return true;

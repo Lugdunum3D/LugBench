@@ -21,11 +21,9 @@ ModelsState::ModelsState(LugBench::Application &application) : AState(applicatio
 }
 
 ModelsState::~ModelsState() {
-    LUG_LOG.info("ModelsState destructor");
 }
 
 bool ModelsState::onPush() {
-
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
 //    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
@@ -104,13 +102,6 @@ bool ModelsState::onPush() {
         }
     }
 
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-    _physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-
-    if (!_physicalDeviceInfo) {
-        return false;
-    }
     return true;
 }
 
@@ -124,15 +115,14 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
-    if (_application.isSending()) {
-        return;
-    }
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
     }
 }
 
 bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
+    _application.setCurrentState(State::MODELS);
+
     _cameraMover.onFrame(elapsedTime);
 
     ImGuiWindowFlags window_flags = 0;
@@ -141,240 +131,61 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoCollapse;
 
-    if (_application.isSending()) {
-        _sending_log_timer = 1.f;
-        _sending_end_log_timer = 0.f;
-        _display_sending_screen = true;
-    }
-    else if (_display_sending_screen == true) {
-        _sending_log_timer = 2.f;
-        _sending_end_log_timer = 3.f;
-        _display_sending_screen = false;
-    }
 
-    if (_sending_log_timer > 0.f) {
-        ImGui::Begin("Send Display", &_isOpen, window_flags);
-        {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
-            //            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, 0 };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };        
-            //            ImGui::Button("Sending data in progress...", buttonSize);
-        }
-        ImGui::End();
-        _sending_log_timer -= elapsedTime.getSeconds();
-    }
-    if (_sending_end_log_timer > 0.f) {
-        ImGui::Begin("Send End Display", &_isOpen, window_flags);
-        {
-            //            lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-            // Sets the window to be at the bottom of the screen (1/3rd of the height)
-            float height = 0;
-            if (_sending_log_timer > 0.f) {
-                height += 25.f;
-            }
-            //            ImVec2 windowSize{ static_cast<float>(window->getWidth()), 30.f };
-            //            ImVec2 windowPos = { 0, height };
-            //            ImGui::SetWindowSize(windowSize);
-            //            ImGui::SetWindowPos(windowPos);
-            //            // Centers the button and keeps it square at all times
-            //            ImVec2 buttonSize{ windowSize.x - 10.0f , windowSize.y - 10.0f };
-            //            ImGui::Button("Sending data completed!", buttonSize);
-        }
-        ImGui::End();
-        _sending_end_log_timer -= elapsedTime.getSeconds();
-    }
-
-
-    if (_display_info_screen == false && _display_result_screen == false) {
-        lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-        float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
+    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
 
 #if defined(LUG_SYSTEM_ANDROID)
-        mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
+    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
 #else
-        mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
 #endif
 
-        ImGui::Begin("Main Menu", &_isOpen, window_flags);
+    GUI::displayMenu(_application, window_flags);
+
+    window_flags |= ImGuiWindowFlags_ShowBorders;
+
+    ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
+    {
+        float modelMenuWidth = static_cast<float>(window->getWidth()) / 8.f;
+#if defined(LUG_SYSTEM_ANDROID)
+        modelMenuWidth = (modelMenuWidth < 165.f * 2.75f) ? 165.f * 2.75f : modelMenuWidth;
+#else
+        modelMenuWidth = (modelMenuWidth < 165.f) ? 165.f : modelMenuWidth;
+#endif
+        ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - mainMenuHeight };
+
+        ImGui::SetWindowSize(modelMenuSize);
+        ImGui::SetWindowPos(ImVec2{0.f, mainMenuHeight});
+        ImGui::SetWindowFontScale(0.67f);
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
         {
-            ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
-            ImVec2 mainMenuPos = { 0, 0 };
-
-            ImGui::SetWindowSize(mainMenuSize);
-            ImGui::SetWindowPos(mainMenuPos);
-            ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
-
-            ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuSize.y };
-
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
-                ImGui::BeginChild("header", headerSize);
-                {
-#if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::SetWindowFontScale(1.5f);
-#else
-                    //ImGui::SetWindowFontScale(1.f);
-#endif
-                    {
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 170.f, headerSize.y };
-#endif
-                            ImGui::Button("LUGBENCH", buttonSize);
-                        }
-                        ImGui::PopStyleColor(2);
-                    }
 
-                    ImGui::SameLine();
-                    ImGui::BeginChild("clickable buttons", headerSize);
-                    {
+            float buttonWidth = ImGui::GetWindowWidth();
+            float buttonHeight;
 #if defined(LUG_SYSTEM_ANDROID)
-                        //ImGui::SetWindowFontScale(1.f);
+            buttonHeight = 80.f * 2.75f;
 #else
-                        ImGui::SetWindowFontScale(0.67f);
+            buttonHeight = 80.f;
 #endif
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 150.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("BENCHMARKS", buttonSize)) {
-                                if (_display_sending_screen == false) {
-                                    LUG_LOG.debug("Start button pressed");
-                                    std::shared_ptr<AState> benchmarkingState;
-                                    benchmarkingState = std::make_shared<BenchmarksState>(_application);
-                                    _application.popState();
-                                    _application.pushState(benchmarkingState);
-                                }
-                                else {
-                                    LUG_LOG.debug("Wait for previous logs to be sent");
-                                }
-                            }
-                        }
 
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 100.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            ImGui::Button("MODELS", buttonSize);
-                        }
-                        ImGui::PopStyleColor(2);
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 60.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("INFO", buttonSize)) {
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<InfoState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                        }
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 110.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("RESULTS", buttonSize)) {
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<ResultsState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                        }
-
-                        {
-#if defined(LUG_SYSTEM_ANDROID)
-                            ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
-#else
-                            ImVec2 buttonSize{ 110.f, headerSize.y };
-#endif
-                            ImGui::SameLine();
-                            if (ImGui::Button("CONTACT", buttonSize)) {
-                                std::shared_ptr<AState> benchmarkingState;
-                                benchmarkingState = std::make_shared<ContactState>(_application);
-                                _application.popState();
-                                _application.pushState(benchmarkingState);
-                            }
-                        }
-                    }
-                    ImGui::EndChild();
-                }
-                ImGui::EndChild();
+            ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
+            ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
+            ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
+            ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
+            ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
             }
             ImGui::PopStyleVar();
         }
-        ImGui::End();
-
-        window_flags |= ImGuiWindowFlags_ShowBorders;
-
-        ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
-        {
-            float modelMenuWidth = static_cast<float>(window->getWidth()) / 8.f;
-#if defined(LUG_SYSTEM_ANDROID)
-            modelMenuWidth = (modelMenuWidth < 165.f * 2.75f) ? 165.f * 2.75f : modelMenuWidth;
-#else
-            modelMenuWidth = (modelMenuWidth < 165.f) ? 165.f : modelMenuWidth;
-#endif
-            ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - mainMenuHeight };
-
-            ImGui::SetWindowSize(modelMenuSize);
-            ImGui::SetWindowPos(ImVec2{0.f, mainMenuHeight});
-            ImGui::SetWindowFontScale(0.67f);
-
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
-            {
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
-                {
-
-                float buttonWidth = ImGui::GetWindowWidth();
-                float buttonHeight;
-#if defined(LUG_SYSTEM_ANDROID)
-                buttonHeight = 80.f * 2.75f;
-#else
-                buttonHeight = 80.f;
-#endif
-
-                ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
-                }
-                ImGui::PopStyleVar();
-            }
-            ImGui::PopStyleColor(4);
-        }
-        ImGui::End();
+        ImGui::PopStyleColor(4);
     }
+    ImGui::End();
     return true;
 }
