@@ -69,12 +69,7 @@ bool ResultsState::onFrame(const lug::System::Time&) {
         ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - mainMenuHeight };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });        
     }
     ImGui::End();
 

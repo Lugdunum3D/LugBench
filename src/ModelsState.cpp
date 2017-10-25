@@ -26,8 +26,8 @@ ModelsState::~ModelsState() {
 bool ModelsState::onPush() {
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-//    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/DamagedHelmet/DamagedHelmet.gltf");
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
+    //    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/DamagedHelmet/DamagedHelmet.gltf");
     if (!sceneResource) {
         return false;
     }
@@ -36,7 +36,7 @@ bool ModelsState::onPush() {
 
     // Scale duck
     {
-//        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
+        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
     }
 
     // Attach directional light to the root node
@@ -157,7 +157,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - mainMenuHeight };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{0.f, mainMenuHeight});
+        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
         ImGui::SetWindowFontScale(0.67f);
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
@@ -168,19 +168,19 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
             {
 
-            float buttonWidth = ImGui::GetWindowWidth();
-            float buttonHeight;
+                float buttonWidth = ImGui::GetWindowWidth();
+                float buttonHeight;
 #if defined(LUG_SYSTEM_ANDROID)
-            buttonHeight = 80.f * 2.75f;
+                buttonHeight = 80.f * 2.75f;
 #else
-            buttonHeight = 80.f;
+                buttonHeight = 80.f;
 #endif
 
-            ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
-            ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
-            ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
-            ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
-            ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
+                ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
             }
             ImGui::PopStyleVar();
         }

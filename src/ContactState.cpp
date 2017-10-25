@@ -24,7 +24,6 @@ ContactState::~ContactState() {
 }
 
 bool ContactState::onPush() {
-    _application.setCurrentState(State::CONTACT);
     return true;
 }
 
@@ -45,6 +44,7 @@ void ContactState::onEvent(const lug::Window::Event& event) {
 
 bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
+    _application.setCurrentState(State::CONTACT);
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
     window_flags |= ImGuiWindowFlags_NoResize;
@@ -71,11 +71,6 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
         ImGui::SetWindowSize(modelMenuSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
     }
     ImGui::End();
     return true;

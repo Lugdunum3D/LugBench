@@ -692,7 +692,7 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImGui::SameLine();
                         if (ImGui::Button("BENCHMARKS", buttonSize) && _application.getCurrentState() != State::BENCHMARKS) {
                             std::shared_ptr<AState> benchmarksState;
-                            benchmarksState = std::make_shared<ModelsState>(_application);
+                            benchmarksState = std::make_shared<BenchmarksState>(_application);
                             _application.popState();
                             _application.pushState(benchmarksState);
                         }
