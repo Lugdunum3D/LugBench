@@ -91,6 +91,36 @@ bool Application::init(int argc, char* argv[]) {
         }
     }
 
+    loadFonts();
+
+    static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
+
+    std::shared_ptr<AState> menuState;
+
+    menuState = std::make_shared<InfoState>(*this);
+    pushState(menuState);
+
+    return true;
+}
+
+bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice) {
+    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+
+    vkRender->getPreferences().device = choosenDevice;
+
+    if (!lug::Core::Application::finishInit()) {
+        return false;
+    }
+
+    const lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
+    if (physicalDeviceInfo == NULL) {
+        return false;
+    }
+    return true;
+}
+
+void Application::loadFonts() {
     // Generating custom font texture
     {
         ImGuiIO& io = ImGui::GetIO();
@@ -99,51 +129,51 @@ bool Application::init(int argc, char* argv[]) {
 
         // FONT 0
 #if defined(LUG_SYSTEM_ANDROID)
-    {        
-        AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/Roboto-Bold.ttf", AASSET_MODE_STREAMING);
 
-        if (!asset) {
-            LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/Roboto-Bold.ttf");
-            return false;
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/Roboto-Bold.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/Roboto-Bold.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config);
         }
-
-        size_t size = AAsset_getLength(asset);
-
-        if (size <= 0) {
-            LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/Roboto-Bold.ttf");
-            return false;
-        }
-        char* buff(new char[size]);
-
-        AAsset_read(asset, buff, size);
-        AAsset_close(asset);
-        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config);
-    }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/Roboto-Bold.ttf", 36, &icons_config);
 #endif
         icons_config.MergeMode = true;
 #if defined(LUG_SYSTEM_ANDROID)
-    {
-        AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
+        {
+            AAsset* asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager, "fonts/fontawesome-webfont.ttf", AASSET_MODE_STREAMING);
 
-        if (!asset) {
-            LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/fontawesome-webfont.ttf");
-            return false;
+            if (!asset) {
+                LUG_LOG.error("Builder::ShaderModule: Can't open Android asset \"{}\"", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+
+            size_t size = AAsset_getLength(asset);
+
+            if (size <= 0) {
+                LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/fontawesome-webfont.ttf");
+                return false;
+            }
+            char* buff(new char[size]);
+
+            AAsset_read(asset, buff, size);
+            AAsset_close(asset);
+            io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config, icons_ranges);
         }
-
-        size_t size = AAsset_getLength(asset);
-
-        if (size <= 0) {
-            LUG_LOG.error("Builder::ShaderModule: Android asset \"{}\" is empty", "fonts/fontawesome-webfont.ttf");
-            return false;
-        }
-        char* buff(new char[size]);
-
-        AAsset_read(asset, buff, size);
-        AAsset_close(asset);
-        io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 72, &icons_config, icons_ranges);
-    }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 36, &icons_config, icons_ranges);
 #endif
@@ -195,7 +225,7 @@ bool Application::init(int argc, char* argv[]) {
             AAsset_read(asset, buff, size);
             AAsset_close(asset);
             io.Fonts->AddFontFromMemoryTTF(std::move(buff), size, 36, &icons_config, icons_ranges);
-    }
+        }
 #else
         io.Fonts->AddFontFromFileTTF("./fonts/fontawesome-webfont.ttf", 18, &icons_config, icons_ranges);
 #endif
@@ -253,32 +283,6 @@ bool Application::init(int argc, char* argv[]) {
 #endif
 
     }
-
-    static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
-
-    std::shared_ptr<AState> menuState;
-
-    menuState = std::make_shared<InfoState>(*this);
-    pushState(menuState);
-
-    return true;
-}
-
-bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice) {
-    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-    vkRender->getPreferences().device = choosenDevice;
-
-    if (!lug::Core::Application::finishInit()) {
-        return false;
-    }
-
-    const lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    if (physicalDeviceInfo == NULL) {
-        return false;
-    }
-    return true;
 }
 
 // bool Application::sendDevice(uint32_t nbFrames, float elapsed) {

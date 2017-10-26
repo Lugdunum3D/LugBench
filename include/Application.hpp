@@ -47,6 +47,7 @@ public:
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
+    void loadFonts();
     std::stack<std::shared_ptr<AState>> _states;
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
