@@ -126,7 +126,7 @@ bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenD
     return true;
 }
 
-void Application::loadFonts() {
+bool Application::loadFonts() {
     // Generating custom font texture
     {
         ImGuiIO& io = ImGui::GetIO();
