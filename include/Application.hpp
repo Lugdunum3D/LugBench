@@ -45,13 +45,18 @@ public:
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
 
-private:
-    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
-    void loadFonts();
-    std::stack<std::shared_ptr<AState>> _states;
-
+public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _gltfLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _vulkanLogo;
+
+private:
+    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
+    bool loadFonts();
+    bool loadImages(lug::Graphics::Renderer* renderer);
+    std::stack<std::shared_ptr<AState>> _states;
 
     State _currentState;
 

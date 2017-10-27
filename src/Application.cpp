@@ -2,6 +2,7 @@
 
 #include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Builder/Light.hpp>
+#include <lug/Graphics/Builder/Texture.hpp>
 #include <lug/System/Logger/Logger.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
@@ -91,9 +92,14 @@ bool Application::init(int argc, char* argv[]) {
         }
     }
 
-    loadFonts();
+    if (loadFonts() == false) {
+        return false;
+    }
 
+    // Call this function only AFTER setting up your fonts
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
+
+    loadImages(renderer);
 
     std::shared_ptr<AState> menuState;
 
@@ -283,6 +289,25 @@ void Application::loadFonts() {
 #endif
 
     }
+    return true;
+}
+
+bool Application::loadImages(lug::Graphics::Renderer* renderer) {
+    // Load logos
+    {
+        lug::Graphics::Builder::Texture textureBuilder(*renderer);
+
+        textureBuilder.addLayer("textures/epitech_logo.png");
+        textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+        textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+
+        _epitechLogo = textureBuilder.build();
+        if (!_epitechLogo) {
+            LUG_LOG.error("Application: Can't create the epitech_logo texture");
+            return false;
+        }
+    }
+    return true;
 }
 
 // bool Application::sendDevice(uint32_t nbFrames, float elapsed) {

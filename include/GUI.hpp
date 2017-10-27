@@ -43,6 +43,7 @@ bool displayReturnButton();
 void setDefaultStyle();
 
 void displayMenu(LugBench::Application &application, ImGuiWindowFlags&);
+void displayFooter(LugBench::Application &application);
 
 namespace Utilities {
 

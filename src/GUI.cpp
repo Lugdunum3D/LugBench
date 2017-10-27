@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
+#include <lug/Graphics/Vulkan/Render/Texture.hpp>
 
 #include <IconsFontAwesome.h>
 
@@ -614,20 +615,11 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
-float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
-{
-    float retVal;
-
-    retVal = fullSize * percentage;
-    if (retVal < minSize) { retVal = minSize;  }
-
-    return retVal;
-}
-
-void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& window_flags) {
+void GUI::displayMenu(LugBench::Application &application, ImGuiWindowFlags& window_flags) {
     bool _isOpen{ false };
+    State currentState = application.getCurrentState();
 
-    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
     float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
 
@@ -679,7 +671,7 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                     ImGui::SetWindowFontScale(0.67f);
 #endif
 
-                    if (_application.getCurrentState() == State::BENCHMARKS) {
+                    if (currentState == State::BENCHMARKS) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     }
@@ -690,18 +682,18 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImVec2 buttonSize{ 150.f, headerSize.y };
 #endif
                         ImGui::SameLine();
-                        if (ImGui::Button("BENCHMARKS", buttonSize) && _application.getCurrentState() != State::BENCHMARKS) {
+                        if (ImGui::Button("BENCHMARKS", buttonSize) && currentState != State::BENCHMARKS) {
                             std::shared_ptr<AState> benchmarksState;
-                            benchmarksState = std::make_shared<BenchmarksState>(_application);
-                            _application.popState();
-                            _application.pushState(benchmarksState);
+                            benchmarksState = std::make_shared<BenchmarksState>(application);
+                            application.popState();
+                            application.pushState(benchmarksState);
                         }
                     }
-                    if (_application.getCurrentState() == State::BENCHMARKS) {
+                    if (currentState == State::BENCHMARKS) {
                         ImGui::PopStyleColor(2);
                     }
 
-                    if (_application.getCurrentState() == State::MODELS) {
+                    if (currentState == State::MODELS) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     }
@@ -712,19 +704,19 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImVec2 buttonSize{ 100.f, headerSize.y };
 #endif
                         ImGui::SameLine();
-                        if (ImGui::Button("MODELS", buttonSize) && _application.getCurrentState() != State::MODELS) {
+                        if (ImGui::Button("MODELS", buttonSize) && currentState != State::MODELS) {
                             std::shared_ptr<AState> modelsState;
-                            modelsState = std::make_shared<ModelsState>(_application);
-                            _application.popState();
-                            _application.pushState(modelsState);
+                            modelsState = std::make_shared<ModelsState>(application);
+                            application.popState();
+                            application.pushState(modelsState);
                         }
                     }
-                    if (_application.getCurrentState() == State::MODELS) {
+                    if (currentState == State::MODELS) {
                         ImGui::PopStyleColor(2);
                     }
 
 
-                    if (_application.getCurrentState() == State::INFO) {
+                    if (currentState == State::INFO) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     }
@@ -735,19 +727,19 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImVec2 buttonSize{ 60.f, headerSize.y };
 #endif
                         ImGui::SameLine();
-                        if (ImGui::Button("INFO", buttonSize) && _application.getCurrentState() != State::INFO) {
+                        if (ImGui::Button("INFO", buttonSize) && currentState != State::INFO) {
                             std::shared_ptr<AState> infoState;
-                            infoState = std::make_shared<InfoState>(_application);
-                            _application.popState();
-                            _application.pushState(infoState);
+                            infoState = std::make_shared<InfoState>(application);
+                            application.popState();
+                            application.pushState(infoState);
                         }
                     }
-                    if (_application.getCurrentState() == State::INFO) {
+                    if (currentState == State::INFO) {
                         ImGui::PopStyleColor(2);
                     }
 
 
-                    if (_application.getCurrentState() == State::RESULTS) {
+                    if (currentState == State::RESULTS) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     }
@@ -758,18 +750,18 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImVec2 buttonSize{ 110.f, headerSize.y };
 #endif
                         ImGui::SameLine();
-                        if (ImGui::Button("RESULTS", buttonSize) && _application.getCurrentState() != State::RESULTS) {
+                        if (ImGui::Button("RESULTS", buttonSize) && currentState != State::RESULTS) {
                             std::shared_ptr<AState> resultState;
-                            resultState = std::make_shared<ResultsState>(_application);
-                            _application.popState();
-                            _application.pushState(resultState);
+                            resultState = std::make_shared<ResultsState>(application);
+                            application.popState();
+                            application.pushState(resultState);
                         }
                     }
-                    if (_application.getCurrentState() == State::RESULTS) {
+                    if (currentState == State::RESULTS) {
                         ImGui::PopStyleColor(2);
                     }
 
-                    if (_application.getCurrentState() == State::CONTACT) {
+                    if (currentState == State::CONTACT) {
                         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
                     }
@@ -780,17 +772,16 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
                         ImVec2 buttonSize{ 110.f, headerSize.y };
 #endif
                         ImGui::SameLine();
-                        if (ImGui::Button("CONTACT", buttonSize) && _application.getCurrentState() != State::CONTACT) {
+                        if (ImGui::Button("CONTACT", buttonSize) && currentState != State::CONTACT) {
                             std::shared_ptr<AState> contactState;
-                            contactState = std::make_shared<ContactState>(_application);
-                            _application.popState();
-                            _application.pushState(contactState);
+                            contactState = std::make_shared<ContactState>(application);
+                            application.popState();
+                            application.pushState(contactState);
                         }
                     }
-                    if (_application.getCurrentState() == State::CONTACT) {
+                    if (currentState == State::CONTACT) {
                         ImGui::PopStyleColor(2);
                     }
-
                 }
                 ImGui::EndChild();
             }
@@ -799,4 +790,43 @@ void GUI::displayMenu(LugBench::Application &_application, ImGuiWindowFlags& win
         ImGui::PopStyleVar();
     }
     ImGui::End();    
+}
+
+void GUI::displayFooter(LugBench::Application & application)
+{
+    bool _isOpen{ false };
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+
+    lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
+
+    float footerHeight = static_cast<float>(window->getHeight()) / 18.f;
+
+#if defined(LUG_SYSTEM_ANDROID)
+    footerHeight = (footerHeight < 60.f * 2.f) ? 60.f * 2.f : footerHeight;
+#else
+    footerHeight = (footerHeight < 60.f) ? 60.f : footerHeight;
+#endif
+    ImGui::Begin("Footer", &_isOpen, window_flags);
+    {
+        ImVec2 footerSize{ static_cast<float>(window->getWidth()), footerHeight };
+        ImVec2 footerPos = { 0, window->getHeight() - 20.f };
+
+        ImGui::SetWindowSize(footerSize);
+        ImGui::SetWindowPos(footerPos);
+    }
+    ImGui::End();
+}
+
+float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
+{
+    float retVal;
+
+    retVal = fullSize * percentage;
+    if (retVal < minSize) { retVal = minSize; }
+
+    return retVal;
 }
