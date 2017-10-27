@@ -103,7 +103,7 @@ bool Application::init(int argc, char* argv[]) {
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<InfoState>(*this);
+    menuState = std::make_shared<BenchmarksState>(*this);
     pushState(menuState);
 
     return true;
@@ -295,16 +295,47 @@ bool Application::loadFonts() {
 bool Application::loadImages(lug::Graphics::Renderer* renderer) {
     // Load logos
     {
-        lug::Graphics::Builder::Texture textureBuilder(*renderer);
+        // Epitech Logo
+        {
+            lug::Graphics::Builder::Texture textureBuilder(*renderer);
 
-        textureBuilder.addLayer("textures/epitech_logo.png");
-        textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
-        textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            textureBuilder.addLayer("textures/epitech_logo.png");
+            textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
 
-        _epitechLogo = textureBuilder.build();
-        if (!_epitechLogo) {
-            LUG_LOG.error("Application: Can't create the epitech_logo texture");
-            return false;
+            _epitechLogo = textureBuilder.build();
+            if (!_epitechLogo) {
+                LUG_LOG.error("Application: Can't create the epitech_logo texture");
+                return false;
+            }
+        }
+        // GLTF Logo
+        {
+            lug::Graphics::Builder::Texture textureBuilder(*renderer);
+
+            textureBuilder.addLayer("textures/gltf_logo.png");
+            textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+
+            _gltfLogo = textureBuilder.build();
+            if (!_gltfLogo) {
+                LUG_LOG.error("Application: Can't create the gltf_logo texture");
+                return false;
+            }
+        }
+        // Vulkan Logo
+        {
+            lug::Graphics::Builder::Texture textureBuilder(*renderer);
+
+            textureBuilder.addLayer("textures/vulkan_logo.png");
+            textureBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            textureBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+
+            _vulkanLogo = textureBuilder.build();
+            if (!_vulkanLogo) {
+                LUG_LOG.error("Application: Can't create the vulkan_logo texture");
+                return false;
+            }
         }
     }
     return true;

@@ -67,9 +67,9 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     mainMenuHeight = GUI::Utilities::getPercentage(window->getHeight(), 0.05f, 60.f);
 #endif
 
-    GUI::displayMenu(_application, window_flags);
+    GUI::displayMenu(_application);
 
-    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(window->getWidth(), 0.35f, 300.f), static_cast<float>(window->getHeight()) - mainMenuHeight };
+    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(window->getWidth(), 0.35f, 300.f), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
 
     ImGui::Begin("Info Window", &_isOpen, window_flags);
     {
@@ -472,6 +472,8 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
         ImGui::PopStyleColor(2);
     }
     ImGui::End();
+
+    GUI::displayFooter(_application);
 
     return true;
 }

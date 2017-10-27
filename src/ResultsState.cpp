@@ -24,6 +24,7 @@ ResultsState::~ResultsState() {
 }
 
 bool ResultsState::onPush() {
+    _application.setCurrentState(State::RESULTS);
     return true;
 }
 
@@ -43,15 +44,14 @@ void ResultsState::onEvent(const lug::Window::Event& event) {
 }
 
 bool ResultsState::onFrame(const lug::System::Time&) {
-    _application.setCurrentState(State::RESULTS);
+
+    GUI::displayMenu(_application);
+
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoCollapse;
-
-    GUI::displayMenu(_application, window_flags);
-
     window_flags |= ImGuiWindowFlags_ShowBorders;
 
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
@@ -66,7 +66,7 @@ bool ResultsState::onFrame(const lug::System::Time&) {
 
     ImGui::Begin("Contact Menu", &_isOpen, window_flags);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - mainMenuHeight };
+        ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
 
         ImGui::SetWindowSize(modelMenuSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });        
@@ -196,6 +196,8 @@ bool ResultsState::onFrame(const lug::System::Time&) {
             //     }
             // }
     //}
+
+    GUI::displayFooter(_application);
 
     return true;
 }

@@ -615,7 +615,13 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
-void GUI::displayMenu(LugBench::Application &application, ImGuiWindowFlags& window_flags) {
+void GUI::displayMenu(LugBench::Application &application) {
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_NoResize;
+    window_flags |= ImGuiWindowFlags_NoMove;
+    window_flags |= ImGuiWindowFlags_NoCollapse;
+
     bool _isOpen{ false };
     State currentState = application.getCurrentState();
 
@@ -810,15 +816,48 @@ void GUI::displayFooter(LugBench::Application & application)
 #else
     footerHeight = (footerHeight < 60.f) ? 60.f : footerHeight;
 #endif
-    ImGui::Begin("Footer", &_isOpen, window_flags);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
     {
-        ImVec2 footerSize{ static_cast<float>(window->getWidth()), footerHeight };
-        ImVec2 footerPos = { 0, window->getHeight() - 20.f };
+            ImGui::Begin("Footer", &_isOpen, window_flags);
+            {
+                ImVec2 footerSize{ static_cast<float>(window->getWidth()), footerHeight };
+                ImVec2 footerPos = { 0, window->getHeight() - footerHeight };
 
-        ImGui::SetWindowSize(footerSize);
-        ImGui::SetWindowPos(footerPos);
+                ImGui::SetWindowSize(footerSize);
+                ImGui::SetWindowPos(footerPos);
+
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._epitechLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60  2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(200, 60), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+                ImGui::SameLine();
+                float width = (float)(window->getWidth() - 320);
+                ImGui::SetCursorPos(ImVec2(width, 0));
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._gltfLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(105 * 2, 60 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(105, 60), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+                ImGui::SameLine();
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._vulkanLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60  2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(200, 60), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+            }
+            ImGui::End();
     }
-    ImGui::End();
+    ImGui::PopStyleColor();
 }
 
 float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)

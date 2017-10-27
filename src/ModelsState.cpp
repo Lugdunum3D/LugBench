@@ -130,7 +130,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     window_flags |= ImGuiWindowFlags_NoResize;
     window_flags |= ImGuiWindowFlags_NoMove;
     window_flags |= ImGuiWindowFlags_NoCollapse;
-
+    window_flags |= ImGuiWindowFlags_ShowBorders;
 
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
 
@@ -142,9 +142,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
 #endif
 
-    GUI::displayMenu(_application, window_flags);
-
-    window_flags |= ImGuiWindowFlags_ShowBorders;
+    GUI::displayMenu(_application);
 
     ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
     {
@@ -154,7 +152,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 #else
         modelMenuWidth = (modelMenuWidth < 165.f) ? 165.f : modelMenuWidth;
 #endif
-        ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - mainMenuHeight };
+        ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
 
         ImGui::SetWindowSize(modelMenuSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
@@ -187,5 +185,8 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         ImGui::PopStyleColor(4);
     }
     ImGui::End();
+
+    GUI::displayFooter(_application);
+
     return true;
 }

@@ -162,6 +162,9 @@ set(OTHER_RESOURCES
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
     fonts/Roboto-Light.ttf
+    textures/epitech_logo.png
+    textures/gltf_logo.png
+    textures/vulkan_logo.png
 )
 
 # create target
