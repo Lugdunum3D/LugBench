@@ -20,9 +20,6 @@ public:
     bool onPush() override;
 
 private:
-    // TEMP:(Stuart) Variables for "Window Editor" (temporary)
-
-   bool _isOpen{ false };
 
     lug::Core::FreeMovement _cameraMover;
 };

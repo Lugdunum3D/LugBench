@@ -615,26 +615,18 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
 }
 
-void GUI::displayMenu(LugBench::Application &application) {
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-
-    bool _isOpen{ false };
+float GUI::displayMenu(LugBench::Application &application) {
     State currentState = application.getCurrentState();
 
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
-    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
-
 #if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
+    float mainMenuHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 120.f);
 #else
-    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
+    float mainMenuHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 60.f);
 #endif
-    ImGui::Begin("Main Menu", &_isOpen, window_flags);
+
+    ImGui::Begin("Main Menu", 0, application._window_flags);
     {
         ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
         ImVec2 mainMenuPos = { 0, 0 };
@@ -795,30 +787,23 @@ void GUI::displayMenu(LugBench::Application &application) {
         }
         ImGui::PopStyleVar();
     }
-    ImGui::End();    
+    ImGui::End();
+    return mainMenuHeight;
 }
 
 void GUI::displayFooter(LugBench::Application & application)
 {
-    bool _isOpen{ false };
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
-    float footerHeight = static_cast<float>(window->getHeight()) / 18.f;
-
 #if defined(LUG_SYSTEM_ANDROID)
-    footerHeight = (footerHeight < 60.f * 2.f) ? 60.f * 2.f : footerHeight;
+    float footerHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 120.f);
 #else
-    footerHeight = (footerHeight < 60.f) ? 60.f : footerHeight;
+    float footerHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 60.f);
 #endif
+
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
     {
-            ImGui::Begin("Footer", &_isOpen, window_flags);
+            ImGui::Begin("Footer", 0, application._window_flags);
             {
                 ImVec2 footerSize{ static_cast<float>(window->getWidth()), footerHeight };
                 ImVec2 footerPos = { 0, window->getHeight() - footerHeight };

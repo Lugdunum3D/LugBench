@@ -3,6 +3,8 @@
 #include <memory>
 #include <stack>
 
+#include <imgui.h>
+
 #include <lug/Core/Application.hpp>
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
 
@@ -46,6 +48,8 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
 
 public:
+    ImGuiWindowFlags _window_flags;
+
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechLogo;

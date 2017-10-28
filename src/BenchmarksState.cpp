@@ -43,32 +43,17 @@ void BenchmarksState::onEvent(const lug::Window::Event& event) {
 }
 
 bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
-
-    GUI::displayMenu(_application);
-
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_ShowBorders;
-
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
 
-    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
-
-#if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
-#else
-    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
-#endif
-
-    ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
+    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
+        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
@@ -80,8 +65,8 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
             {
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 {
-                    ImVec2 buttonSize{ window->getWidth() / 10.f, window->getWidth() / 10.f };
-                    ImVec2 fullSize{ window->getWidth() - buttonSize.x, buttonSize.y };
+                    ImVec2 buttonSize{ windowWidth / 10.f, windowWidth / 10.f };
+                    ImVec2 fullSize{ windowWidth - buttonSize.x, buttonSize.y };
                     ImVec2 textSize{ 500.f, buttonSize.y };
 
                     {

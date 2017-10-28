@@ -24,6 +24,7 @@ InfoState::~InfoState() {
 }
 
 bool InfoState::onPush() {
+    _application.setCurrentState(State::INFO);
 
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
@@ -51,30 +52,17 @@ void InfoState::onEvent(const lug::Window::Event& event) {
 }
 
 bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
-    _application.setCurrentState(State::INFO);
-
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-    float mainMenuHeight;
-#if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = GUI::Utilities::getPercentage(window->getHeight(), 0.05f, 120.f);
-#else
-    mainMenuHeight = GUI::Utilities::getPercentage(window->getHeight(), 0.05f, 60.f);
-#endif
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
 
-    GUI::displayMenu(_application);
+    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(windowWidth, 0.35f, 300.f), windowHeight - (widowHeightOffset * 2) };
 
-    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(window->getWidth(), 0.35f, 300.f), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
-
-    ImGui::Begin("Info Window", &_isOpen, window_flags);
+    ImGui::Begin("Info Window", 0, _application._window_flags);
     {
         ImGui::SetWindowSize(infoWindowSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
 
 #if defined(LUG_SYSTEM_ANDROID)
         ImVec2 deviceWindowSize{ GUI::Utilities::getPercentage(ImGui::GetWindowWidth(), 0.9f), 250.f };
@@ -167,12 +155,12 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     }
     ImGui::End();
 
-    ImGui::Begin("Info Extra Window", &_isOpen, window_flags);
+    ImGui::Begin("Info Extra Window", 0, _application._window_flags);
     {
-        ImVec2 infoExtraWindowSize{ window->getWidth() - infoWindowSize.x, infoWindowSize.y };
+        ImVec2 infoExtraWindowSize{ windowWidth - infoWindowSize.x, infoWindowSize.y };
 
         ImGui::SetWindowSize(infoExtraWindowSize);
-        ImGui::SetWindowPos(ImVec2{ infoWindowSize.x, mainMenuHeight });
+        ImGui::SetWindowPos(ImVec2{ infoWindowSize.x, widowHeightOffset });
 
         ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));

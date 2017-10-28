@@ -17,11 +17,4 @@ public:
     bool onFrame(const lug::System::Time& elapsedTime) override;
     bool onPop() override;
     bool onPush() override;
-
-private:
-    // TEMP:(Stuart) Variables for "Window Editor" (temporary)
-
-    bool _isOpen{ true };
-
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> baseColorTexture;
 };

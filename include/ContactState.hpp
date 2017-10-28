@@ -17,12 +17,4 @@ public:
     bool onFrame(const lug::System::Time& elapsedTime) override;
     bool onPop() override;
     bool onPush() override;
-
-private:
-//	lug::Graphics::Vulkan::PhysicalDeviceInfo *_physicalDeviceInfo;
-
-    // TEMP:(Stuart) Variables for "Window Editor" (temporary)
-
-    bool _isOpen{ false };
-
 };

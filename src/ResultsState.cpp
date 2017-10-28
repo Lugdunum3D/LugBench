@@ -43,32 +43,17 @@ void ResultsState::onEvent(const lug::Window::Event& event) {
 }
 
 bool ResultsState::onFrame(const lug::System::Time&) {
-
-    GUI::displayMenu(_application);
-
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_ShowBorders;
-
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
 
-    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
-
-#if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
-#else
-    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
-#endif
-
-    ImGui::Begin("Contact Menu", &_isOpen, window_flags);
+    ImGui::Begin("Result Window", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
+        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });        
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
     }
     ImGui::End();
 

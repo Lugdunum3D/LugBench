@@ -24,6 +24,8 @@ ModelsState::~ModelsState() {
 }
 
 bool ModelsState::onPush() {
+    _application.setCurrentState(State::MODELS);
+
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
@@ -120,41 +122,25 @@ void ModelsState::onEvent(const lug::Window::Event& event) {
 }
 
 bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
-    _application.setCurrentState(State::MODELS);
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
 
     _cameraMover.onFrame(elapsedTime);
 
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_ShowBorders;
-
-    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-
-    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
-
-#if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
-#else
-    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
-#endif
-
-    GUI::displayMenu(_application);
-
-    ImGui::Begin("Model Select Menu", &_isOpen, window_flags);
+    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-        float modelMenuWidth = static_cast<float>(window->getWidth()) / 8.f;
 #if defined(LUG_SYSTEM_ANDROID)
-        modelMenuWidth = (modelMenuWidth < 165.f * 2.75f) ? 165.f * 2.75f : modelMenuWidth;
+        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
 #else
-        modelMenuWidth = (modelMenuWidth < 165.f) ? 165.f : modelMenuWidth;
+        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
 #endif
-        ImVec2 modelMenuSize{ modelMenuWidth, static_cast<float>(window->getHeight()) - (mainMenuHeight * 2) };
+
+        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
         ImGui::SetWindowFontScale(0.67f);
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
@@ -166,11 +152,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             {
 
                 float buttonWidth = ImGui::GetWindowWidth();
-                float buttonHeight;
 #if defined(LUG_SYSTEM_ANDROID)
-                buttonHeight = 80.f * 2.75f;
+                float buttonHeight = 80.f * 2.75f;
 #else
-                buttonHeight = 80.f;
+                float buttonHeight = 80.f;
 #endif
 
                 ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });

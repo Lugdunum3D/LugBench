@@ -54,6 +54,11 @@ Application::Application() : lug::Core::Application::Application{{"lugbench", {0
         nullptr                                             // camera
     });
 
+    _window_flags = 0;
+    _window_flags |= ImGuiWindowFlags_NoTitleBar;
+    _window_flags |= ImGuiWindowFlags_NoResize;
+    _window_flags |= ImGuiWindowFlags_NoMove;
+    _window_flags |= ImGuiWindowFlags_NoCollapse;
 }
 
 Application::~Application() {

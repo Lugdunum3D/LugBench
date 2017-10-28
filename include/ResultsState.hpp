@@ -29,8 +29,4 @@ private:
     // float _sending_log_timer;
     // float _sending_end_log_timer;
 
-    // TEMP:(Stuart) Variables for "Window Editor" (temporary)
-
-   bool _isOpen{ false };
-
 };

@@ -23,6 +23,7 @@ ContactState::~ContactState() {
 }
 
 bool ContactState::onPush() {
+    _application.setCurrentState(State::CONTACT);
     return true;
 }
 
@@ -41,34 +42,59 @@ void ContactState::onEvent(const lug::Window::Event& event) {
 }
 
 bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
-
-    _application.setCurrentState(State::CONTACT);
-
-    GUI::displayMenu(_application);
-
-    ImGuiWindowFlags window_flags = 0;
-    window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoMove;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
-    window_flags |= ImGuiWindowFlags_ShowBorders;
-
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
 
-    float mainMenuHeight = static_cast<float>(window->getHeight()) / 18.f;
+    ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
 
-#if defined(LUG_SYSTEM_ANDROID)
-    mainMenuHeight = (mainMenuHeight < 60.f * 2.f) ? 60.f * 2.f : mainMenuHeight;
-#else
-    mainMenuHeight = (mainMenuHeight < 60.f) ? 60.f : mainMenuHeight;
-#endif
-
-    ImGui::Begin("Contact Menu", &_isOpen, window_flags);
+    ImGui::Begin("Contact Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(window->getWidth()), static_cast<float>(window->getHeight()) - (mainMenuHeight * 2)};
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+
+        ImGui::BeginChild("Model Select Menu", ImVec2{ 165.f, windowHeight - (widowHeightOffset * 2) });
+        {
+#if defined(LUG_SYSTEM_ANDROID)
+            float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+#else
+            float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+#endif
+            modelMenuSize = ImVec2{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
+
+//            ImGui::SetWindowSize(modelMenuSize);0
+//            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+            ImGui::SetWindowFontScale(0.67f);
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+                {
+
+                    float buttonWidth = ImGui::GetWindowWidth();
+                    float buttonHeight;
+#if defined(LUG_SYSTEM_ANDROID)
+                    buttonHeight = 80.f * 2.75f;
+#else
+                    buttonHeight = 80.f;
+#endif
+
+                    ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
+                    ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
+                    ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
+                    ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
+                    ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
+                }
+                ImGui::PopStyleVar();
+            }
+            ImGui::PopStyleColor(4);
+        }
+        ImGui::EndChild();
     }
     ImGui::End();
 
