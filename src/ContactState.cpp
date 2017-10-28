@@ -51,50 +51,51 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
     ImGui::Begin("Contact Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-
         ImGui::SetWindowSize(modelMenuSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
 
-        ImGui::BeginChild("Model Select Menu", ImVec2{ 165.f, windowHeight - (widowHeightOffset * 2) });
+        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
         {
-#if defined(LUG_SYSTEM_ANDROID)
-            float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
-#else
-            float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
-#endif
-            modelMenuSize = ImVec2{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
-
-//            ImGui::SetWindowSize(modelMenuSize);0
-//            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
-            ImGui::SetWindowFontScale(0.67f);
-
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+            ImGui::BeginChild("Model Select Menu", ImVec2{ 165.f, windowHeight - (widowHeightOffset * 2) });
             {
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
-                {
-
-                    float buttonWidth = ImGui::GetWindowWidth();
-                    float buttonHeight;
 #if defined(LUG_SYSTEM_ANDROID)
-                    buttonHeight = 80.f * 2.75f;
+                float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
 #else
-                    buttonHeight = 80.f;
+                float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+#endif
+                modelMenuSize = ImVec2{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
+
+                //            ImGui::SetWindowSize(modelMenuSize);0
+                //            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
+                ImGui::SetWindowFontScale(0.67f);
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                {
+                    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+                    {
+
+                        float buttonWidth = ImGui::GetWindowWidth();
+                        float buttonHeight;
+#if defined(LUG_SYSTEM_ANDROID)
+                        buttonHeight = 80.f * 2.75f;
+#else
+                        buttonHeight = 80.f;
 #endif
 
-                    ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
-                    ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
+                        ImGui::Button("Authors", ImVec2{ buttonWidth, buttonHeight });
+                        ImGui::Button("Licence", ImVec2{ buttonWidth, buttonHeight });
+                        ImGui::Button("Contact", ImVec2{ buttonWidth, buttonHeight });
+                    }
+                    ImGui::PopStyleVar();
                 }
-                ImGui::PopStyleVar();
+                ImGui::PopStyleColor(4);
             }
-            ImGui::PopStyleColor(4);
+            ImGui::EndChild();
         }
-        ImGui::EndChild();
+        ImGui::PopStyleColor();
     }
     ImGui::End();
 
