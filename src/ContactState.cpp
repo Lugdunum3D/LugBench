@@ -20,7 +20,6 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
 }
 
 ContactState::~ContactState() {
-    LUG_LOG.info("ContactState destructor");
 }
 
 bool ContactState::onPush() {
@@ -28,7 +27,6 @@ bool ContactState::onPush() {
 }
 
 bool ContactState::onPop() {
-    LUG_LOG.info("ContactState onPop");
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();

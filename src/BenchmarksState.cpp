@@ -21,7 +21,6 @@ BenchmarksState::BenchmarksState(LugBench::Application &application) : AState(ap
 }
 
 BenchmarksState::~BenchmarksState() {
-    LUG_LOG.info("BenchmarksState destructor");
 }
 
 bool BenchmarksState::onPush() {
@@ -30,7 +29,6 @@ bool BenchmarksState::onPush() {
 }
 
 bool BenchmarksState::onPop() {
-    LUG_LOG.info("BenchmarksState onPop");
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
