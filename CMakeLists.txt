@@ -103,6 +103,7 @@ set(SRC
     src/LugNetwork.cpp
     src/BenchmarksState.cpp
     src/ModelsState.cpp
+    src/ModelViewer.cpp
     src/ResultsState.cpp
     src/InfoState.cpp
     src/ContactState.cpp
@@ -117,6 +118,7 @@ set(INC
     include/LugNetwork.hpp
     include/BenchmarksState.hpp
     include/ModelsState.hpp
+    include/ModelViewer.hpp
     include/ResultsState.hpp
     include/InfoState.hpp
     include/ContactState.hpp

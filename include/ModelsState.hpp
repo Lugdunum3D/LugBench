@@ -2,9 +2,9 @@
 
 #include "AState.hpp"
 #include "Application.hpp"
+#include "ModelViewer.hpp"
 
 #include <lug/Graphics/Scene/Scene.hpp>
-#include <lug/Core/FreeMovement.hpp>
 #include <json/json.hpp>
 #include <imgui.h>
 
@@ -30,7 +30,7 @@ private:
     bool loadModel(const ModelInfos& model);
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
 
-    lug::Core::FreeMovement _cameraMover;
+    ModelViewer _cameraMover;
 
     std::vector<ModelInfos> _models;
     const ModelInfos* _selectedModel{nullptr};

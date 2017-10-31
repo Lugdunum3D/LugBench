@@ -47,6 +47,7 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
+    _cameraMover.onEvent(event);
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
     }
