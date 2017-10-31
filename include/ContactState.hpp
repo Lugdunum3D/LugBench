@@ -17,4 +17,13 @@ public:
     bool onFrame(const lug::System::Time& elapsedTime) override;
     bool onPop() override;
     bool onPush() override;
+
+private:
+    void selectedButtonColorSet();
+    void unselectedButtonColorSet();
+
+private:
+    bool AuthorsPageActive = true;
+    bool LicencePageActive = false;
+    bool ContactPageActive = false;
 };

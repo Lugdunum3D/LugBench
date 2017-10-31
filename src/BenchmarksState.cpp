@@ -48,7 +48,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     uint16_t windowWidth = window->getWidth();
     float widowHeightOffset = GUI::displayMenu(_application);
 
-    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+    ImGui::Begin("Model Select Menu", 0, _application._window_flags);
     {
         ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
 

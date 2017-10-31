@@ -576,7 +576,7 @@ void GUI::setDefaultStyle()
     style.Colors[ImGuiCol_Text]                 = V4_WHITE;
     style.Colors[ImGuiCol_WindowBg]             = V4_WHITE;
     style.Colors[ImGuiCol_ChildWindowBg]        = V4_SKYBLUE;
-    style.Colors[ImGuiCol_Border]               = V4_LIGHTGRAY;
+    style.Colors[ImGuiCol_Border]               = V4_DARKGRAY;
     style.Colors[ImGuiCol_ScrollbarBg]          = V4_WHITE;
     style.Colors[ImGuiCol_ScrollbarGrab]        = V4_LIGHTGRAY;
     style.Colors[ImGuiCol_ScrollbarGrabHovered] = V4_GRAY;
@@ -778,13 +778,17 @@ void GUI::displayFooter(LugBench::Application & application)
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._epitechLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60  2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
                     ImGui::Image(vkTexture.get(), ImVec2(200, 60), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
                 ImGui::SameLine();
-                float width = (float)(window->getWidth() - 320);
+#if defined(LUG_SYSTEM_ANDROID)
+                float width = (float)(window->getWidth() - ((105 * 2) + (200 * 2) + 30));
+#else
+                float width = (float)(window->getWidth() - (105 + 200 + 15));
+#endif
                 ImGui::SetCursorPos(ImVec2(width, 0));
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._gltfLogo);
@@ -798,7 +802,7 @@ void GUI::displayFooter(LugBench::Application & application)
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._vulkanLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60  2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(200 * 2, 60 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
                     ImGui::Image(vkTexture.get(), ImVec2(200, 60), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif

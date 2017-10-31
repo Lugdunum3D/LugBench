@@ -27,6 +27,23 @@ bool ContactState::onPush() {
     return true;
 }
 
+void ContactState::selectedButtonColorSet()
+{
+    ImGui::PushStyleColor(ImGuiCol_Button, GUI::V4_SKYBLUE);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GUI::V4_SKYBLUE);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, GUI::V4_SKYBLUE);
+    ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_WHITE);
+}
+
+void ContactState::unselectedButtonColorSet()
+{
+    ImGui::PushStyleColor(ImGuiCol_Button, GUI::V4_WHITE);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GUI::V4_WHITE);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, GUI::V4_WHITE);
+    ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
+
+}
+
 bool ContactState::onPop() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
@@ -47,57 +64,75 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     uint16_t windowWidth = window->getWidth();
     float widowHeightOffset = GUI::displayMenu(_application);
 
-    ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
+    //    ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
+#if defined(LUG_SYSTEM_ANDROID)
+    float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+#else
+    float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+#endif
+    ImVec2 contactWindowSelectSize = ImVec2{ contactWindowSelectWidth, windowHeight - (widowHeightOffset * 2) };
 
-    ImGui::Begin("Contact Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+    ImGui::Begin("Contact Menu", 0, _application._window_flags);
     {
-        ImGui::SetWindowSize(modelMenuSize);
+        ImGui::SetWindowSize(contactWindowSelectSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
 
-        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
+        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
         {
-            ImGui::BeginChild("Model Select Menu", ImVec2{ 165.f, windowHeight - (widowHeightOffset * 2) });
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 10.f);
             {
+
+                float buttonWidth = ImGui::GetWindowWidth() / 1.25f;
 #if defined(LUG_SYSTEM_ANDROID)
-                float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+                float buttonHeight = 60.f * 2.75f;
 #else
-                float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+                float buttonHeight = 60.f;
 #endif
-                modelMenuSize = ImVec2{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
+                float xOffset = ImGui::GetWindowWidth() - (buttonWidth * 1.125f);
+                float yOffset = (ImGui::GetWindowHeight() / 2.f);
 
-                //            ImGui::SetWindowSize(modelMenuSize);0
-                //            ImGui::SetWindowPos(ImVec2{ 0.f, mainMenuHeight });
-                ImGui::SetWindowFontScale(0.67f);
-
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+                ImGui::SetCursorPos(ImVec2(xOffset, yOffset - (buttonHeight * 1.5f)));
+                (AuthorsPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Authors", ImVec2{ buttonWidth, buttonHeight }))
                 {
-                    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
-                    {
-
-                        float buttonWidth = ImGui::GetWindowWidth();
-                        float buttonHeight;
-#if defined(LUG_SYSTEM_ANDROID)
-                        buttonHeight = 80.f * 2.75f;
-#else
-                        buttonHeight = 80.f;
-#endif
-
-                        ImGui::Button("Authors", ImVec2{ buttonWidth, buttonHeight });
-                        ImGui::Button("Licence", ImVec2{ buttonWidth, buttonHeight });
-                        ImGui::Button("Contact", ImVec2{ buttonWidth, buttonHeight });
-                    }
-                    ImGui::PopStyleVar();
+                    AuthorsPageActive = true;
+                    LicencePageActive = false;
+                    ContactPageActive = false;
                 }
-                ImGui::PopStyleColor(4);
+                ImGui::SetCursorPos(ImVec2(xOffset, yOffset - (buttonHeight * .5f)));
+                (LicencePageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Licence", ImVec2{ buttonWidth, buttonHeight }))
+                {
+                    AuthorsPageActive = false;
+                    LicencePageActive = true;
+                    ContactPageActive = false;
+                }
+                ImGui::SetCursorPos(ImVec2(xOffset, yOffset + (buttonHeight * .5f)));
+                (ContactPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Contact", ImVec2{ buttonWidth, buttonHeight }))
+                {
+                    AuthorsPageActive = false;
+                    LicencePageActive = false;
+                    ContactPageActive = true;
+                }
+                ImGui::PopStyleColor(12); // For the 4 PushStyleVar in each selectedButtonColorSet()/unselectedButtonColorSet()
             }
-            ImGui::EndChild();
+            ImGui::PopStyleVar();
         }
-        ImGui::PopStyleColor();
+        ImGui::PopFont();
     }
     ImGui::End();
+
+    ImVec2 contactWindowSize = ImVec2{ windowWidth - contactWindowSelectWidth, windowHeight - (widowHeightOffset * 2) };
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, GUI::V4_PINK);
+    ImGui::Begin("Contact Window", 0, _application._window_flags);
+    {
+        ImGui::SetWindowSize(contactWindowSize);
+        ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, widowHeightOffset });
+    }
+    ImGui::End();
+    ImGui::PopStyleColor();
 
     GUI::displayFooter(_application);
 

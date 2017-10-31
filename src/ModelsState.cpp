@@ -77,7 +77,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
     _cameraMover.onFrame(elapsedTime);
 
-    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+    ImGui::Begin("Model Select Menu", 0, _application._window_flags);
     {
         float modelMenuWidth = getModelMenuWidth(windowWidth);
 

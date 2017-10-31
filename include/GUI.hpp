@@ -22,6 +22,7 @@ static const ImVec4 V4_SKYBLUE{ .31f, .67f, .98f, 1.f };
 static const ImVec4 V4_LIGHTGRAY{ 0.80f, 0.80f, 0.83f, 1.f };
 static const ImVec4 V4_GRAY{ 0.5f, 0.5f, 0.5f, 1.f };
 static const ImVec4 V4_DARKGRAY{ 0.40f, 0.40f, 0.40f, 1.f };
+static const ImVec4 V4_PINK{ 1.f, 0.08f, 0.58f, 1.f };
 
 void displayConfigInfoString(const char* title, const char* content, const ImVec4 color = {.64f, .87f, .29f, 1.f});
 void displayConfigInfoVersion(const char* title, const lug::Core::Version& version, const ImVec4 color = {.64f, .87f, .29f, 1.f});
