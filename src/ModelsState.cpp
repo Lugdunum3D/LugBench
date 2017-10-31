@@ -18,6 +18,11 @@
 
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
+    _models = {
+        // { name, path, modelNodeName }
+        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074" },
+        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074" }
+    };
 }
 
 ModelsState::~ModelsState() {
@@ -26,19 +31,117 @@ ModelsState::~ModelsState() {
 bool ModelsState::onPush() {
     _application.setCurrentState(State::MODELS);
 
+    if (!_models.size()) {
+        return true;
+    }
+
+    return loadModel(_models.front());
+}
+
+bool ModelsState::onPop() {
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
+    vkRender->getDevice().waitIdle();
+    _scene = nullptr;
+    return true;
+}
+
+void ModelsState::onEvent(const lug::Window::Event& event) {
+    if (event.type == lug::Window::Event::Type::Close) {
+        _application.close();
+    }
+}
+
+bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
+    bool success = true;
+
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowHeight = window->getHeight();
+    uint16_t windowWidth = window->getWidth();
+    float widowHeightOffset = GUI::displayMenu(_application);
+
+    _cameraMover.onFrame(elapsedTime);
+
+    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+    {
+#if defined(LUG_SYSTEM_ANDROID)
+        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+#else
+        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+#endif
+
+        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
+
+        ImGui::SetWindowSize(modelMenuSize);
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+        ImGui::SetWindowFontScale(0.67f);
+
+        {
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+            {
+
+                float buttonWidth = ImGui::GetWindowWidth();
+#if defined(LUG_SYSTEM_ANDROID)
+                float buttonHeight = 80.f * 2.75f;
+#else
+                float buttonHeight = 80.f;
+#endif
+
+                for (auto& model: _models) {
+                    // Selected style
+                    if (_selectedModel == &model) {
+                        pushButtonsStyle(
+                            ImVec4(.31f, .67f, .98f, 1.00f),
+                            ImVec4(.31f, .67f, .98f, 1.00f),
+                            ImVec4(.31f, .67f, .98f, 1.00f),
+                            ImVec4(0.33f, 0.33f, 0.33f, 1.00f)
+                        );
+                    }
+                    // Unselected style
+                    else {
+                        pushButtonsStyle(
+                            ImVec4(1.f, 1.f, 1.f, 1.00f),
+                            ImVec4(.31f, .67f, .98f, 1.00f),
+                            ImVec4(.31f, .67f, .98f, 1.00f),
+                            ImVec4(0.33f, 0.33f, 0.33f, 1.00f)
+                        );
+                    }
+
+                    if (ImGui::Button(model.name.c_str(), ImVec2{ buttonWidth, buttonHeight })) {
+                        if (!loadModel(model)) {
+                            // Don't return false directly or it will make ImGui crash
+                            // (Because we need to pop styles and call ImGui::End)
+                            success = false;
+                        }
+                    }
+
+                    ImGui::PopStyleColor(4);
+                }
+            }
+            ImGui::PopStyleVar();
+        }
+    }
+    ImGui::End();
+
+    GUI::displayFooter(_application);
+
+    return success;
+}
+
+bool ModelsState::loadModel(const ModelInfos& model) {
     // Load scene
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/Duck/Duck.gltf");
-    //    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile("models/DamagedHelmet/DamagedHelmet.gltf");
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
     if (!sceneResource) {
         return false;
     }
 
     _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
 
-    // Scale duck
-    {
-        _scene->getSceneNode("duck")->scale(lug::Math::Vec3f(0.01f));
+    auto modelNode = _scene->getSceneNode(model.modelNodeName);
+    if (!modelNode) {
+        LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
+        return false;
     }
 
     // Attach directional light to the root node
@@ -51,7 +154,7 @@ bool ModelsState::onPush() {
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
-            LUG_LOG.error("Application::init Can't create directional light");
+            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
             return false;
         }
 
@@ -68,11 +171,10 @@ bool ModelsState::onPush() {
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
-            LUG_LOG.error("Application::init Can't create directional light");
+            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
             return false;
         }
 
-        //_scene->getSceneNode("duck")->attachLight(light);
         _scene->getRoot().attachLight(light);
     }
 
@@ -104,73 +206,18 @@ bool ModelsState::onPush() {
         }
     }
 
+    _selectedModel = &model;
     return true;
 }
 
-bool ModelsState::onPop() {
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-    vkRender->getDevice().waitIdle();
-    _scene = nullptr;
-    return true;
-}
-
-void ModelsState::onEvent(const lug::Window::Event& event) {
-    if (event.type == lug::Window::Event::Type::Close) {
-        _application.close();
-    }
-}
-
-bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
-    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
-    uint16_t windowHeight = window->getHeight();
-    uint16_t windowWidth = window->getWidth();
-    float widowHeightOffset = GUI::displayMenu(_application);
-
-    _cameraMover.onFrame(elapsedTime);
-
-    ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
-    {
-#if defined(LUG_SYSTEM_ANDROID)
-        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
-#else
-        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
-#endif
-
-        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
-
-        ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
-        ImGui::SetWindowFontScale(0.67f);
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
-            {
-
-                float buttonWidth = ImGui::GetWindowWidth();
-#if defined(LUG_SYSTEM_ANDROID)
-                float buttonHeight = 80.f * 2.75f;
-#else
-                float buttonHeight = 80.f;
-#endif
-
-                ImGui::Button("Duck", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Helmet", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Monkey", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Repunzel", ImVec2{ buttonWidth, buttonHeight });
-                ImGui::Button("Tower", ImVec2{ buttonWidth, buttonHeight });
-            }
-            ImGui::PopStyleVar();
-        }
-        ImGui::PopStyleColor(4);
-    }
-    ImGui::End();
-
-    GUI::displayFooter(_application);
-
-    return true;
+void ModelsState::pushButtonsStyle(
+    const ImVec4& color,
+    const ImVec4& hoveredColor,
+    const ImVec4& activeColor,
+    const ImVec4& textColor
+) const {
+    ImGui::PushStyleColor(ImGuiCol_Button, color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeColor);
+    ImGui::PushStyleColor(ImGuiCol_Text, textColor);
 }

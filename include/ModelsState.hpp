@@ -9,6 +9,13 @@
 #include <imgui.h>
 
 class ModelsState : public AState {
+private:
+    struct ModelInfos {
+        std::string name;
+        std::string path;
+        std::string modelNodeName;
+    };
+
 public:
     ModelsState() = delete;
     ModelsState(LugBench::Application &application);
@@ -20,6 +27,11 @@ public:
     bool onPush() override;
 
 private:
+    bool loadModel(const ModelInfos& model);
+    void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
 
     lug::Core::FreeMovement _cameraMover;
+
+    std::vector<ModelInfos> _models;
+    const ModelInfos* _selectedModel{nullptr};
 };
