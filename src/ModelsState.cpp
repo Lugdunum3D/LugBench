@@ -47,6 +47,20 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    auto window = renderer->getWindow();
+    auto& renderViews = window->getRenderViews();
+    float mainMenuHeight = GUI::Utilities::getMainMenuHeight(window->getHeight());
+    float modelMenuWidth = getModelMenuWidth(window->getWidth());
+    float footerHeight = GUI::Utilities::getFooterHeight(window->getHeight());
+
+    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+    renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
+    renderViews[0]->getInfo().viewport.extent.height = 1.0f - (mainMenuHeight + footerHeight) / window->getHeight();
+    renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
+    renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
+    renderViews[0]->update();
     _cameraMover.onEvent(event);
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
@@ -65,11 +79,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
     ImGui::Begin("Model Select Menu", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
     {
-#if defined(LUG_SYSTEM_ANDROID)
-        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
-#else
-        float modelMenuWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
-#endif
+        float modelMenuWidth = getModelMenuWidth(windowWidth);
 
         ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
 
@@ -221,4 +231,12 @@ void ModelsState::pushButtonsStyle(
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredColor);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeColor);
     ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+}
+
+float ModelsState::getModelMenuWidth(float windowWidth) {
+#if defined(LUG_SYSTEM_ANDROID)
+        return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+#else
+        return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+#endif
 }

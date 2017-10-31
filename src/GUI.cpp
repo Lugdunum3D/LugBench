@@ -591,11 +591,7 @@ float GUI::displayMenu(LugBench::Application &application) {
 
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
-#if defined(LUG_SYSTEM_ANDROID)
-    float mainMenuHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 120.f);
-#else
-    float mainMenuHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 60.f);
-#endif
+    float mainMenuHeight = Utilities::getMainMenuHeight(window->getHeight());
 
     ImGui::Begin("Main Menu", 0, application._window_flags);
     {
@@ -767,11 +763,7 @@ void GUI::displayFooter(LugBench::Application & application)
 {
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
-#if defined(LUG_SYSTEM_ANDROID)
-    float footerHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 120.f);
-#else
-    float footerHeight = Utilities::getPercentage(window->getHeight(), 0.06f, 60.f);
-#endif
+    float footerHeight = Utilities::getFooterHeight(window->getHeight());
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, V4_GRAY);
     {
@@ -825,4 +817,20 @@ float GUI::Utilities::getPercentage(float fullSize, float percentage, float minS
     if (retVal < minSize) { retVal = minSize; }
 
     return retVal;
+}
+
+float GUI::Utilities::getMainMenuHeight(float windowHeight) {
+#if defined(LUG_SYSTEM_ANDROID)
+    return Utilities::getPercentage(windowHeight, 0.06f, 120.f);
+#else
+    return Utilities::getPercentage(windowHeight, 0.06f, 60.f);
+#endif
+}
+
+float GUI::Utilities::getFooterHeight(float windowHeight) {
+#if defined(LUG_SYSTEM_ANDROID)
+    return Utilities::getPercentage(windowHeight, 0.06f, 120.f);
+#else
+    return Utilities::getPercentage(windowHeight, 0.06f, 60.f);
+#endif
 }
