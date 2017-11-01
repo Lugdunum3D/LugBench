@@ -14,15 +14,30 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         float axisRightY = _eventSource->_gamePadState.axisRight.y();
 
         if (axisRightX || axisRightY) {
-            _model->rotate(_speed * axisRightX, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
-            _model->rotate(_speed * axisRightY, {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(
+                _rotationSpeed * axisRightX * elapsedTime.getSeconds<float>(),
+                {0.0f, 1.0f, 0.0f},
+                lug::Graphics::Node::TransformSpace::World
+            );
+            _model->rotate(
+                _rotationSpeed * axisRightY * elapsedTime.getSeconds<float>(),
+                {1.0f, 0.0f, 0.0f},
+                lug::Graphics::Node::TransformSpace::World
+            );
         }
     }
     // TouchScreen
     {
         if (_eventSource->_touchScreenState.drag) {
-            _model->rotate(_speed * _eventSource->_touchScreenState.coordinates[0].x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
-            _model->rotate(_speed * _eventSource->_touchScreenState.coordinates[0].y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(
+                _rotationSpeed * _eventSource->_touchScreenState.coordinates[0].x() * elapsedTime.getSeconds<float>(),
+                {0.0f, 1.0f, 0.0f},
+                lug::Graphics::Node::TransformSpace::World
+            );
+            _model->rotate(_rotationSpeed * _eventSource->_touchScreenState.coordinates[0].y() * elapsedTime.getSeconds<float>(),
+                {1.0f, 0.0f, 0.0f},
+                lug::Graphics::Node::TransformSpace::World
+            );
         }
     }
 
@@ -44,9 +59,13 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         if (_lastMousePos != mousePos) {
             lug::Math::Vec2i delta = mousePos - _lastMousePos;
             _lastMousePos = mousePos;
+            _lastRotationVelocity = {
+                _rotationSpeed * delta.x() * elapsedTime.getSeconds<float>(),
+                _rotationSpeed * delta.y() * elapsedTime.getSeconds<float>()
+            };
 
-            _model->rotate(_speed * delta.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
-            _model->rotate(_speed * delta.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
 
             lug::Math::Vec2i windowSize = _eventSource->getWindowSize();
 
@@ -58,10 +77,29 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
                 _lastMousePos = middle;
             }
         }
+        else {
+            _lastRotationVelocity = {0.0f, 0.0f};
+        }
     }
 
     if (_zoom) {
-        _camera->translate({0.0f, 0.0f, _speed * _zoom * elapsedTime.getMilliseconds<float>() * 4.0f});
+        _camera->translate({0.0f, 0.0f, _zoomSpeed * _zoom * elapsedTime.getSeconds<float>() * 4.0f});
+    }
+    // Rotate model after mouse released or drag released
+    else if (_rotationVelocity.x() || _rotationVelocity.y()) {
+        _model->rotate(_rotationVelocity.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        _model->rotate(_rotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+
+        // Reduce rotation velocity by 0.05% each millisecond
+        _rotationVelocity = _rotationVelocity * (1.0f - 0.005f * elapsedTime.getMilliseconds<float>());
+
+        // Stop rotation if velocity is close to 0
+        if (_rotationVelocity.x() < 0.01f &&
+            _rotationVelocity.x() > -0.01f &&
+            _rotationVelocity.y() < 0.01f &&
+            _rotationVelocity.y() > -0.01f) {
+            _rotationVelocity = {0.0f, 0.0f};
+        }
     }
 
     _zoom = 0.0f;
@@ -75,4 +113,12 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
         event.mouse.code == lug::Window::Mouse::Button::Left) {
         _lastMousePos = _eventSource->getMousePos();
     }
+    else if (isRotationEnd(event)) {
+        _rotationVelocity = _lastRotationVelocity;
+    }
+}
+
+bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
+    return (event.type == lug::Window::Event::Type::ButtonReleased &&
+        event.mouse.code == lug::Window::Mouse::Button::Left);
 }

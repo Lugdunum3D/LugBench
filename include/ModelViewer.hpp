@@ -33,14 +33,21 @@ public:
     void onEvent(const lug::Window::Event& event);
 
 private:
+    bool isRotationEnd(const lug::Window::Event& event);
+
+private:
     lug::Graphics::Scene::Node* _camera{nullptr};
     lug::Graphics::Scene::Node* _model{nullptr};
     lug::Window::Window* _eventSource{nullptr};
-    float _speed{0.005f};
+    float _rotationSpeed{0.25f};
+    float _zoomSpeed{3.0f};
     float _zoom{0.0f};
 
     bool _hasFocus{false};
     lug::Math::Vec2i _lastMousePos{0, 0};
+
+    lug::Math::Vec2f _lastRotationVelocity{0, 0};
+    lug::Math::Vec2f _rotationVelocity{0.0f, 0.0f};
 };
 
 #include "ModelViewer.inl"
