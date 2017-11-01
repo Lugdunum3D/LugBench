@@ -15,7 +15,12 @@ public:
     /**
      * @brief      Sets the camera node (i.e. the node to which the camera is attached to).
      */
-    void setTargetNode(lug::Graphics::Scene::Node& target);
+    void setCameraNode(lug::Graphics::Scene::Node& camera);
+
+    /**
+     * @brief      Sets the model node (i.e. the node to which the model is attached to).
+     */
+    void setModelNode(lug::Graphics::Scene::Node& model);
 
     /**
      * @brief      Sets the event source, a Window instance.
@@ -28,11 +33,11 @@ public:
     void onEvent(const lug::Window::Event& event);
 
 private:
-    lug::Graphics::Scene::Node* _target{nullptr};
+    lug::Graphics::Scene::Node* _camera{nullptr};
+    lug::Graphics::Scene::Node* _model{nullptr};
     lug::Window::Window* _eventSource{nullptr};
     float _speed{0.005f};
-    float _scroll{0.0f};
-    lug::Math::Vec2f _rotation{0.0f, 0.0f};
+    float _zoom{0.0f};
 
     bool _hasFocus{false};
     lug::Math::Vec2i _lastMousePos{0, 0};
