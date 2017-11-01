@@ -46,14 +46,15 @@ bool ResultsState::onFrame(const lug::System::Time&) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeightOffset = GUI::displayMenu(_application);
+    float widowHeaderOffset = GUI::displayMenu(_application);
+    float widowFooterOffset = GUI::displayFooter(_application);
 
     ImGui::Begin("Result Window", 0, _application._window_flags);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
+        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeaderOffset + widowFooterOffset) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
     }
     ImGui::End();
 
@@ -180,8 +181,6 @@ bool ResultsState::onFrame(const lug::System::Time&) {
             //     }
             // }
     //}
-
-    GUI::displayFooter(_application);
 
     return true;
 }

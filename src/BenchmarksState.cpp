@@ -46,14 +46,15 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeightOffset = GUI::displayMenu(_application);
+    float widowHeaderOffset = GUI::displayMenu(_application);
+    float widowFooterOffset = GUI::displayFooter(_application);
 
     ImGui::Begin("Model Select Menu", 0, _application._window_flags);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
+        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeaderOffset + widowFooterOffset) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
@@ -130,8 +131,6 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
         ImGui::PopStyleColor(5);
     }
     ImGui::End();
-
-    GUI::displayFooter(_application);
 
     return true;
 }

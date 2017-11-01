@@ -23,7 +23,7 @@ private:
     void unselectedButtonColorSet();
 
 private:
-    bool AuthorsPageActive = true;
-    bool LicencePageActive = false;
-    bool ContactPageActive = false;
+    bool _authorsPageActive = true;
+    bool _licencePageActive = false;
+    bool _contactPageActive = false;
 };

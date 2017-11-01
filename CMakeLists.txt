@@ -165,8 +165,11 @@ set(OTHER_RESOURCES
     fonts/Roboto-Bold.ttf
     fonts/Roboto-Light.ttf
     textures/epitech_logo.png
+    textures/epitech_color_logo.png
     textures/gltf_logo.png
     textures/vulkan_logo.png
+    textures/lugbench_logo.png
+    textures/lugdunum_logo.png
 )
 
 # create target

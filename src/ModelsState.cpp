@@ -73,7 +73,8 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeightOffset = GUI::displayMenu(_application);
+    float widowHeaderOffset = GUI::displayMenu(_application);
+    float widowFooterOffset = GUI::displayFooter(_application);
 
     _cameraMover.onFrame(elapsedTime);
 
@@ -81,10 +82,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     {
         float modelMenuWidth = getModelMenuWidth(windowWidth);
 
-        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeightOffset * 2) };
+        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (widowHeaderOffset + widowFooterOffset) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
         ImGui::SetWindowFontScale(0.67f);
 
         {
@@ -133,8 +134,6 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         }
     }
     ImGui::End();
-
-    GUI::displayFooter(_application);
 
     return success;
 }

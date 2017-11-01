@@ -53,13 +53,17 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechColorLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _gltfLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _vulkanLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugbenchLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugdunumLogo;
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
     bool loadFonts();
     bool loadImages(lug::Graphics::Renderer* renderer);
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> buildImage(lug::Graphics::Renderer* renderer, std::string fileName);
     std::stack<std::shared_ptr<AState>> _states;
 
     State _currentState;

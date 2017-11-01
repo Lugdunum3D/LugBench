@@ -4,6 +4,7 @@
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
+#include <lug/Graphics/Vulkan/Render/Texture.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
 #include "BenchmarkingState.hpp"
@@ -62,20 +63,20 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeightOffset = GUI::displayMenu(_application);
+    float widowHeaderOffset = GUI::displayMenu(_application);
+    float widowFooterOffset = GUI::displayFooter(_application);
 
-    //    ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeightOffset * 2) };
 #if defined(LUG_SYSTEM_ANDROID)
     float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
 #else
     float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
 #endif
-    ImVec2 contactWindowSelectSize = ImVec2{ contactWindowSelectWidth, windowHeight - (widowHeightOffset * 2) };
+    ImVec2 contactWindowSelectSize = ImVec2{ contactWindowSelectWidth, windowHeight - (widowHeaderOffset + widowFooterOffset) };
 
     ImGui::Begin("Contact Menu", 0, _application._window_flags);
     {
         ImGui::SetWindowSize(contactWindowSelectSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeightOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
 
         ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
         {
@@ -92,28 +93,25 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                 float yOffset = (ImGui::GetWindowHeight() / 2.f);
 
                 ImGui::SetCursorPos(ImVec2(xOffset, yOffset - (buttonHeight * 1.5f)));
-                (AuthorsPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
-                if (ImGui::Button("Authors", ImVec2{ buttonWidth, buttonHeight }))
-                {
-                    AuthorsPageActive = true;
-                    LicencePageActive = false;
-                    ContactPageActive = false;
+                (_authorsPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Authors", ImVec2{ buttonWidth, buttonHeight })) {
+                    _authorsPageActive = true;
+                    _licencePageActive = false;
+                    _contactPageActive = false;
                 }
                 ImGui::SetCursorPos(ImVec2(xOffset, yOffset - (buttonHeight * .5f)));
-                (LicencePageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
-                if (ImGui::Button("Licence", ImVec2{ buttonWidth, buttonHeight }))
-                {
-                    AuthorsPageActive = false;
-                    LicencePageActive = true;
-                    ContactPageActive = false;
+                (_licencePageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Licence", ImVec2{ buttonWidth, buttonHeight })) {
+                    _authorsPageActive = false;
+                    _licencePageActive = true;
+                    _contactPageActive = false;
                 }
                 ImGui::SetCursorPos(ImVec2(xOffset, yOffset + (buttonHeight * .5f)));
-                (ContactPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
-                if (ImGui::Button("Contact", ImVec2{ buttonWidth, buttonHeight }))
-                {
-                    AuthorsPageActive = false;
-                    LicencePageActive = false;
-                    ContactPageActive = true;
+                (_contactPageActive == true) ? selectedButtonColorSet() : unselectedButtonColorSet();
+                if (ImGui::Button("Contact", ImVec2{ buttonWidth, buttonHeight })) {
+                    _authorsPageActive = false;
+                    _licencePageActive = false;
+                    _contactPageActive = true;
                 }
                 ImGui::PopStyleColor(12); // For the 4 PushStyleVar in each selectedButtonColorSet()/unselectedButtonColorSet()
             }
@@ -123,18 +121,66 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     }
     ImGui::End();
 
-    ImVec2 contactWindowSize = ImVec2{ windowWidth - contactWindowSelectWidth, windowHeight - (widowHeightOffset * 2) };
+    ImVec2 contactWindowSize = ImVec2{ windowWidth - contactWindowSelectWidth, windowHeight - (widowHeaderOffset + widowFooterOffset) };
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, GUI::V4_PINK);
-    ImGui::Begin("Contact Window", 0, _application._window_flags);
+    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
     {
-        ImGui::SetWindowSize(contactWindowSize);
-        ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, widowHeightOffset });
-    }
-    ImGui::End();
-    ImGui::PopStyleColor();
+        ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_DARKGRAY);
+        {
+            ImGui::Begin("Contact Window", 0, _application._window_flags);
+            {
+                ImGui::SetWindowSize(contactWindowSize);
+                ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, widowHeaderOffset });
+        
+                ImGui::SetCursorPosY(15.f);
+                ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
+                {
+                    ImGui::BeginChild("Left Section", ImVec2{ contactWindowSize.x / 3.f, contactWindowSize.y - 15.f });
+                    {
+                        if (_authorsPageActive) {
 
-    GUI::displayFooter(_application);
+                            auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_application._epitechColorLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImGui::Image(vkTexture.get(), ImVec2(275.f * 2, 100 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                            ImGui::Image(vkTexture.get(), ImVec2(275.f, 100), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                            ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+
+                            ImGui::NewLine(); ImGui::NewLine();
+
+                            vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_application._lugbenchLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImGui::Image(vkTexture.get(), ImVec2(301.f * 2, 100 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                            ImGui::Image(vkTexture.get(), ImVec2(301.f, 100), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                            vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_application._lugdunumLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                            ImGui::Image(vkTexture.get(), ImVec2(301 * 2, 100 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                            ImGui::Image(vkTexture.get(), ImVec2(301, 100), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                        } else if (_licencePageActive) {
+                            ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+                        } else if (_contactPageActive) {
+                            ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+                        }
+                    }
+                    ImGui::EndChild();
+                    ImGui::SameLine();
+                    ImGui::BeginChild("Right Section", ImVec2{ contactWindowSize.x * 0.6667f, contactWindowSize.y - 15.f });
+                    {
+                    }
+                    ImGui::EndChild();
+                }
+                ImGui::PopStyleColor();
+            }
+            ImGui::End();
+        }
+        ImGui::PopStyleColor();
+    }
+    ImGui::PopFont();
 
     return true;
 }

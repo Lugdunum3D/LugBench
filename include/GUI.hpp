@@ -50,7 +50,7 @@ bool displayReturnButton();
 void setDefaultStyle();
 
 float displayMenu(LugBench::Application &application);
-void displayFooter(LugBench::Application &application);
+float displayFooter(LugBench::Application &application);
 
 namespace Utilities {
 

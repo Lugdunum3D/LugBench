@@ -759,7 +759,7 @@ float GUI::displayMenu(LugBench::Application &application) {
     return mainMenuHeight;
 }
 
-void GUI::displayFooter(LugBench::Application & application)
+float GUI::displayFooter(LugBench::Application & application)
 {
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
@@ -779,39 +779,40 @@ void GUI::displayFooter(LugBench::Application & application)
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._epitechLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(139.2f * 2, 50 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(220.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(139.2f, 50), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(220.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
                 ImGui::SameLine();
 #if defined(LUG_SYSTEM_ANDROID)
-                float width = (float)(window->getWidth() - ((93.3f * 2) + (192.8f * 2) + 30));
+                float width = (float)(window->getWidth() - ((150.f * 2) + (300.f * 2) + 30));
 #else
-                float width = (float)(window->getWidth() - (93.3f + 192.8f + 15));
+                float width = (float)(window->getWidth() - (150.f + 300.f + 15));
 #endif
                 ImGui::SetCursorPos(ImVec2(width, 5));
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._gltfLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(93.3f * 2, 50 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(150.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(93.3f, 50), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(150.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
                 ImGui::SameLine();
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._vulkanLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(192.8f * 2, 50 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(300.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(192.8f, 50), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(300.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
             }
             ImGui::End();
     }
     ImGui::PopStyleColor();
+    return footerHeight;
 }
 
 float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
@@ -834,8 +835,8 @@ float GUI::Utilities::getMainMenuHeight(float windowHeight) {
 
 float GUI::Utilities::getFooterHeight(float windowHeight) {
 #if defined(LUG_SYSTEM_ANDROID)
-    return Utilities::getPercentage(windowHeight, 0.06f, 120.f);
+    return Utilities::getPercentage(windowHeight, 0.06f, 160.f);
 #else
-    return Utilities::getPercentage(windowHeight, 0.06f, 60.f);
+    return Utilities::getPercentage(windowHeight, 0.06f, 80.f);
 #endif
 }
