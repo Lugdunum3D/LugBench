@@ -8,33 +8,21 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         return;
     }
 
-    // GamePad Movement
-    {
-        float axisLeftX = _eventSource->_gamePadState.axisLeft.x();
-        float axisLeftY = _eventSource->_gamePadState.axisLeft.y();
-
-        if (axisLeftX) {
-            _target->translate({ ((axisLeftX > 0) ? 1 : -1) * _speed * 0.5f * elapsedTime.getMilliseconds<float>(), 0.0f, 0.0f});
-        }
-        if (axisLeftY) {
-            _target->translate({0.0f, 0.0f, ((axisLeftY > 0) ? 1 : -1) * _speed * 0.5f * elapsedTime.getMilliseconds<float>()});
-        }
-    }
     // GamePad View
     {
         float axisRightX = _eventSource->_gamePadState.axisRight.x();
         float axisRightY = _eventSource->_gamePadState.axisRight.y();
 
         if (axisRightX || axisRightY) {
-            _target->rotate(-_speed * axisRightX, {0, 1, 0}, lug::Graphics::Node::TransformSpace::World);
-            _target->rotate(-_speed * axisRightY, {1, 0, 0});
+            _model->rotate(_speed * axisRightX, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_speed * axisRightY, {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
         }
     }
     // TouchScreen
     {
         if (_eventSource->_touchScreenState.drag) {
-            _target->rotate(-_speed * _eventSource->_touchScreenState.coordinates[0].x(), {0, 1, 0}, lug::Graphics::Node::TransformSpace::World);
-            _target->rotate(-_speed * _eventSource->_touchScreenState.coordinates[0].y(), {1, 0, 0});
+            _model->rotate(_speed * _eventSource->_touchScreenState.coordinates[0].x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_speed * _eventSource->_touchScreenState.coordinates[0].y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
         }
     }
 
@@ -57,16 +45,8 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
             lug::Math::Vec2i delta = mousePos - _lastMousePos;
             _lastMousePos = mousePos;
 
-            _rotation.x() += _speed * -delta.x() * 10.0f;
-            _rotation.y() += _speed * -delta.y() * 10.0f;
-
-            float x = 4.0f * (cos(lug::Math::Geometry::radians(-_rotation.x())) * sin(lug::Math::Geometry::radians(_rotation.y())));
-            float y = 4.0f * (sin(lug::Math::Geometry::radians(-_rotation.x())) * sin(lug::Math::Geometry::radians(_rotation.y())));
-            float z = 4.0f * cos(lug::Math::Geometry::radians(_rotation.y()));
-
-            _target->setPosition({x, z, y}, lug::Graphics::Node::TransformSpace::World);
-            _target->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
-
+            _model->rotate(_speed * delta.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_speed * delta.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
 
             lug::Math::Vec2i windowSize = _eventSource->getWindowSize();
 
@@ -80,15 +60,19 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         }
     }
 
-    if (_scroll) {
-        _target->translate({0.0f, 0.0f, _speed * _scroll * elapsedTime.getMilliseconds<float>() * 4.0f});
+    if (_zoom) {
+        _camera->translate({0.0f, 0.0f, _speed * _zoom * elapsedTime.getMilliseconds<float>() * 4.0f});
     }
 
-    _scroll = 0.0f;
+    _zoom = 0.0f;
 }
 
 void ModelViewer::onEvent(const lug::Window::Event& event) {
     if (event.type == lug::Window::Event::Type::MouseWheel) {
-        _scroll = static_cast<float>(event.mouse.scrollOffset.xOffset);
+        _zoom = static_cast<float>(event.mouse.scrollOffset.xOffset);
+    }
+    else if (event.type == lug::Window::Event::Type::ButtonPressed &&
+        event.mouse.code == lug::Window::Mouse::Button::Left) {
+        _lastMousePos = _eventSource->getMousePos();
     }
 }

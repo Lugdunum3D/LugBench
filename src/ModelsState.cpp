@@ -196,13 +196,14 @@ bool ModelsState::loadModel(const ModelInfos& model) {
         node->attachCamera(_application.getCamera());
 
         // Set initial position of the camera
-        node->setPosition({ 3.0f, 4.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
+        node->setPosition({ 0.0f, 4.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
         // Look at once
         node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
 
         // Attach the camera node to the mover
         {
-            _cameraMover.setTargetNode(*node);
+            _cameraMover.setCameraNode(*node);
+            _cameraMover.setModelNode(*modelNode);
             _cameraMover.setEventSource(*renderer->getWindow());
         }
 
