@@ -100,7 +100,6 @@ set(SRC
     src/GUI.cpp
     src/main.cpp
     src/BenchmarkingState.cpp
-    src/LugNetwork.cpp
     src/BenchmarksState.cpp
     src/ModelsState.cpp
     src/ModelViewer.cpp
@@ -115,7 +114,6 @@ set(INC
     include/GUI.hpp
     include/AState.hpp
     include/BenchmarkingState.hpp
-    include/LugNetwork.hpp
     include/BenchmarksState.hpp
     include/ModelsState.hpp
     include/ModelViewer.hpp

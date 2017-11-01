@@ -9,7 +9,6 @@
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
 
 #include <AState.hpp>
-#include <LugNetwork.hpp>
 
 class AState;
 enum class State : uint8_t;
@@ -38,10 +37,6 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-//  bool sendDevice(uint32_t frames, float elapsed);
-//  void sendScore();
-//  bool isSending() const;
-
     State getCurrentState() const;
     void setCurrentState(State);
 
@@ -67,9 +62,6 @@ private:
     std::stack<std::shared_ptr<AState>> _states;
 
     State _currentState;
-
-    // bool _isSendingDevice{false};
-    // bool _isSendingScore{false};
 };
 
 #include "Application.inl"

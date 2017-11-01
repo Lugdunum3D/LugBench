@@ -345,57 +345,6 @@ lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> Application::
     return textureBuilder.build();
 }
 
-// bool Application::sendDevice(uint32_t nbFrames, float elapsed) {
-//     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-//     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-//     lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-//     if (!physicalDeviceInfo) {
-//         return false;
-//     }
-
-//     nlohmann::json device;
-
-//     device["name"] = physicalDeviceInfo->properties.deviceName;
-
-// #if defined(LUG_SYSTEM_ANDROID)
-//     device["os"] = "Android";
-// #elif defined(LUG_SYSTEM_WINDOWS)
-//     device["os"] = "Windows";
-// #else
-//     device["os"] = "Linux";
-// #endif
-
-//     device["deviceId"] = physicalDeviceInfo->properties.deviceID;
-//     device["vendorId"] = physicalDeviceInfo->properties.vendorID;
-//     device["driverVersion"] = physicalDeviceInfo->properties.driverVersion;
-//     device["vulkanInfo"] = GPUInfoProvider::get(*physicalDeviceInfo);
-
-//     _nbFrames = nbFrames;
-//     _elapsed = elapsed;
-//     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
-//                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendDevice),
-//                                                     device.dump());
-//     _isSendingDevice = true;
-//     return true;
-// }
-
-// void Application::sendScore() {
-//     nlohmann::json score;
-//     nlohmann::json lastResquestBody;
-
-//     lastResquestBody = nlohmann::json::parse(LugBench::LugNetwork::getInstance().getLastRequestBody());
-
-//     score["device"] = lastResquestBody["id"].get<std::string>();
-//     score["scenario"] = "595ed69c734d1d25634280b0";
-//     score["nbFrames"] = _nbFrames;
-//     score["averageFps"] = _nbFrames / _elapsed;
-
-//     LugBench::LugNetwork::getInstance().makeRequest(LugBench::Method::POST,
-//                                                     LugBench::LugNetwork::urlToString(LugBench::Route::sendScore),
-//                                                     score.dump());
-// }
-
 void Application::onFrame(const lug::System::Time& elapsedTime) {
     if (_states.empty()) {
         return;
