@@ -72,20 +72,20 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeaderOffset = GUI::displayMenu(_application);
-    float widowFooterOffset = GUI::displayFooter(_application);
+    float windowHeaderOffset = GUI::displayMenu(_application);
+    float windowFooterOffset = GUI::displayFooter(_application);
 
 #if defined(LUG_SYSTEM_ANDROID)
     float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
 #else
     float contactWindowSelectWidth = GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
 #endif
-    ImVec2 contactWindowSelectSize = ImVec2{ contactWindowSelectWidth, windowHeight - (widowHeaderOffset + widowFooterOffset) };
+    ImVec2 contactWindowSelectSize = ImVec2{ contactWindowSelectWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
     ImGui::Begin("Contact Menu", 0, _application._window_flags);
     {
         ImGui::SetWindowSize(contactWindowSelectSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
 
         ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
         {
@@ -129,7 +129,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     }
     ImGui::End();
 
-    ImVec2 contactWindowSize = ImVec2{ windowWidth - contactWindowSelectWidth, windowHeight - (widowHeaderOffset + widowFooterOffset) };
+    ImVec2 contactWindowSize = ImVec2{ windowWidth - contactWindowSelectWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
     {
@@ -138,7 +138,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
             ImGui::Begin("Contact Window", 0, _application._window_flags);
             {
                 ImGui::SetWindowSize(contactWindowSize);
-                ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, widowHeaderOffset });
+                ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, windowHeaderOffset });
         
                 ImGui::SetCursorPosY(15.f);
                 ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);

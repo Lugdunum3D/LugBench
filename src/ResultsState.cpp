@@ -46,15 +46,15 @@ bool ResultsState::onFrame(const lug::System::Time&) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeaderOffset = GUI::displayMenu(_application);
-    float widowFooterOffset = GUI::displayFooter(_application);
+    float windowHeaderOffset = GUI::displayMenu(_application);
+    float windowFooterOffset = GUI::displayFooter(_application);
 
     ImGui::Begin("Result Window", 0, _application._window_flags);
     {
-        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (widowHeaderOffset + widowFooterOffset) };
+        ImVec2 modelMenuSize{ static_cast<float>(windowWidth), windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
         ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
     }
     ImGui::End();
     return true;

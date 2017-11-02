@@ -55,15 +55,15 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float widowHeaderOffset = GUI::displayMenu(_application);
-    float widowFooterOffset = GUI::displayFooter(_application);
+    float windowHeaderOffset = GUI::displayMenu(_application);
+    float windowFooterOffset = GUI::displayFooter(_application);
 
-    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(windowWidth, 0.35f, 300.f), windowHeight - (widowHeaderOffset + widowFooterOffset) };
+    ImVec2 infoWindowSize{ GUI::Utilities::getPercentage(windowWidth, 0.35f, 300.f), windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
     ImGui::Begin("Info Window", 0, _application._window_flags);
     {
         ImGui::SetWindowSize(infoWindowSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, widowHeaderOffset });
+        ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
 
 #if defined(LUG_SYSTEM_ANDROID)
         ImVec2 deviceWindowSize{ GUI::Utilities::getPercentage(ImGui::GetWindowWidth(), 0.9f), 250.f };
@@ -161,7 +161,7 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
         ImVec2 infoExtraWindowSize{ windowWidth - infoWindowSize.x, infoWindowSize.y };
 
         ImGui::SetWindowSize(infoExtraWindowSize);
-        ImGui::SetWindowPos(ImVec2{ infoWindowSize.x, widowHeaderOffset });
+        ImGui::SetWindowPos(ImVec2{ infoWindowSize.x, windowHeaderOffset });
 
         ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.95f, 0.98f, 1.f, 1.00f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
