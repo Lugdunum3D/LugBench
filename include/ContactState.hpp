@@ -26,4 +26,7 @@ private:
     bool _authorsPageActive = true;
     bool _licencePageActive = false;
     bool _contactPageActive = false;
+
+    std::vector<std::string> _autorNames;
+    std::vector<std::string> _autorTitle;
 };

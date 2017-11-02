@@ -759,8 +759,10 @@ float GUI::displayMenu(LugBench::Application &application) {
     return mainMenuHeight;
 }
 
-float GUI::displayFooter(LugBench::Application & application)
+float GUI::displayFooter(LugBench::Application& /*application*/)
 {
+    return 0;
+    /*
     lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
 
     float footerHeight = Utilities::getFooterHeight(window->getHeight());
@@ -813,6 +815,7 @@ float GUI::displayFooter(LugBench::Application & application)
     }
     ImGui::PopStyleColor();
     return footerHeight;
+    */
 }
 
 float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
