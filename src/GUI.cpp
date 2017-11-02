@@ -779,33 +779,33 @@ float GUI::displayFooter(LugBench::Application & application)
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._epitechLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(220.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(193.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(220.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(193.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
                 ImGui::SameLine();
 #if defined(LUG_SYSTEM_ANDROID)
-                float width = (float)(window->getWidth() - ((150.f * 2) + (300.f * 2) + 30));
+                float width = (float)(window->getWidth() - ((134.f * 2) + (261.f * 2) + 30));
 #else
-                float width = (float)(window->getWidth() - (150.f + 300.f + 15));
+                float width = (float)(window->getWidth() - (134.f + 261.f + 15));
 #endif
                 ImGui::SetCursorPos(ImVec2(width, 5));
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._gltfLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(150.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(134.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(150.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(134.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
                 ImGui::SameLine();
                 {
                     auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._vulkanLogo);
 #if defined(LUG_SYSTEM_ANDROID)
-                    ImGui::Image(vkTexture.get(), ImVec2(300.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(261.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #else
-                    ImGui::Image(vkTexture.get(), ImVec2(300.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::Image(vkTexture.get(), ImVec2(261.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
 #endif
                 }
             }
