@@ -247,12 +247,11 @@ void ModelsState::handleResize() {
     auto& renderViews = window->getRenderViews();
     float mainMenuHeight = GUI::Utilities::getMainMenuHeight(window->getHeight());
     float modelMenuWidth = getModelMenuWidth(window->getWidth());
-    float footerHeight = GUI::Utilities::getFooterHeight(window->getHeight());
 
     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
 
     renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
-    renderViews[0]->getInfo().viewport.extent.height = 1.0f - (mainMenuHeight + footerHeight) / window->getHeight();
+    renderViews[0]->getInfo().viewport.extent.height = 1.0f - mainMenuHeight / window->getHeight();
     renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
     renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
     renderViews[0]->update();
