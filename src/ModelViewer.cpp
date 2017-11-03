@@ -64,7 +64,8 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
                 _rotationSpeed * delta.y() * elapsedTime.getSeconds<float>()
             };
 
-            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            // Rotate in world space to freeze the rotation on the X axis
+            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f});
             _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
 
             lug::Math::Vec2i windowSize = _eventSource->getWindowSize();
@@ -87,7 +88,8 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
     }
     // Rotate model after mouse released or drag released
     else if (_rotationVelocity.x() || _rotationVelocity.y()) {
-        _model->rotate(_rotationVelocity.x(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        // Rotate in world space to freeze the rotation on the X axis
+        _model->rotate(_rotationVelocity.x(), {0.0f, 1.0f, 0.0f});
         _model->rotate(_rotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
 
         // Reduce rotation velocity by 0.05% each millisecond
@@ -114,7 +116,13 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
         _lastMousePos = _eventSource->getMousePos();
     }
     else if (isRotationEnd(event)) {
-        _rotationVelocity = _lastRotationVelocity;
+        // Rotate only on one axis or we get strange rotations
+        if (std::abs(_lastRotationVelocity.x()) > std::abs(_lastRotationVelocity.y())) {
+            _rotationVelocity = {_lastRotationVelocity.x(), 0.0f};
+        }
+        else {
+            _rotationVelocity = {0.0f, _lastRotationVelocity.y()};
+        }
     }
 }
 
