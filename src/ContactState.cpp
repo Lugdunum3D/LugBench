@@ -205,22 +205,19 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                 const float minSizeTripleElements = (childMinWidth * 3.f) + (childSpacing * 5.f);
 #endif
 
-                                ImVec2 childWindowSize{ childMinWidth, childHeight };
+                                ImVec2 childWindowSize{ 0, childHeight };
 #if defined(LUG_SYSTEM_ANDROID)
-                                //
+                                childWindowSize.x = uiSize.x - (childSpacing * 2.f);
 #else
 
                                 if (uiSize.x >= minSizeTripleElements) {
                                     childWindowSize.x = GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.33f, childMinWidth);
-                                    ImGui::SetCursorPos(ImVec2{ childSpacing, 20.f });
                                 }
                                 else if (uiSize.x >= minSizeDoubleElements) {
                                     childWindowSize.x = GUI::Utilities::getPercentage(uiSize.x - (childSpacing * 3.f), 0.5f, childMinWidth);
-                                    ImGui::SetCursorPos(ImVec2{ childSpacing, 20.f });
                                 }
                                 else {
                                     childWindowSize.x = uiSize.x - (childSpacing * 2.f);
-                                    ImGui::SetCursorPos(ImVec2{ childSpacing, 20.f });
                                 }
 #endif
                                 for (int i = 0; i < _autorNames.size(); ++i)
@@ -231,9 +228,9 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                         int collumn;
 #if defined(LUG_SYSTEM_ANDROID)
                                         {
-                                            childWindowHeaderSize = ImVec2{ childMinWidth, childHeaderHeight };
-                                            float cursorPos = (uiSize.x - childWindowHeaderSize.x) / 2.f;
-                                            ImGui::SetCursorPos(ImVec2{ cursorPos, ((childHeaderHeight + childHeight) * 3.f) + (childSpacing * 4.f) });
+                                            row = i;
+                                            collumn = 0;
+                                            ImGui::SetCursorPos(ImVec2{ childSpacing, (childHeight * row) + (childSpacing * (row + 1)) });
                                         }
 #else
                                         if (uiSize.x >= minSizeTripleElements) {
