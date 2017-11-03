@@ -14,6 +14,7 @@ private:
         std::string name;
         std::string path;
         std::string modelNodeName;
+        lug::Math::Vec3f rotation{0.0f, 0.0f, 0.0f};
     };
 
 public:

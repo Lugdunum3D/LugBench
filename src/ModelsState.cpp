@@ -19,9 +19,9 @@
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
     _models = {
-        // { name, path, modelNodeName }
-        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074" },
-        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074" }
+        // { name, path, modelNodeName, rotation }
+        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", {0.0f, -160.0f, 0.0f} },
+        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", {0.0f, -160.0f, 0.0f} }
     };
 }
 
@@ -154,13 +154,23 @@ bool ModelsState::loadModel(const ModelInfos& model) {
         return false;
     }
 
+    if (model.rotation.x()) {
+        modelNode->rotate(model.rotation.x(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+    }
+    if (model.rotation.y()) {
+        modelNode->rotate(model.rotation.y(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+    }
+    if (model.rotation.z()) {
+        modelNode->rotate(model.rotation.z(), {0.0f, 0.0f, 1.0f}, lug::Graphics::Node::TransformSpace::World);
+    }
+
     // Attach directional light to the root node
     {
         lug::Graphics::Builder::Light lightBuilder(*renderer);
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
         lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 4.0f, -5.0f });
+        lightBuilder.setDirection({ 0.0f, 0.0f, -3.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -177,7 +187,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
         lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, -4.0f, 5.0f });
+        lightBuilder.setDirection({ 0.0f, 0.0f, -3.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -196,7 +206,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
         node->attachCamera(_application.getCamera());
 
         // Set initial position of the camera
-        node->setPosition({ 0.0f, 4.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
+        node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
         // Look at once
         node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
 
