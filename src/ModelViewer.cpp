@@ -28,16 +28,16 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
     }
     // TouchScreen
     {
-        if (_eventSource->_touchScreenState.drag) {
-            _model->rotate(
+        if (_eventSource->_touchScreenState.drag &&
+            _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::Move) {
+            _lastRotationVelocity = {
                 _rotationSpeed * _eventSource->_touchScreenState.coordinates[0].x() * elapsedTime.getSeconds<float>(),
-                {0.0f, 1.0f, 0.0f},
-                lug::Graphics::Node::TransformSpace::World
-            );
-            _model->rotate(_rotationSpeed * _eventSource->_touchScreenState.coordinates[0].y() * elapsedTime.getSeconds<float>(),
-                {1.0f, 0.0f, 0.0f},
-                lug::Graphics::Node::TransformSpace::World
-            );
+                _rotationSpeed * _eventSource->_touchScreenState.coordinates[0].y() * elapsedTime.getSeconds<float>()
+            };
+
+            // Rotate in world space to freeze the rotation on the X axis
+            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f});
+            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
         }
     }
 
@@ -127,6 +127,11 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
 }
 
 bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
-    return (event.type == lug::Window::Event::Type::ButtonReleased &&
-        event.mouse.code == lug::Window::Mouse::Button::Left);
+#if defined(LUG_SYSTEM_ANDROID)
+    return _eventSource->_touchScreenState.drag &&
+        _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::End;
+#else
+    return event.type == lug::Window::Event::Type::ButtonReleased &&
+        event.mouse.code == lug::Window::Mouse::Button::Left;
+#endif
 }
