@@ -31,6 +31,7 @@ private:
     bool loadModel(const ModelInfos& model);
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
     float getModelMenuWidth(float windowWidth);
+    void handleResize();
 
     ModelViewer _cameraMover;
 

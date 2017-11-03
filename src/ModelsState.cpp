@@ -30,6 +30,7 @@ ModelsState::~ModelsState() {
 
 bool ModelsState::onPush() {
     _application.setCurrentState(State::MODELS);
+    handleResize();
 
     if (!_models.size()) {
         return true;
@@ -47,23 +48,12 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    auto window = renderer->getWindow();
-    auto& renderViews = window->getRenderViews();
-    float mainMenuHeight = GUI::Utilities::getMainMenuHeight(window->getHeight());
-    float modelMenuWidth = getModelMenuWidth(window->getWidth());
-    float footerHeight = GUI::Utilities::getFooterHeight(window->getHeight());
-
-    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-
-    renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
-    renderViews[0]->getInfo().viewport.extent.height = 1.0f - (mainMenuHeight + footerHeight) / window->getHeight();
-    renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
-    renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
-    renderViews[0]->update();
     _cameraMover.onEvent(event);
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
+    }
+    else if (event.type == lug::Window::Event::Type::Resize) {
+        handleResize();
     }
 }
 
@@ -249,4 +239,21 @@ float ModelsState::getModelMenuWidth(float windowWidth) {
 #else
         return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
 #endif
+}
+
+void ModelsState::handleResize() {
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    auto window = renderer->getWindow();
+    auto& renderViews = window->getRenderViews();
+    float mainMenuHeight = GUI::Utilities::getMainMenuHeight(window->getHeight());
+    float modelMenuWidth = getModelMenuWidth(window->getWidth());
+    float footerHeight = GUI::Utilities::getFooterHeight(window->getHeight());
+
+    LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+    renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
+    renderViews[0]->getInfo().viewport.extent.height = 1.0f - (mainMenuHeight + footerHeight) / window->getHeight();
+    renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
+    renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
+    renderViews[0]->update();
 }
