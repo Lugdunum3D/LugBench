@@ -1,1 +1,1 @@
-include ':lugbench'
+include ':app'

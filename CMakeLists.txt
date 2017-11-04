@@ -140,9 +140,9 @@ set(SHADERS
     gui.vert
     gui.frag
 )
+
 # List of resources in the directory ${LUG_RESOURCES_DIR}
 set(LUG_RESOURCES
-    # Nothing for the moment
     shaders/forward/shader.vert
     shaders/forward/shader.frag
     models/DamagedHelmet/DamagedHelmet.bin
@@ -175,7 +175,7 @@ if(LUG_OS_ANDROID)
     add_library(${EXECUTABLE_NAME} SHARED ${SRC} ${INC})
     set(EXT_LIBRARIES android)
 
-    set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/${EXECUTABLE_NAME})
+    set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/app)
     set(ANDROID_PROJECT_ASSETS ${ANDROID_PROJECT_PATH}/src/main/assets)
     set(ANDROID_PROJECT_SHADERS ${ANDROID_PROJECT_PATH}/src/main/shaders)
 else()
