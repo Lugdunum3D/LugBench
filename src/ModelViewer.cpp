@@ -127,6 +127,7 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
 }
 
 bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
+    (void)event;
 #if defined(LUG_SYSTEM_ANDROID)
     return _eventSource->_touchScreenState.drag &&
         _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::End;

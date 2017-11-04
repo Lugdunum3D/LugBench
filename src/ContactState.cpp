@@ -194,7 +194,6 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                 ImVec2 uiSize = ImVec2{ rightSectionWidth, contactWindowSize.y };
                                 ImVec2 childWindowHeaderSize;
 #if defined(LUG_SYSTEM_ANDROID)
-                                const float childMinWidth = 1000.f / 2.f;
                                 const float childHeight = 400.f;
                                 const float childSpacing = 30.f;
 #else
@@ -220,7 +219,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                     childWindowSize.x = uiSize.x - (childSpacing * 2.f);
                                 }
 #endif
-                                for (int i = 0; i < _autorNames.size(); ++i)
+                                for (int i = 0; i < static_cast<int>(_autorNames.size()); ++i)
                                 {
                                     ImGui::PushID(i);
                                     {
@@ -263,14 +262,14 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                                     {
                                                         float text1Centered = ImGui::CalcTextSize(_autorNames[i].c_str()).x;
                                                         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text1Centered / 2.f));
-                                                        ImGui::Text(_autorNames[i].c_str());
+                                                        ImGui::Text("%s", _autorNames[i].c_str());
                                                     }
                                                     ImGui::PopFont();
                                                     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                                                     {
                                                         float text1Centered = ImGui::CalcTextSize(_autorTitle[i].c_str()).x;
                                                         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text1Centered / 2.f));
-                                                        ImGui::Text(_autorTitle[i].c_str());
+                                                        ImGui::Text("%s", _autorTitle[i].c_str());
                                                     }
                                                     ImGui::PopFont();
                                                     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
