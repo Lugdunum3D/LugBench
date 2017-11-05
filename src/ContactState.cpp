@@ -29,6 +29,21 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
     _autorNames.push_back("Guillaume Sabatier"); _autorTitle.push_back("Co-Founder");
     _autorNames.push_back("Yoann Picquenot"); _autorTitle.push_back("Co-Founder");
     _autorNames.push_back("Stuart Sulaski"); _autorTitle.push_back("Co-Founder");
+    _licenses.push_back({
+        /* logo */ _application._lugbenchLogo,
+        /* title */"Licence 1",
+        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    });
+   _licenses.push_back({
+        /* logo */ _application._lugdunumLogo,
+        /* title */"Licence 2",
+        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    });
+   _licenses.push_back({
+        /* logo */ _application._epitechColorLogo,
+        /* title */"Licence 3",
+        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    });
 }
 
 ContactState::~ContactState() {
@@ -148,7 +163,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                     displayAuthorsTab(contactWindowSize);
                 }
                 else if (_licencePageActive) {
-                    displayLicenseTab();
+                    displayLicenseTab(contactWindowSize);
                 }
                 else if (_contactPageActive) {
                     displayContactTab(contactWindowSize);
@@ -324,8 +339,69 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
     ImGui::EndChild();
 }
 
-void ContactState::displayLicenseTab() {
-    ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
+    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_LIGHTBLUE);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 5.f, 2.f });
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
+
+    ImGui::BeginChild("License Section", ImVec2{ contactWindowSize.x, contactWindowSize.y - 15.f});
+    {
+#if defined(LUG_SYSTEM_ANDROID)
+        const float childHeight = 400.f;
+        const float childSpacing = 25.f;
+#else
+        const float childHeight = 400.f / 2.33f;
+        const float childSpacing = 15.f;
+#endif
+
+        ImVec2 childWindowSize{ contactWindowSize.x * 0.65f, childHeight };
+        float marginTop = 30.0f;
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, childSpacing });
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 10.0f, 10.0f });
+        {
+            ImGui::SetCursorPosY(ImGui::GetCursorPos().y + marginTop);
+            for (int i = 0; i < static_cast<int>(_licenses.size()); ++i) {
+                ImGui::PushID(i);
+                {
+                    ImGui::SetCursorPosX(contactWindowSize.x / 2.0f - childWindowSize.x / 2.0f);
+
+                    ImGui::BeginGroup();
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
+                        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
+                        ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                        {
+                            auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_licenses[i].logo);
+                            #if defined(LUG_SYSTEM_ANDROID)
+                                    ImVec2 logoSize(150.0f * 2.0f, 50.0f * 2.0f);
+                            #else
+                                    ImVec2 logoSize(50.0f, 25.0f);
+                            #endif
+                            ImGui::Image(vkTexture.get(), logoSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                            ImGui::SameLine();
+
+                            float titleMarginLeft = 20.0f;
+
+                            ImGui::SetCursorPos({logoSize.x + titleMarginLeft, logoSize.y / 2.0f});
+                            ImGui::Text(_licenses[i].title.c_str());
+
+                            ImGui::SetCursorPosX(logoSize.x + titleMarginLeft);
+                            ImGui::TextWrapped(_licenses[i].text.c_str());
+                        }
+                        ImGui::EndChild();
+                        ImGui::PopStyleColor(2);
+                    }
+                    ImGui::EndGroup();
+                }
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopStyleVar(2);
+    }
+    ImGui::EndChild();
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar(2);
 }
 
 void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
