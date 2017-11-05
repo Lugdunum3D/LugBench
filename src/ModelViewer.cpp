@@ -26,6 +26,7 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
             );
         }
     }
+
     // TouchScreen
     {
         if (_eventSource->_touchScreenState.drag &&
@@ -41,19 +42,8 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         }
     }
 
-    // Capture / Release the mouse cursor
-    if (_eventSource->isKeyPressed(lug::Window::Keyboard::Key::C) && !_hasFocus) {
-        _lastMousePos = _eventSource->getMousePos();
-        _hasFocus = true;
-        _eventSource->setMouseCursorVisible(false);
-    }
-    if (_eventSource->isKeyPressed(lug::Window::Keyboard::Key::LAlt) && _hasFocus) {
-        _hasFocus = false;
-        _eventSource->setMouseCursorVisible(true);
-    }
-
     auto mousePos = _eventSource->getMousePos();
-    if (_hasFocus && _eventSource->isMousePressed(lug::Window::Mouse::Button::Left)) {
+    if (_eventSource->isMousePressed(lug::Window::Mouse::Button::Left)) {
 
         // Only if the mouse moved since the last time
         if (_lastMousePos != mousePos) {
@@ -108,14 +98,25 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
 }
 
 void ModelViewer::onEvent(const lug::Window::Event& event) {
+    // Zoom
+    // TODO (nokitoo): Add android pinch
     if (event.type == lug::Window::Event::Type::MouseWheel) {
         _zoom = static_cast<float>(event.mouse.scrollOffset.xOffset);
     }
-    else if (event.type == lug::Window::Event::Type::ButtonPressed &&
+
+    // Windows mouse button pressed/released
+    if (event.type == lug::Window::Event::Type::ButtonPressed &&
         event.mouse.code == lug::Window::Mouse::Button::Left) {
         _lastMousePos = _eventSource->getMousePos();
+        _eventSource->setMouseCursorVisible(false);
     }
-    else if (isRotationEnd(event)) {
+    else if (event.type == lug::Window::Event::Type::ButtonReleased &&
+        event.mouse.code == lug::Window::Mouse::Button::Left) {
+        _eventSource->setMouseCursorVisible(true);
+    }
+
+    // Rotate the model after mouse/drag released
+    if (isRotationEnd(event)) {
         // Rotate only on one axis or we get strange rotations
         if (std::abs(_lastRotationVelocity.x()) > std::abs(_lastRotationVelocity.y())) {
             _rotationVelocity = {_lastRotationVelocity.x(), 0.0f};
@@ -127,10 +128,9 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
 }
 
 bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
-    (void)event;
 #if defined(LUG_SYSTEM_ANDROID)
-    return _eventSource->_touchScreenState.drag &&
-        _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::End;
+    return event.touchScreen.drag &&
+        event.touchScreen.state == lug::Window::TouchScreenEvent::GestureState::End;
 #else
     return event.type == lug::Window::Event::Type::ButtonReleased &&
         event.mouse.code == lug::Window::Mouse::Button::Left;
