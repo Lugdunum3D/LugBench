@@ -57,7 +57,7 @@ endmacro()
 macro(add_shader shader)
     # Select where to copy the resource
     if(LUG_OS_ANDROID)
-        set(new_path ${ANDROID_PROJECT_SHADERS}/${shader})
+        set(new_path ${ANDROID_PROJECT_SHADERS}/${shader}.spv)
     else()
         set(new_path ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_SHADERS_ROOT}/${shader}.spv)
     endif()
@@ -66,14 +66,14 @@ macro(add_shader shader)
     get_filename_component(new_path_directory ${new_path} DIRECTORY)
 
     if(LUG_OS_ANDROID)
-        # Just copy to the good place, Android will compile the shader for us
+        execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE_NAME)
+        execute_process(COMMAND uname -s COMMAND tr -d '\n' OUTPUT_VARIABLE OS_NAME)
+
         add_custom_command(
             OUTPUT ${new_path}
             DEPENDS ${old_path}
             COMMAND ${CMAKE_COMMAND} -E make_directory ${new_path_directory}
-            COMMAND ${CMAKE_COMMAND} -E copy ${old_path} ${new_path}
-
-            COMMENT "Copying shader ${old_path} to ${new_path}"
+            COMMAND ${ANDROID_NDK}/shader-tools/${OS_NAME}-${ARCHITECTURE_NAME}/glslc ${old_path} -o ${new_path}
         )
     else()
         # Compile the shader

@@ -1,5 +1,6 @@
 #include "GUI.hpp"
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
+#include <lug/Graphics/Vulkan/Render/Texture.hpp>
 
 #include <IconsFontAwesome.h>
 
@@ -553,13 +554,6 @@ void GUI::displayDeviceFeatures(lug::Graphics::Vulkan::PhysicalDeviceInfo * phys
     GUI::displayConfigInfoBool("Inherited Queries", physicalDeviceInfo->features.inheritedQueries);
 }
 
-ImVec2 GUI::centerButton(ImVec2 windowSize, ImVec2 offset) {
-    ImVec2 buttonSize = (windowSize.x > windowSize.y) ? ImVec2{ (windowSize.y/* / 2.f*/), (windowSize.y/* / 2.f*/) } : ImVec2{ (windowSize.x / 2.f), (windowSize.x / 2.f) };
-    ImVec2 centerButtonPos = { (windowSize.x / 2.f) - (buttonSize.x * offset.x), /*(windowSize.y / 2.f) - */(buttonSize.y * offset.y) };
-    ImGui::SetCursorPos(centerButtonPos);
-    return buttonSize;
-}
-
 bool GUI::displayReturnButton() {
     ImGui::Separator();
     ImGui::SetWindowFontScale(.67f);
@@ -568,4 +562,284 @@ bool GUI::displayReturnButton() {
         return true;
     }
     return false;
+}
+
+void GUI::setDefaultStyle()
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ChildWindowRounding = 0.f;
+    style.WindowRounding = 0.f;
+    style.FrameRounding = 0.f;
+    style.WindowPadding.x = 0.f;
+    style.WindowPadding.y = 0.f;
+
+    style.Colors[ImGuiCol_Text]                 = V4_WHITE;
+    style.Colors[ImGuiCol_WindowBg]             = V4_WHITE;
+    style.Colors[ImGuiCol_ChildWindowBg]        = V4_SKYBLUE;
+    style.Colors[ImGuiCol_Border]               = V4_DARKGRAY;
+    style.Colors[ImGuiCol_ScrollbarBg]          = V4_WHITE;
+    style.Colors[ImGuiCol_ScrollbarGrab]        = V4_LIGHTGRAY;
+    style.Colors[ImGuiCol_ScrollbarGrabHovered] = V4_GRAY;
+    style.Colors[ImGuiCol_ScrollbarGrabActive]  = V4_GRAY;
+    style.Colors[ImGuiCol_Button]               = V4_SKYBLUE;
+    style.Colors[ImGuiCol_ButtonHovered]        = V4_DARKGRAY;
+    style.Colors[ImGuiCol_ButtonActive]         = V4_DARKGRAY;
+}
+
+float GUI::displayMenu(LugBench::Application &application) {
+    State currentState = application.getCurrentState();
+
+    lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
+
+    float mainMenuHeight = Utilities::getMainMenuHeight(window->getHeight());
+
+    ImGui::Begin("Main Menu", 0, application._window_flags);
+    {
+        ImVec2 mainMenuSize{ static_cast<float>(window->getWidth()), mainMenuHeight };
+        ImVec2 mainMenuPos = { 0, 0 };
+
+        ImGui::SetWindowSize(mainMenuSize);
+        ImGui::SetWindowPos(mainMenuPos);
+        ImGui::SetCursorPos(ImVec2{ 0.f, 0.f });
+
+        ImVec2 headerSize = { static_cast<float>(window->getWidth()), mainMenuHeight };
+
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+        {
+            ImGui::BeginChild("header", headerSize);
+            {
+#if defined(LUG_SYSTEM_ANDROID)
+                ImGui::SetWindowFontScale(1.5f);
+#else
+                //ImGui::SetWindowFontScale(1.f);
+#endif
+                {
+                    // This button does nothing but we use a button instead of a text so that it lines up perfectly
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, V4_SKYBLUE);
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 170.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 170.f, headerSize.y };
+#endif
+                        ImGui::Button("LUGBENCH", buttonSize);
+                    }
+                    ImGui::PopStyleColor(2);
+                }
+
+                ImGui::SameLine();
+                ImGui::BeginChild("clickable buttons", headerSize);
+                {
+#if defined(LUG_SYSTEM_ANDROID)
+                    //ImGui::SetWindowFontScale(1.f);
+#else
+                    ImGui::SetWindowFontScale(0.67f);
+#endif
+
+                    if (currentState == State::BENCHMARKS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 150.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 150.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("BENCHMARKS", buttonSize) && currentState != State::BENCHMARKS) {
+                            std::shared_ptr<AState> benchmarksState;
+                            benchmarksState = std::make_shared<BenchmarksState>(application);
+                            application.popState();
+                            application.pushState(benchmarksState);
+                        }
+                    }
+                    if (currentState == State::BENCHMARKS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+                    if (currentState == State::MODELS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 100.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 100.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("MODELS", buttonSize) && currentState != State::MODELS) {
+                            std::shared_ptr<AState> modelsState;
+                            modelsState = std::make_shared<ModelsState>(application);
+                            application.popState();
+                            application.pushState(modelsState);
+                        }
+                    }
+                    if (currentState == State::MODELS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+
+                    if (currentState == State::INFO) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 60.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 60.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("INFO", buttonSize) && currentState != State::INFO) {
+                            std::shared_ptr<AState> infoState;
+                            infoState = std::make_shared<InfoState>(application);
+                            application.popState();
+                            application.pushState(infoState);
+                        }
+                    }
+                    if (currentState == State::INFO) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+
+                    if (currentState == State::RESULTS) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("RESULTS", buttonSize) && currentState != State::RESULTS) {
+                            std::shared_ptr<AState> resultState;
+                            resultState = std::make_shared<ResultsState>(application);
+                            application.popState();
+                            application.pushState(resultState);
+                        }
+                    }
+                    if (currentState == State::RESULTS) {
+                        ImGui::PopStyleColor(2);
+                    }
+
+                    if (currentState == State::CONTACT) {
+                        ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
+                    }
+                    {
+#if defined(LUG_SYSTEM_ANDROID)
+                        ImVec2 buttonSize{ 110.f * 2.75f, headerSize.y };
+#else
+                        ImVec2 buttonSize{ 110.f, headerSize.y };
+#endif
+                        ImGui::SameLine();
+                        if (ImGui::Button("CONTACT", buttonSize) && currentState != State::CONTACT) {
+                            std::shared_ptr<AState> contactState;
+                            contactState = std::make_shared<ContactState>(application);
+                            application.popState();
+                            application.pushState(contactState);
+                        }
+                    }
+                    if (currentState == State::CONTACT) {
+                        ImGui::PopStyleColor(2);
+                    }
+                }
+                ImGui::EndChild();
+            }
+            ImGui::EndChild();
+        }
+        ImGui::PopStyleVar();
+    }
+    ImGui::End();
+    return mainMenuHeight;
+}
+
+float GUI::displayFooter(LugBench::Application& /*application*/)
+{
+    return 0;
+    /*
+    lug::Graphics::Render::Window* window = application.getGraphics().getRenderer()->getWindow();
+
+    float footerHeight = Utilities::getFooterHeight(window->getHeight());
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, V4_GRAY);
+    {
+            ImGui::Begin("Footer", 0, application._window_flags);
+            {
+                ImVec2 footerSize{ static_cast<float>(window->getWidth()), footerHeight };
+                ImVec2 footerPos = { 0, window->getHeight() - footerHeight };
+
+                ImGui::SetWindowSize(footerSize);
+                ImGui::SetWindowPos(footerPos);
+
+                ImGui::SetCursorPos(ImVec2(5, 5));
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._epitechLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(193.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(193.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+                ImGui::SameLine();
+#if defined(LUG_SYSTEM_ANDROID)
+                float width = (float)(window->getWidth() - ((134.f * 2) + (261.f * 2) + 30));
+#else
+                float width = (float)(window->getWidth() - (134.f + 261.f + 15));
+#endif
+                ImGui::SetCursorPos(ImVec2(width, 5));
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._gltfLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(134.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(134.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+                ImGui::SameLine();
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(application._vulkanLogo);
+#if defined(LUG_SYSTEM_ANDROID)
+                    ImGui::Image(vkTexture.get(), ImVec2(261.f * 2, 70 * 2), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#else
+                    ImGui::Image(vkTexture.get(), ImVec2(261.f, 70), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+#endif
+                }
+            }
+            ImGui::End();
+    }
+    ImGui::PopStyleColor();
+    return footerHeight;
+    */
+}
+
+float GUI::Utilities::getPercentage(float fullSize, float percentage, float minSize)
+{
+    float retVal;
+
+    retVal = fullSize * percentage;
+    if (retVal < minSize) { retVal = minSize; }
+
+    return retVal;
+}
+
+float GUI::Utilities::getMainMenuHeight(float windowHeight) {
+#if defined(LUG_SYSTEM_ANDROID)
+    return Utilities::getPercentage(windowHeight, 0.06f, 120.f);
+#else
+    return Utilities::getPercentage(windowHeight, 0.06f, 60.f);
+#endif
+}
+
+float GUI::Utilities::getFooterHeight(float windowHeight) {
+#if defined(LUG_SYSTEM_ANDROID)
+    return Utilities::getPercentage(windowHeight, 0.06f, 160.f);
+#else
+    return Utilities::getPercentage(windowHeight, 0.06f, 80.f);
+#endif
 }

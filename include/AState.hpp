@@ -10,6 +10,16 @@ namespace LugBench {
     class Application;
 } // LugBench
 
+enum class State : uint8_t {
+    UNDEFINED = 0,
+    BENCHMARKS,
+    MODELS,
+    INFO,
+    RESULTS,
+    CONTACT,
+    BENCHMARKING
+};
+
 class AState {
 public:
     AState() = delete;

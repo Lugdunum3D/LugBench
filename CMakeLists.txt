@@ -99,9 +99,13 @@ set(SRC
     src/GPUInfoProvider.cpp
     src/GUI.cpp
     src/main.cpp
-    src/MenuState.cpp
     src/BenchmarkingState.cpp
-    src/LugNetwork.cpp
+    src/BenchmarksState.cpp
+    src/ModelsState.cpp
+    src/ModelViewer.cpp
+    src/ResultsState.cpp
+    src/InfoState.cpp
+    src/ContactState.cpp
 )
 
 set(INC
@@ -109,9 +113,13 @@ set(INC
     include/GPUInfoProvider.hpp
     include/GUI.hpp
     include/AState.hpp
-    include/MenuState.hpp
     include/BenchmarkingState.hpp
-    include/LugNetwork.hpp
+    include/BenchmarksState.hpp
+    include/ModelsState.hpp
+    include/ModelViewer.hpp
+    include/ResultsState.hpp
+    include/InfoState.hpp
+    include/ContactState.hpp
 )
 
 # find imgui
@@ -132,9 +140,9 @@ set(SHADERS
     gui.vert
     gui.frag
 )
+
 # List of resources in the directory ${LUG_RESOURCES_DIR}
 set(LUG_RESOURCES
-    # Nothing for the moment
     shaders/forward/shader.vert
     shaders/forward/shader.frag
     models/DamagedHelmet/DamagedHelmet.bin
@@ -153,6 +161,13 @@ set(OTHER_RESOURCES
     models/Duck/DuckCM.png
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
+    fonts/Roboto-Light.ttf
+    textures/epitech_logo.png
+    textures/epitech_color_logo.png
+    textures/gltf_logo.png
+    textures/vulkan_logo.png
+    textures/lugbench_logo.png
+    textures/lugdunum_logo.png
 )
 
 # create target
@@ -162,7 +177,7 @@ if(LUG_OS_ANDROID)
 
     set(ANDROID_PROJECT_PATH ${CMAKE_SOURCE_DIR}/android/${EXECUTABLE_NAME})
     set(ANDROID_PROJECT_ASSETS ${ANDROID_PROJECT_PATH}/src/main/assets)
-    set(ANDROID_PROJECT_SHADERS ${ANDROID_PROJECT_PATH}/src/main/shaders)
+    set(ANDROID_PROJECT_SHADERS ${ANDROID_PROJECT_PATH}/src/main/assets/shaders)
 else()
     add_executable(${EXECUTABLE_NAME} ${SRC} ${INC})
 endif()

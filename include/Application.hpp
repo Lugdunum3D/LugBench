@@ -3,13 +3,15 @@
 #include <memory>
 #include <stack>
 
+#include <imgui.h>
+
 #include <lug/Core/Application.hpp>
 #include <lug/Graphics/Vulkan/Vulkan.hpp>
 
 #include <AState.hpp>
-#include <LugNetwork.hpp>
 
 class AState;
+enum class State : uint8_t;
 
 namespace LugBench {
 
@@ -35,24 +37,31 @@ public:
     bool pushState(std::shared_ptr<AState> &state);
     bool popAndPushState(std::shared_ptr<AState> &state);
 
-    bool sendDevice(uint32_t frames, float elapsed);
-    void sendScore();
+    State getCurrentState() const;
+    void setCurrentState(State);
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> getCamera();
-    bool isSending() const;
 
-private:
-    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
-    std::stack<std::shared_ptr<AState>> _states;
+public:
+    ImGuiWindowFlags _window_flags;
 
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Camera::Camera> _camera;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _epitechColorLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _gltfLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _vulkanLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugbenchLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugdunumLogo;
 
-    uint32_t _nbFrames{0};
-    float _elapsed{0.0f};
-    bool _isSendingDevice{false};
-    bool _isSendingScore{false};
+private:
+    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
+    bool loadFonts();
+    bool loadImages(lug::Graphics::Renderer* renderer);
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> buildImage(lug::Graphics::Renderer* renderer, std::string fileName);
+    std::stack<std::shared_ptr<AState>> _states;
 
+    State _currentState;
 };
 
 #include "Application.inl"

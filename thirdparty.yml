@@ -13,11 +13,3 @@ vulkan:
 json:
     repository:
         tag: 8f169c9930d3dcba0e487c55e7a9139d6bea5dc9
-
-curl:
-    repository:
-        tag: 729e9d3ad5df1d75dbb3e3fae09cda9fe9d89acc
-
-restclient:
-    repository:
-        tag: 8142fc8fc1e89b79225a0d09d6a430c04b7317ca

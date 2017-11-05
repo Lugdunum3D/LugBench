@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
+
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "com.lugdunum.lugbench"
+        applicationId "eu.lugdunum.lugbench"
         minSdkVersion 24
         targetSdkVersion 26
         versionCode 1
@@ -35,8 +36,4 @@ android {
             path "../../CMakeLists.txt"
         }
     }
-}
-
-dependencies {
-    compile 'com.android.volley:volley:1.0.0'
 }
