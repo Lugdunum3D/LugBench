@@ -168,6 +168,7 @@ set(OTHER_RESOURCES
     textures/vulkan_logo.png
     textures/lugbench_logo.png
     textures/lugdunum_logo.png
+    textures/info_device_logo.png
 )
 
 # create target
