@@ -93,19 +93,19 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     // Selected style
                     if (_selectedModel == &model) {
                         pushButtonsStyle(
-                            ImVec4(.31f, .67f, .98f, 1.00f),
-                            ImVec4(.31f, .67f, .98f, 1.00f),
-                            ImVec4(.31f, .67f, .98f, 1.00f),
-                            ImVec4(0.33f, 0.33f, 0.33f, 1.00f)
+                            GUI::V4_SKYBLUE,
+                            GUI::V4_SKYBLUE,
+                            GUI::V4_SKYBLUE,
+                            GUI::V4_DARKGRAY
                         );
                     }
                     // Unselected style
                     else {
                         pushButtonsStyle(
-                            ImVec4(1.f, 1.f, 1.f, 1.00f),
-                            ImVec4(.31f, .67f, .98f, 1.00f),
-                            ImVec4(.31f, .67f, .98f, 1.00f),
-                            ImVec4(0.33f, 0.33f, 0.33f, 1.00f)
+                            GUI::V4_WHITE,
+                            GUI::V4_SKYBLUE,
+                            GUI::V4_SKYBLUE,
+                            GUI::V4_DARKGRAY
                         );
                     }
 

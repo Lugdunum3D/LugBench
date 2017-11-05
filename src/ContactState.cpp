@@ -16,17 +16,19 @@
 
 #include <IconsFontAwesome.h>
 
+
+
 ContactState::ContactState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
     _autorNames.push_back("Yoann Long"); _autorTitle.push_back("Co-Founder & Project Lead");
     _autorNames.push_back("Quentin Buathier"); _autorTitle.push_back("Co-Founder & CTO");
-    _autorNames.push_back("Nicolas Comte"); _autorTitle.push_back("Co-Founder & Communications Director");
+    _autorNames.push_back("Nicolas Comte"); _autorTitle.push_back("Co-Founder & PR Manager");
     _autorNames.push_back("Antoine Bolvy"); _autorTitle.push_back("Co-Founder & Graphics Programmer");
-    _autorNames.push_back("Nokitoo"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Nokitoo"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Nokitoo"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Nokitoo"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Nokitoo"); _autorTitle.push_back("Co-Founder");
+    _autorNames.push_back("Corentin Chardeau"); _autorTitle.push_back("Co-Founder");
+    _autorNames.push_back("Guillaume Labey"); _autorTitle.push_back("Co-Founder");
+    _autorNames.push_back("Guillaume Sabatier"); _autorTitle.push_back("Co-Founder");
+    _autorNames.push_back("Yoann Picquenot"); _autorTitle.push_back("Co-Founder");
+    _autorNames.push_back("Stuart Sulaski"); _autorTitle.push_back("Co-Founder");
 }
 
 ContactState::~ContactState() {
@@ -143,7 +145,11 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                 ImGui::SetCursorPosY(15.f);
                 ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
                 {
-                    float leftSectionWidth = GUI::Utilities::getPercentage(contactWindowSize.x, 0.33f, 301.f);
+#if defined(LUG_SYSTEM_ANDROID)
+                    float leftSectionWidth = GUI::Utilities::getPercentage(contactWindowSize.x, 0.33f, 290.f * 2.f);
+#else
+                    float leftSectionWidth = GUI::Utilities::getPercentage(contactWindowSize.x, 0.33f, 290.f);
+#endif
                     ImGui::BeginChild("Left Section", ImVec2{ leftSectionWidth, contactWindowSize.y - 15.f});
                     {
                         if (_authorsPageActive) {
@@ -197,7 +203,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                 const float childHeight = 400.f;
                                 const float childSpacing = 30.f;
 #else
-                                const float childMinWidth = 405.f / 2.33f;
+                                const float childMinWidth = 405.f / 1.8f;
                                 const float childHeight = 400.f / 2.33f;
                                 const float childSpacing = 20.f;
                                 const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
