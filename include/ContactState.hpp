@@ -22,6 +22,10 @@ private:
     void selectedButtonColorSet();
     void unselectedButtonColorSet();
 
+    void displayAuthorsTab(const ImVec2& contactWindowSize);
+    void displayLicenseTab();
+    void displayContactTab(const ImVec2& contactWindowSize);
+
 private:
     bool _authorsPageActive = true;
     bool _licencePageActive = false;
