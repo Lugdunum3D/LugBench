@@ -60,36 +60,6 @@ message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
 
-# we don't use RestClientCpp on android
-if(NOT LUG_OS_ANDROID)
-    find_package(RestClientCpp)
-    if (NOT RESTCLIENTCPP_FOUND)
-        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
-            message(FATAL_ERROR "Can't find restclient in the thirdparty directory")
-        endif()
-
-        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
-        find_package(RestClientCpp REQUIRED)
-    endif()
-
-    include_directories(${RESTCLIENTCPP_INCLUDE_DIR})
-
-    # restclient-cpp depends of curl
-    find_package(CURL)
-    if (NOT CURL_FOUND)
-        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
-            message(FATAL_ERROR "Can't find curl in the thirdparty directory")
-        endif()
-
-        set(CMAKE_PREFIX_PATH ${LUGBENCH_THIRDPARTY_DIR}/curl)
-        find_package(CURL REQUIRED)
-        message(STATUS "Found Curl: ${CURL_INCLUDE_DIR}")
-    endif()
-
-    include_directories(${CURL_INCLUDE_DIR})
-    list(APPEND RESTCLIENTCPP_LIBRARIES ${CURL_LIBRARIES})
-endif()
-
 # find Lugdunum
 find_package(LUG REQUIRED core graphics system window math)
 include_directories(${LUG_INCLUDE_DIR})
@@ -189,10 +159,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads ${EXT_LIBRARIES})
-
-if(RESTCLIENTCPP_LIBRARIES)
-    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})
-endif()
 
 # copy / build shaders
 add_shaders(${EXECUTABLE_NAME} ${SHADERS})
