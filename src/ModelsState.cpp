@@ -68,6 +68,38 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
     _cameraMover.onFrame(elapsedTime);
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, {0.0f, 0.0f, 0.0f, 0.0f});
+    {
+        ImGui::Begin("Render settings", 0, _application._window_flags);
+        {
+            ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth), windowHeight - (windowHeaderOffset + windowFooterOffset) };
+            float settingsMarginRight = 10.0f;
+            ImVec2 buttonSize{ 30.0f, 30.0f };
+            ImVec2 windowRightAlign {
+                windowWidth - buttonSize.x - settingsMarginRight,
+                (windowHeight / 2) - (buttonSize.y / 2)
+            };
+
+            // Setup window
+            ImGui::SetWindowSize(modelSettingsWindowSize);
+            ImGui::SetWindowPos(windowRightAlign);
+
+            // Display settings buttons
+            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
+                {
+                    if (ImGui::Button(ICON_FA_DESKTOP, buttonSize)) {
+                    }
+                }
+                ImGui::PopStyleVar();
+            }
+            ImGui::PopFont();
+        }
+        ImGui::End();
+    }
+    ImGui::PopStyleColor();
+
     ImGui::Begin("Model Select Menu", 0, _application._window_flags);
     {
         float modelMenuWidth = getModelMenuWidth(windowWidth);
