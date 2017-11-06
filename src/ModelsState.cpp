@@ -90,6 +90,8 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
                 {
                     if (ImGui::Button(ICON_FA_DESKTOP, buttonSize)) {
+                        const uint32_t currentDisplayMode = static_cast<uint32_t>(_application.getGraphics().getRenderer()->getDisplayMode());
+                        _application.getGraphics().getRenderer()->setDisplayMode(static_cast<::lug::Graphics::Renderer::DisplayMode>(currentDisplayMode == 0 ? 7 : currentDisplayMode - 1));
                     }
                 }
                 ImGui::PopStyleVar();
