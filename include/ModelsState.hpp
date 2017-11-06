@@ -18,7 +18,7 @@ private:
         std::string path;
         std::string modelNodeName;
         std::string skyboxName;
-        lug::Math::Vec3f rotation{0.0f, 0.0f, 0.0f};
+        lug::Math::Vec2f rotation{0.0f, 0.0f};
     };
     struct SkyBoxInfo{
         std::string positiveXFile;

@@ -15,12 +15,7 @@ public:
     /**
      * @brief      Sets the camera node (i.e. the node to which the camera is attached to).
      */
-    void setCameraNode(lug::Graphics::Scene::Node& camera);
-
-    /**
-     * @brief      Sets the model node (i.e. the node to which the model is attached to).
-     */
-    void setModelNode(lug::Graphics::Scene::Node& model);
+    void setTargetNode(lug::Graphics::Scene::Node& camera);
 
     /**
      * @brief      Sets the event source, a Window instance.
@@ -32,16 +27,21 @@ public:
     void onFrame(const lug::System::Time& elapsedTime);
     void onEvent(const lug::Window::Event& event);
 
-private:
-    bool isRotationEnd(const lug::Window::Event& event);
+    void rotate(float x, float y);
 
 private:
-    lug::Graphics::Scene::Node* _camera{nullptr};
-    lug::Graphics::Scene::Node* _model{nullptr};
+    bool isRotationEnd(const lug::Window::Event& event);
+    void updateRotation();
+
+private:
+    lug::Graphics::Scene::Node* _target{nullptr};
     lug::Window::Window* _eventSource{nullptr};
     float _rotationSpeed{0.25f};
-    float _zoomSpeed{3.0f};
-    float _zoom{0.0f};
+    float _zoomSpeed{10.0f};
+    float _zoom{5.0f};
+    lug::Math::Vec2f _rotation{0.0f, 0.0f};
+
+    float _zoomUpdate{0.0f};
 
     lug::Math::Vec2i _lastMousePos{0, 0};
 

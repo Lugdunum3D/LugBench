@@ -29,8 +29,8 @@ ModelsState::ModelsState(LugBench::Application &application) : AState(applicatio
     };
     _models = {
         // { name, path, modelNodeName, skyboxName, rotation }
-        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {0.0f, -160.0f, 0.0f} },
-        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {0.0f, -160.0f, 0.0f} }
+        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
+        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} }
     };
 }
 
@@ -217,15 +217,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
         return false;
     }
 
-    if (model.rotation.x()) {
-        modelNode->rotate(model.rotation.x(), { 1.0f, 0.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-    }
-    if (model.rotation.y()) {
-        modelNode->rotate(model.rotation.y(), { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-    }
-    if (model.rotation.z()) {
-        modelNode->rotate(model.rotation.z(), { 0.0f, 0.0f, 1.0f }, lug::Graphics::Node::TransformSpace::World);
-    }
+    _cameraMover.rotate(model.rotation.x(), model.rotation.y());
 
     // Attach directional light to the root node
     {
@@ -233,7 +225,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
         lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 0.0f, -3.0f });
+        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -250,7 +242,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
         lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 0.0f, -3.0f });
+        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
         if (!light) {
@@ -280,8 +272,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
 
         // Attach the camera node to the mover
         {
-            _cameraMover.setCameraNode(*node);
-            _cameraMover.setModelNode(*modelNode);
+            _cameraMover.setTargetNode(*node);
             _cameraMover.setEventSource(*renderer->getWindow());
         }
 

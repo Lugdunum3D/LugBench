@@ -8,22 +8,19 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         return;
     }
 
+    _zoom += _zoomSpeed * _zoomUpdate * elapsedTime.getSeconds<float>();
+
     // GamePad View
     {
         float axisRightX = _eventSource->_gamePadState.axisRight.x();
         float axisRightY = _eventSource->_gamePadState.axisRight.y();
 
         if (axisRightX || axisRightY) {
-            _model->rotate(
+            _lastRotationVelocity = {
                 _rotationSpeed * axisRightX * elapsedTime.getSeconds<float>(),
-                {0.0f, 1.0f, 0.0f},
-                lug::Graphics::Node::TransformSpace::World
-            );
-            _model->rotate(
-                _rotationSpeed * axisRightY * elapsedTime.getSeconds<float>(),
-                {1.0f, 0.0f, 0.0f},
-                lug::Graphics::Node::TransformSpace::World
-            );
+                _rotationSpeed * axisRightY * elapsedTime.getSeconds<float>()
+            };
+            updateRotation();
         }
     }
 
@@ -46,39 +43,12 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
                     100 * elapsedTime.getSeconds<float>()
             };
 
-            // Rotate in world space to freeze the rotation on the X axis
-            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f});
-            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f},
-                           lug::Graphics::Node::TransformSpace::World);
+            updateRotation();
         } else if (_eventSource->_touchScreenState.drag
                    && _eventSource->_touchScreenState.state ==
                       lug::Window::TouchScreenEvent::GestureState::End) {
             _lastDragPosition = {0, 0};
         }
-
-        if (_eventSource->_touchScreenState.pinch
-            && _eventSource->_touchScreenState.state ==
-               lug::Window::TouchScreenEvent::GestureState::Start) {
-            _lastPinchGap = _eventSource->_touchScreenState.coordinates[1].x() -
-                            _eventSource->_touchScreenState.coordinates[0].x() +
-                            _eventSource->_touchScreenState.coordinates[1].y() -
-                            _eventSource->_touchScreenState.coordinates[0].y();
-        } else if (_eventSource->_touchScreenState.pinch &&
-                   _eventSource->_touchScreenState.state ==
-                   lug::Window::TouchScreenEvent::GestureState::Move) {
-                float zoomFactor = _lastPinchGap - (_eventSource->_touchScreenState.coordinates[1].x() -
-                                   _eventSource->_touchScreenState.coordinates[0].x() +
-                                   _eventSource->_touchScreenState.coordinates[1].y() -
-                                   _eventSource->_touchScreenState.coordinates[0].y());
-
-                    _camera->translate({0.0f, 0.0f, _rotationSpeed * zoomFactor / 100000 *
-                                                    elapsedTime.getMilliseconds<float>()});
-
-            } else if (_eventSource->_touchScreenState.pinch
-                       && _eventSource->_touchScreenState.state ==
-                          lug::Window::TouchScreenEvent::GestureState::End) {
-                _lastPinchGap = 0;
-            }
     }
 
     auto mousePos = _eventSource->getMousePos();
@@ -92,10 +62,7 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
                 _rotationSpeed * delta.x() * elapsedTime.getSeconds<float>(),
                 _rotationSpeed * delta.y() * elapsedTime.getSeconds<float>()
             };
-
-            // Rotate in world space to freeze the rotation on the X axis
-            _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f});
-            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            updateRotation();
 
             lug::Math::Vec2i windowSize = _eventSource->getWindowSize();
 
@@ -112,17 +79,26 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         }
     }
 
-    if (_zoom) {
-        _camera->translate({0.0f, 0.0f, _zoomSpeed * _zoom * elapsedTime.getSeconds<float>() * 4.0f});
-    }
-    // Rotate model after mouse released or drag released
-    else if (_rotationVelocity.x() || _rotationVelocity.y()) {
-        // Rotate in world space to freeze the rotation on the X axis
-        _model->rotate(_rotationVelocity.x(), {0.0f, 1.0f, 0.0f});
-        _model->rotate(_rotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+    // Rotate camera
+    {
+        float theta = lug::Math::Geometry::radians(-_rotation.x());
+        float phi = lug::Math::Geometry::radians(_rotation.y());
 
+        float z = _zoom * cos(theta) * cos(phi);
+        float x = _zoom * sin(theta) * cos(phi);
+        float y = _zoom * sin(phi);
+
+        _target->setPosition({x, y, z}, lug::Graphics::Node::TransformSpace::World);
+        _target->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+    }
+
+    // Rotate model after mouse released or drag released
+    if (_rotationVelocity.x() || _rotationVelocity.y()) {
         // Reduce rotation velocity by 0.05% each millisecond
         _rotationVelocity = _rotationVelocity * (1.0f - 0.005f * elapsedTime.getMilliseconds<float>());
+        _lastRotationVelocity = _rotationVelocity;
+
+        updateRotation();
 
         // Stop rotation if velocity is close to 0
         if (_rotationVelocity.x() < 0.01f &&
@@ -133,14 +109,35 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
         }
     }
 
-    _zoom = 0.0f;
+    _zoomUpdate = 0.0f;
 }
 
 void ModelViewer::onEvent(const lug::Window::Event& event) {
     // Zoom
-    // TODO (nokitoo): Add android pinch
+    // Windows
     if (event.type == lug::Window::Event::Type::MouseWheel) {
-        _zoom = static_cast<float>(event.mouse.scrollOffset.xOffset);
+        _zoomUpdate = static_cast<float>(event.mouse.scrollOffset.xOffset);
+    }
+    // Android
+    if (event.touchScreen.pinch
+        && event.touchScreen.state ==
+           lug::Window::TouchScreenEvent::GestureState::Start) {
+        _lastPinchGap = event.touchScreen.coordinates[1].x() -
+                        event.touchScreen.coordinates[0].x() +
+                        event.touchScreen.coordinates[1].y() -
+                        event.touchScreen.coordinates[0].y();
+    } else if (event.touchScreen.pinch &&
+               event.touchScreen.state ==
+               lug::Window::TouchScreenEvent::GestureState::Move) {
+            _zoomUpdate = _lastPinchGap - (event.touchScreen.coordinates[1].x() -
+                            event.touchScreen.coordinates[0].x() +
+                            event.touchScreen.coordinates[1].y() -
+                            event.touchScreen.coordinates[0].y());
+            _zoomUpdate /= 100;
+    } else if (event.touchScreen.pinch
+               && _eventSource->_touchScreenState.state ==
+                  lug::Window::TouchScreenEvent::GestureState::End) {
+        _lastPinchGap = 0;
     }
 
     // Windows mouse button pressed/released
@@ -166,6 +163,13 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
     }
 }
 
+void ModelViewer::rotate(float x, float y) {
+    lug::Math::Vec2f tmp = _lastRotationVelocity;
+    _lastRotationVelocity = {x, y};
+    updateRotation();
+    _lastRotationVelocity = tmp;
+}
+
 bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
 #if defined(LUG_SYSTEM_ANDROID)
     return event.touchScreen.drag &&
@@ -174,4 +178,26 @@ bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
     return event.type == lug::Window::Event::Type::ButtonReleased &&
         event.mouse.code == lug::Window::Mouse::Button::Left;
 #endif
+}
+
+void ModelViewer::updateRotation() {
+    // Rotate in world space to freeze the rotation on the X axis
+    _rotation.x() += _lastRotationVelocity.x() * 30.0f;
+    _rotation.y() += _lastRotationVelocity.y() * 30.0f;
+
+    // Prevent overflow/underflow
+    if (_rotation.x() > 360.0f) {
+        _rotation.x() -= 360.0f;
+    }
+    else if (_rotation.x() < 360.0f) {
+        _rotation.x() += 360.0f;
+    }
+
+    // Lock rotation on top and bottom or it will reverse the camera
+    if (_rotation.y() >= 89.0f) {
+        _rotation.y() = 89.0f;
+    }
+    else if (_rotation.y() <= -89.0f) {
+        _rotation.y() = -89.0f;
+    }
 }
