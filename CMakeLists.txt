@@ -153,6 +153,12 @@ set(OTHER_RESOURCES
     textures/vulkan_logo.png
     textures/lugbench_logo.png
     textures/lugdunum_logo.png
+    textures/skybox/back.jpg
+    textures/skybox/bottom.jpg
+    textures/skybox/front.jpg
+    textures/skybox/left.jpg
+    textures/skybox/right.jpg
+    textures/skybox/top.jpg
     textures/licence_logo.png
     textures/lugbench-short.png
     textures/lugdunum-short.png

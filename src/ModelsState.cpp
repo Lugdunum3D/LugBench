@@ -3,6 +3,7 @@
 
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
+#include <lug/Graphics/Builder/SkyBox.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
@@ -18,10 +19,18 @@
 
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
+    _skyBoxes["default"] = {
+        "textures/skybox/right.jpg",
+        "textures/skybox/left.jpg",
+        "textures/skybox/top.jpg",
+        "textures/skybox/bottom.jpg",
+        "textures/skybox/back.jpg",
+        "textures/skybox/front.jpg"
+    };
     _models = {
-        // { name, path, modelNodeName, rotation }
-        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", {0.0f, -160.0f, 0.0f} },
-        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", {0.0f, -160.0f, 0.0f} }
+        // { name, path, modelNodeName, skyboxName, rotation }
+        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {0.0f, -160.0f, 0.0f} },
+        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {0.0f, -160.0f, 0.0f} }
     };
 }
 
@@ -74,10 +83,11 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         {
             ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth), windowHeight - (windowHeaderOffset + windowFooterOffset) };
             float settingsMarginRight = 10.0f;
+            float buttonsSpacing = 10.0f;
             ImVec2 buttonSize{ 30.0f, 30.0f };
             ImVec2 windowRightAlign {
                 windowWidth - buttonSize.x - settingsMarginRight,
-                (windowHeight / 2) - (buttonSize.y / 2)
+                (windowHeight / 2) - ((buttonSize.y * 2 + buttonsSpacing) / 2)
             };
 
             // Setup window
@@ -88,13 +98,18 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
             {
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, buttonsSpacing });
                 {
                     if (ImGui::Button(ICON_FA_DESKTOP, buttonSize)) {
                         const uint32_t currentDisplayMode = static_cast<uint32_t>(_application.getGraphics().getRenderer()->getDisplayMode());
                         _application.getGraphics().getRenderer()->setDisplayMode(static_cast<::lug::Graphics::Renderer::DisplayMode>(currentDisplayMode == 0 ? 7 : currentDisplayMode - 1));
                     }
+                    if (ImGui::Button(ICON_FA_TWITTER, buttonSize)) {
+                        _displaySkyBox = !_displaySkyBox;
+                        loadModelSkyBox(*_selectedModel);
+                    }
                 }
-                ImGui::PopStyleVar();
+                ImGui::PopStyleVar(2);
             }
             ImGui::PopFont();
         }
@@ -222,6 +237,11 @@ bool ModelsState::loadModel(const ModelInfos& model) {
         _scene->getRoot().attachLight(light);
     }
 
+    // Attach skyBox
+    if (!loadModelSkyBox(model)) {
+        return false;
+    }
+
     // Attach camera
     {
         lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
@@ -252,6 +272,43 @@ bool ModelsState::loadModel(const ModelInfos& model) {
     }
 
     _selectedModel = &model;
+    return true;
+}
+
+bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+
+    if (model.skyboxName.size()) {
+        auto skyBox = _skyBoxes.find(model.skyboxName);
+        if (skyBox == _skyBoxes.end()) {
+            LUG_LOG.error("ModelsState::loadModel Can't load skybox {}", model.skyboxName);
+            return false;
+        }
+        else if (!skyBox->second.resource) {
+            lug::Graphics::Builder::SkyBox skyBoxBuilder(*renderer);
+
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveX, skyBox->second.positiveXFile);
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeX, skyBox->second.negativeXFile);
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveY, skyBox->second.positiveYFile);
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeY, skyBox->second.negativeYFile);
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveZ, skyBox->second.positiveZFile);
+            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeZ, skyBox->second.negativeZFile);
+
+            skyBox->second.resource = skyBoxBuilder.build();
+            if (!skyBox->second.resource) {
+                LUG_LOG.error("ModelsState::loadModel Can't create skyBox {}", model.skyboxName);
+                return false;
+            }
+        }
+
+        if (_displaySkyBox) {
+            _scene->setSkyBox(skyBox->second.resource);
+        }
+        else {
+            _scene->setSkyBox(nullptr);
+        }
+    }
+
     return true;
 }
 
