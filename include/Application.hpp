@@ -53,6 +53,7 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _vulkanLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugbenchLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugdunumLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _licenceLogo;
 
 private:
     bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);

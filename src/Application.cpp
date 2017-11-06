@@ -322,12 +322,17 @@ bool Application::loadImages(lug::Graphics::Renderer* renderer) {
         }
         _lugdunumLogo = buildImage(renderer, "textures/lugdunum_logo.png");
         if (!_lugdunumLogo) {
-            LUG_LOG.error("Application: Can't create the vulkan_logo texture");
+            LUG_LOG.error("Application: Can't create the lugdunum_logo texture");
             return false;
         }
         _lugbenchLogo = buildImage(renderer, "textures/lugbench_logo.png");
         if (!_lugbenchLogo) {
-            LUG_LOG.error("Application: Can't create the vulkan_logo texture");
+            LUG_LOG.error("Application: Can't create the lugbench_logo texture");
+            return false;
+        }
+        _licenceLogo = buildImage(renderer, "textures/licence_logo.png");
+        if (!_licenceLogo) {
+            LUG_LOG.error("Application: Can't create the licence_logo texture");
             return false;
         }
     }

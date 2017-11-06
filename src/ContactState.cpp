@@ -30,17 +30,17 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
     _autorNames.push_back("Yoann Picquenot"); _autorTitle.push_back("Co-Founder");
     _autorNames.push_back("Stuart Sulaski"); _autorTitle.push_back("Co-Founder");
     _licenses.push_back({
-        /* logo */ _application._lugbenchLogo,
+        /* logo */ _application._licenceLogo,
         /* title */"Licence 1",
         /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     });
    _licenses.push_back({
-        /* logo */ _application._lugdunumLogo,
+        /* logo */ _application._licenceLogo,
         /* title */"Licence 2",
         /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     });
    _licenses.push_back({
-        /* logo */ _application._epitechColorLogo,
+        /* logo */ _application._licenceLogo,
         /* title */"Licence 3",
         /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     });
@@ -373,9 +373,9 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
                         {
                             auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_licenses[i].logo);
                             #if defined(LUG_SYSTEM_ANDROID)
-                                    ImVec2 logoSize(150.0f * 2.0f, 50.0f * 2.0f);
+                                    ImVec2 logoSize(50.0f * 2.0f, 50.0f * 2.0f);
                             #else
-                                    ImVec2 logoSize(50.0f, 25.0f);
+                                    ImVec2 logoSize(50.0f, 50.0f);
                             #endif
                             ImGui::Image(vkTexture.get(), logoSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
                             ImGui::SameLine();
