@@ -16,8 +16,6 @@
 
 #include <IconsFontAwesome.h>
 
-
-
 ContactState::ContactState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
     _autorNames.push_back("Yoann Long"); _autorTitle.push_back("Co-Founder & Project Lead");
@@ -29,21 +27,48 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
     _autorNames.push_back("Guillaume Sabatier"); _autorTitle.push_back("Co-Founder");
     _autorNames.push_back("Yoann Picquenot"); _autorTitle.push_back("Co-Founder");
     _autorNames.push_back("Stuart Sulaski"); _autorTitle.push_back("Co-Founder");
+   _licenses.push_back({
+        /* logo */ _application._licenceLogo,
+        /* title */"Apache",
+        /* text */ ""
+    });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/apache-licence.txt");
+   _licenses.push_back({
+       /* logo */ _application._licenceLogo,
+       /* title */"FMT",
+       /* text */ ""
+   });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/fmt-licence.txt");
+   _licenses.push_back({
+       /* logo */ _application._licenceLogo,
+       /* title */"FreeType",
+       /* text */ ""
+   });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/freetype-licence.txt");
+   _licenses.push_back({
+       /* logo */ _application._licenceLogo,
+       /* title */"Google Mock",
+       /* text */ ""
+   });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/googlemock-licence.txt");
+   _licenses.push_back({
+       /* logo */ _application._licenceLogo,
+       /* title */"Dear ImGui",
+       /* text */ ""
+   });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/imgui-licence.txt");
+   _licenses.push_back({
+       /* logo */ _application._licenceLogo,
+       /* title */"JSON",
+       /* text */ ""
+   });
+   _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/json-licence.txt");
     _licenses.push_back({
-        /* logo */ _application._licenceLogo,
-        /* title */"Licence 1",
-        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        /* logo */ _application._lugdunumShortLogo,
+        /* title */"Lugdunum 3d",
+        /* text */ ""
     });
-   _licenses.push_back({
-        /* logo */ _application._licenceLogo,
-        /* title */"Licence 2",
-        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    });
-   _licenses.push_back({
-        /* logo */ _application._licenceLogo,
-        /* title */"Licence 3",
-        /* text */ "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    });
+    _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/lugdunum3d-licence.txt");
 }
 
 ContactState::~ContactState() {
@@ -157,7 +182,6 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                 ImGui::SetWindowSize(contactWindowSize);
                 ImGui::SetWindowPos(ImVec2{ contactWindowSelectWidth, windowHeaderOffset });
 
-                ImGui::SetCursorPosY(15.f);
                 ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
                 if (_authorsPageActive) {
                     displayAuthorsTab(contactWindowSize);
@@ -181,6 +205,7 @@ bool ContactState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
 
 void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
+    ImGui::SetCursorPosY(15.f);
 #if defined(LUG_SYSTEM_ANDROID)
     float leftSectionWidth = GUI::Utilities::getPercentage(contactWindowSize.x, 0.33f, 290.f * 2.f);
 #else
@@ -231,12 +256,14 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
 #if defined(LUG_SYSTEM_ANDROID)
                 const float childHeight = 400.f;
                 const float childSpacing = 30.f;
+                const ImVec2 buttonSideLength{ 25.f * 2.f, 25.f * 2.f };
 #else
                 const float childMinWidth = 405.f / 1.8f;
                 const float childHeight = 400.f / 2.33f;
                 const float childSpacing = 20.f;
                 const float minSizeDoubleElements = (childMinWidth * 2.f) + (childSpacing * 3.f);
                 const float minSizeTripleElements = (childMinWidth * 3.f) + (childSpacing * 5.f);
+                const ImVec2 buttonSideLength{ 25.f, 25.f };
 #endif
 
                 ImVec2 childWindowSize{ 0, childHeight };
@@ -312,10 +339,14 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
                                         ImGui::PushStyleColor(ImGuiCol_Button, GUI::V4_LIGHTBLUE);
                                         {
                                             ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (((3.f + 25.f) * 3.f) / 2.f));
+#if defined(LUG_SYSTEM_ANDROID)
+                                            ImGui::SetCursorPosY(ImGui::GetWindowHeight() - (55.f * 2.f));
+#elif
                                             ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 55.f);
-                                            ImGui::Button(ICON_FA_INSTAGRAM, ImVec2{ 25, 25 }); ImGui::SameLine();
-                                            ImGui::Button(ICON_FA_TWITTER, ImVec2{ 25, 25 }); ImGui::SameLine();
-                                            ImGui::Button(ICON_FA_FACEBOOK, ImVec2{ 25, 25 });
+#endif
+                                            ImGui::Button(ICON_FA_INSTAGRAM, buttonSideLength); ImGui::SameLine();
+                                            ImGui::Button(ICON_FA_TWITTER, buttonSideLength); ImGui::SameLine();
+                                            ImGui::Button(ICON_FA_FACEBOOK, buttonSideLength);
                                         }
                                         ImGui::PopStyleColor();
                                     }
@@ -344,17 +375,25 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 5.f, 2.f });
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
 
-    ImGui::BeginChild("License Section", ImVec2{ contactWindowSize.x, contactWindowSize.y - 15.f});
+    ImGui::BeginChild("License Section", ImVec2{ contactWindowSize.x, contactWindowSize.y});
     {
 #if defined(LUG_SYSTEM_ANDROID)
-        const float childHeight = 400.f;
+        const float childHeight = 500.f * 2.f;
+        const float childTextHeight = 400.f * 2.f;
         const float childSpacing = 25.f;
+        const ImVec2 logoSize(100.0f * 2.0f, 100.0f * 2.0f);
+        const float titleMarginLeft = 20.0f * 2.f;
+        ImVec2 childWindowSize{ GUI::Utilities::getPercentage(contactWindowSize.x, 0.90f, 600.f * 2.f), childHeight };
 #else
-        const float childHeight = 400.f / 2.33f;
+        const float childHeight = 500.f;
+        const float childTextHeight = 400.f;
         const float childSpacing = 15.f;
+        const ImVec2 logoSize(100.0f, 100.0f);
+        const float titleMarginLeft = 20.0f;
+        ImVec2 childWindowSize{ GUI::Utilities::getPercentage(contactWindowSize.x, 0.65f, 600.f), childHeight };
 #endif
 
-        ImVec2 childWindowSize{ contactWindowSize.x * 0.65f, childHeight };
+        ImVec2 textchildWindowSize{ childWindowSize.x - (logoSize.x), childTextHeight };
         float marginTop = 30.0f;
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, childSpacing });
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 10.0f, 10.0f });
@@ -372,21 +411,17 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
                         ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
                         {
                             auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_licenses[i].logo);
-                            #if defined(LUG_SYSTEM_ANDROID)
-                                    ImVec2 logoSize(50.0f * 2.0f, 50.0f * 2.0f);
-                            #else
-                                    ImVec2 logoSize(50.0f, 50.0f);
-                            #endif
                             ImGui::Image(vkTexture.get(), logoSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
                             ImGui::SameLine();
 
-                            float titleMarginLeft = 20.0f;
-
                             ImGui::SetCursorPos({logoSize.x + titleMarginLeft, logoSize.y / 2.0f});
                             ImGui::Text(_licenses[i].title.c_str());
-
-                            ImGui::SetCursorPosX(logoSize.x + titleMarginLeft);
-                            ImGui::TextWrapped(_licenses[i].text.c_str());
+                            ImGui::SetCursorPos({ logoSize.x - 10.f, logoSize.y });
+                            ImGui::BeginChild("text", textchildWindowSize);
+                            {
+                                ImGui::TextWrapped(_licenses[i].text.c_str());
+                            }
+                            ImGui::EndChild();
                         }
                         ImGui::EndChild();
                         ImGui::PopStyleColor(2);

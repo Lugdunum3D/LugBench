@@ -330,6 +330,16 @@ bool Application::loadImages(lug::Graphics::Renderer* renderer) {
             LUG_LOG.error("Application: Can't create the lugbench_logo texture");
             return false;
         }
+        _lugdunumShortLogo = buildImage(renderer, "textures/lugdunum-short.png");
+        if (!_lugdunumLogo) {
+            LUG_LOG.error("Application: Can't create the lugdunum-short texture");
+            return false;
+        }
+        _lugbenchShortLogo = buildImage(renderer, "textures/lugbench-short.png");
+        if (!_lugbenchLogo) {
+            LUG_LOG.error("Application: Can't create the lugbench-short texture");
+            return false;
+        }
         _licenceLogo = buildImage(renderer, "textures/licence_logo.png");
         if (!_licenceLogo) {
             LUG_LOG.error("Application: Can't create the licence_logo texture");

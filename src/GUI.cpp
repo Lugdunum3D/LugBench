@@ -4,6 +4,8 @@
 
 #include <IconsFontAwesome.h>
 
+#include <fstream>
+
 static bool displayExtraDeviceInfo = false;
 static bool displayFeatures = false;
 
@@ -842,4 +844,19 @@ float GUI::Utilities::getFooterHeight(float windowHeight) {
 #else
     return Utilities::getPercentage(windowHeight, 0.06f, 80.f);
 #endif
+}
+
+std::string GUI::Utilities::ReadWholeFile(std::string filename) {
+    std::string resultBuffer = {};
+    std::string line;
+    std::ifstream myfile(filename);
+    if (myfile.is_open())
+    {
+        while (getline(myfile, line))
+        {
+            resultBuffer += line + '\n';
+        }
+        myfile.close();
+    }
+    return resultBuffer;
 }
