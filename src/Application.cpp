@@ -330,6 +330,11 @@ bool Application::loadImages(lug::Graphics::Renderer* renderer) {
             LUG_LOG.error("Application: Can't create the vulkan_logo texture");
             return false;
         }
+        _infoDeviceLogo = buildImage(renderer, "textures/info_device_logo.png");
+        if (!_infoDeviceLogo) {
+            LUG_LOG.error("Application: Can't create the vulkan_logo texture");
+            return false;
+        }
     }
     return true;
 }
