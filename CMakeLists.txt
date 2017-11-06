@@ -61,8 +61,19 @@ message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 include_directories(${JSON_INCLUDE_DIR})
 
 # find Lugdunum
-find_package(LUG REQUIRED core graphics system window math)
+
+find_package(LUG QUIET COMPONENTS core graphics system window math)
+if (NOT LUG_FOUND)
+    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/lugdunum")
+        message(FATAL_ERROR "Can't find lugdunum in the thirdparty directory")
+    endif()
+
+    set(LUG_ROOT ${LUGBENCH_THIRDPARTY_DIR}/lugdunum)
+    find_package(LUG REQUIRED COMPONENTS core graphics system window math)
+endif()
+
 include_directories(${LUG_INCLUDE_DIR})
+
 
 set(SRC
     src/Application.cpp
