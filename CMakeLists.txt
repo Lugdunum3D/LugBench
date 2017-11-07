@@ -124,6 +124,8 @@ include_directories(ext/)
 set(SHADERS
     gui.vert
     gui.frag
+    skybox.frag
+    skybox.vert
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}

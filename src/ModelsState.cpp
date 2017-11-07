@@ -106,7 +106,9 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     }
                     if (ImGui::Button(ICON_FA_TWITTER, buttonSize)) {
                         _displaySkyBox = !_displaySkyBox;
-                        loadModelSkyBox(*_selectedModel);
+                        if (!loadModelSkyBox(*_selectedModel)) {
+                            success = false;
+                        }
                     }
                 }
                 ImGui::PopStyleVar(2);
