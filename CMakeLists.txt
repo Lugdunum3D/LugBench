@@ -86,6 +86,7 @@ set(SRC
     src/main.cpp
     src/BenchmarkingState.cpp
     src/BenchmarksState.cpp
+    src/LoadingAnimation.cpp
     src/ModelsState.cpp
     src/ModelViewer.cpp
     src/ResultsState.cpp
@@ -100,6 +101,7 @@ set(INC
     include/AState.hpp
     include/BenchmarkingState.hpp
     include/BenchmarksState.hpp
+    include/LoadingAnimation.hpp
     include/ModelsState.hpp
     include/ModelViewer.hpp
     include/ResultsState.hpp
@@ -175,6 +177,7 @@ set(OTHER_RESOURCES
     licences/imgui-licence.txt
     licences/json-licence.txt
     licences/lugdunum3d-licence.txt
+    textures/loader.png
 )
 
 # create target

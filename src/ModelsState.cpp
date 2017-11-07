@@ -43,11 +43,19 @@ bool ModelsState::onPush() {
     _application.setCurrentState(State::MODELS);
     handleResize();
 
-    if (!_models.size()) {
-        return true;
+    if (_models.size() && !loadModel(_models.front())) {
+        return false;
     }
 
-    return loadModel(_models.front());
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowWidth = window->getWidth();
+
+    return _loadingAnimation.init(
+        /* application */ _application,
+        /* loaderImage */ "textures/loader.png",
+        /* size */ {100.0f, 100.0f},
+        /* offset */ {ModelsState::getModelMenuWidth(windowWidth) / 2.0f, 0.0f}
+    );
 }
 
 bool ModelsState::onPop() {
@@ -202,8 +210,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::PopStyleVar();
             }
         }
+        _loadingAnimation.update(elapsedTime);
         ImGui::End();
     }
+
 
     return success;
 }
@@ -211,6 +221,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 bool ModelsState::loadModel(const ModelInfos& model) {
     // Load scene
     _lockCamera = true;
+    _loadingAnimation.display(true);
     std::thread loadModelThread([&]{
         lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
@@ -294,6 +305,7 @@ bool ModelsState::loadModel(const ModelInfos& model) {
             }
 
             _lockCamera = false;
+            _loadingAnimation.display(false);
         }
 
 
