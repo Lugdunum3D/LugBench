@@ -1,6 +1,8 @@
 #include "ModelsState.hpp"
 #include "GUI.hpp"
 
+#include <thread>
+
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Builder/SkyBox.hpp>
@@ -57,7 +59,10 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
-    _cameraMover.onEvent(event);
+    if (!_lockCamera) {
+        _cameraMover.onEvent(event);
+    }
+
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
     }
@@ -80,7 +85,9 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         windowFooterOffset = GUI::displayFooter(_application);
     }
 
-    _cameraMover.onFrame(elapsedTime);
+    if (!_lockCamera) {
+        _cameraMover.onFrame(elapsedTime);
+    }
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
     {
@@ -203,90 +210,99 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
 bool ModelsState::loadModel(const ModelInfos& model) {
     // Load scene
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
-    if (!sceneResource) {
-        return false;
-    }
+    _lockCamera = true;
+    std::thread loadModelThread([&]{
+        lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
+        if (!sceneResource) {
+            return false;
+        }
 
-    _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+        _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
 
-    auto modelNode = _scene->getSceneNode(model.modelNodeName);
-    if (!modelNode) {
-        LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
-        return false;
-    }
+        auto modelNode = _scene->getSceneNode(model.modelNodeName);
+        if (!modelNode) {
+            LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
+            return false;
+        }
 
-    _cameraMover.rotate(model.rotation.x(), model.rotation.y());
+        _cameraMover.rotate(model.rotation.x(), model.rotation.y());
 
-    // Attach directional light to the root node
-    {
-        lug::Graphics::Builder::Light lightBuilder(*renderer);
+        // Attach directional light to the root node
+        {
+            lug::Graphics::Builder::Light lightBuilder(*renderer);
 
         lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
         lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
         lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
 
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
-        if (!light) {
-            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
-            return false;
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+            if (!light) {
+                LUG_LOG.error("ModelsState::loadModel Can't create directional light");
+                return false;
+            }
+
+            _scene->getRoot().attachLight(light);
         }
 
-        _scene->getRoot().attachLight(light);
-    }
-
-    // Attach ambient light to the root node
-    {
-        lug::Graphics::Builder::Light lightBuilder(*renderer);
-
-        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
-        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
-
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
-        if (!light) {
-            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
-            return false;
-        }
-
-        _scene->getRoot().attachLight(light);
-    }
-
-    // Attach skyBox
-    if (!loadModelSkyBox(model)) {
-        return false;
-    }
-
-    // Attach camera
-    {
-        lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
-        _scene->getRoot().attachChild(*node);
-
-        node->attachCamera(_application.getCamera());
-
-        // Set initial position of the camera
-        node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
-        // Look at once
-        node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-
-        // Attach the camera node to the mover
+        // Attach ambient light to the root node
         {
-            _cameraMover.setTargetNode(*node);
-            _cameraMover.setEventSource(*renderer->getWindow());
+            lug::Graphics::Builder::Light lightBuilder(*renderer);
+
+            lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+            lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+            lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+            if (!light) {
+                LUG_LOG.error("ModelsState::loadModel Can't create directional light");
+                return false;
+            }
+
+            _scene->getRoot().attachLight(light);
         }
 
-        // Attach camera to RenderView
+        // Attach camera
         {
-            auto& renderViews = renderer->getWindow()->getRenderViews();
+            lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
+            _scene->getRoot().attachChild(*node);
 
-            LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+            // Attach skyBox
+            if (!loadModelSkyBox(model)) {
+                return false;
+            }
 
-            renderViews[0]->attachCamera(_application.getCamera());
+            node->attachCamera(_application.getCamera());
+
+            // Set initial position of the camera
+            node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
+            // Look at once
+            node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
+
+            // Attach the camera node to the mover
+            {
+                _cameraMover.setTargetNode(*node);
+                _cameraMover.setEventSource(*renderer->getWindow());
+            }
+
+            // Attach camera to RenderView
+            {
+                auto& renderViews = renderer->getWindow()->getRenderViews();
+
+                LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+                renderViews[0]->attachCamera(_application.getCamera());
+            }
+
+            _lockCamera = false;
         }
-    }
 
+
+        return true;
+    });
+
+    loadModelThread.detach();
     _selectedModel = &model;
+
     return true;
 }
 

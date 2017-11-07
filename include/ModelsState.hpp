@@ -55,4 +55,7 @@ private:
     bool _displayFullscreen{false};
 
     const ModelInfos* _selectedModel{nullptr};
+
+    // Set to true when a model is loading to ignore onFrame/onEvent calls
+    bool _lockCamera{true};
 };
