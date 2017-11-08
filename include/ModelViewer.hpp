@@ -43,7 +43,6 @@ private:
     float _zoomSpeed{3.0f};
     float _zoom{0.0f};
 
-    bool _hasFocus{false};
     lug::Math::Vec2i _lastMousePos{0, 0};
 
     lug::Math::Vec2f _lastRotationVelocity{0, 0};

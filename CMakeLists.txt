@@ -8,8 +8,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/Macros.cmake)
 # determine the build type
 lug_set_option(CMAKE_BUILD_TYPE Release STRING "Choose the type of build (Debug or Release)")
 
-# set the path of thirdparty
-lug_set_option(LUGBENCH_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choose the path for the thirdparty directory")
 
 if(ANDROID)
     populate_android_infos()
@@ -21,17 +19,23 @@ project(lugbench)
 # define the executable
 set(EXECUTABLE_NAME "lugbench")
 
+# set the path of thirdparty
+lug_set_option(LUG_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choose the path for the thirdparty directory")
+
+# download thirdparty dir if not specified
+lug_download_thirdparty()
+
 # use config
 include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
 # find Vulkan
 find_package(Vulkan)
 if (NOT VULKAN_INCLUDE_DIR)
-    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/vulkan")
+    if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/vulkan")
         message(FATAL_ERROR "Can't find vulkan in the thirdparty directory")
     endif()
 
-    set(VULKAN_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/vulkan/include)
+    set(VULKAN_INCLUDE_DIR ${LUG_THIRDPARTY_DIR}/vulkan/include)
     message(STATUS "Found Vulkan: ${VULKAN_INCLUDE_DIR}")
 endif()
 
@@ -41,58 +45,39 @@ include_directories(${VULKAN_INCLUDE_DIR})
 find_package(Fmt)
 
 if (NOT FMT_INCLUDE_DIR)
-    if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/fmt")
+    if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/fmt")
         message(FATAL_ERROR "Can't find fmt in the thirdparty directory")
     endif()
 
-    set(FMT_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/fmt/include)
+    set(FMT_INCLUDE_DIR ${LUG_THIRDPARTY_DIR}/fmt/include)
     message(STATUS "Found Fmt: ${FMT_INCLUDE_DIR}")
 endif()
 
 include_directories(${FMT_INCLUDE_DIR})
 
-if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/json")
+if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/json")
     message(FATAL_ERROR "Can't find json in the thirdparty directory")
 endif()
 
-set(JSON_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/json/include)
+set(JSON_INCLUDE_DIR ${LUG_THIRDPARTY_DIR}/json/include)
 message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
 
-# we don't use RestClientCpp on android
-if(NOT LUG_OS_ANDROID)
-    find_package(RestClientCpp)
-    if (NOT RESTCLIENTCPP_FOUND)
-        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/restclient")
-            message(FATAL_ERROR "Can't find restclient in the thirdparty directory")
-        endif()
+# find Lugdunum
 
-        set(RESTCLIENTCPP_ROOT ${LUGBENCH_THIRDPARTY_DIR}/restclient)
-        find_package(RestClientCpp REQUIRED)
+find_package(LUG QUIET COMPONENTS core graphics system window math)
+if (NOT LUG_FOUND)
+    if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/lugdunum")
+        message(FATAL_ERROR "Can't find lugdunum in the thirdparty directory")
     endif()
 
-    include_directories(${RESTCLIENTCPP_INCLUDE_DIR})
-
-    # restclient-cpp depends of curl
-    find_package(CURL)
-    if (NOT CURL_FOUND)
-        if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/curl")
-            message(FATAL_ERROR "Can't find curl in the thirdparty directory")
-        endif()
-
-        set(CMAKE_PREFIX_PATH ${LUGBENCH_THIRDPARTY_DIR}/curl)
-        find_package(CURL REQUIRED)
-        message(STATUS "Found Curl: ${CURL_INCLUDE_DIR}")
-    endif()
-
-    include_directories(${CURL_INCLUDE_DIR})
-    list(APPEND RESTCLIENTCPP_LIBRARIES ${CURL_LIBRARIES})
+    set(LUG_ROOT ${LUG_THIRDPARTY_DIR}/lugdunum)
+    find_package(LUG REQUIRED COMPONENTS core graphics system window math)
 endif()
 
-# find Lugdunum
-find_package(LUG REQUIRED core graphics system window math)
 include_directories(${LUG_INCLUDE_DIR})
+
 
 set(SRC
     src/Application.cpp
@@ -123,11 +108,11 @@ set(INC
 )
 
 # find imgui
-if (NOT EXISTS "${LUGBENCH_THIRDPARTY_DIR}/imgui")
+if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/imgui")
     message(FATAL_ERROR "Can't find imgui in the thirdparty directory")
 endif()
 
-set(IMGUI_INCLUDE_DIR ${LUGBENCH_THIRDPARTY_DIR}/imgui/include)
+set(IMGUI_INCLUDE_DIR ${LUG_THIRDPARTY_DIR}/imgui/include)
 message(STATUS "Found Imgui: ${IMGUI_INCLUDE_DIR}")
 
 include_directories(${IMGUI_INCLUDE_DIR})
@@ -190,10 +175,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads ${EXT_LIBRARIES})
-
-if(RESTCLIENTCPP_LIBRARIES)
-    target_link_libraries(${EXECUTABLE_NAME} ${RESTCLIENTCPP_LIBRARIES})
-endif()
 
 # copy / build shaders
 add_shaders(${EXECUTABLE_NAME} ${SHADERS})
