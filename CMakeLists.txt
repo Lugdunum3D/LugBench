@@ -153,7 +153,17 @@ set(OTHER_RESOURCES
     textures/vulkan_logo.png
     textures/lugbench_logo.png
     textures/lugdunum_logo.png
+    textures/licence_logo.png
+    textures/lugbench-short.png
+    textures/lugdunum-short.png
     textures/info_device_logo.png
+    licences/apache-licence.txt
+    licences/fmt-licence.txt
+    licences/freetype-licence.txt
+    licences/googlemock-licence.txt
+    licences/imgui-licence.txt
+    licences/json-licence.txt
+    licences/lugdunum3d-licence.txt
 )
 
 # create target

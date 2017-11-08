@@ -53,6 +53,9 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _vulkanLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugbenchLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugdunumLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugbenchShortLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _lugdunumShortLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _licenceLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _infoDeviceLogo;
 
 private:

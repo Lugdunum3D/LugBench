@@ -8,6 +8,13 @@
 #include <imgui.h>
 
 class ContactState : public AState {
+private:
+    struct LicenseInfo{
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> logo;
+        std::string title;
+        std::string text;
+    };
+
 public:
     ContactState() = delete;
     ContactState(LugBench::Application &application);
@@ -22,6 +29,10 @@ private:
     void selectedButtonColorSet();
     void unselectedButtonColorSet();
 
+    void displayAuthorsTab(const ImVec2& contactWindowSize);
+    void displayLicenseTab(const ImVec2& contactWindowSize);
+    void displayContactTab(const ImVec2& contactWindowSize);
+
 private:
     bool _authorsPageActive = true;
     bool _licencePageActive = false;
@@ -29,4 +40,5 @@ private:
 
     std::vector<std::string> _autorNames;
     std::vector<std::string> _autorTitle;
+    std::vector<LicenseInfo> _licenses;
 };

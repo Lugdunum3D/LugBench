@@ -58,6 +58,7 @@ namespace Utilities {
 float getPercentage(float fullSize, float percentage, float minSize = 0);
 float getMainMenuHeight(float windowHeight);
 float getFooterHeight(float windowHeight);
+std::string ReadWholeFile(std::string filename);
 
 } // Utilities
 } // GUI
