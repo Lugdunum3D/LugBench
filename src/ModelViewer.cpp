@@ -30,24 +30,55 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
     // TouchScreen
     {
         if (_eventSource->_touchScreenState.drag
-            && _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::Start) {
-            _lastDragPosition =  _eventSource->_touchScreenState.coordinates[0];
-        }
-        else if (_eventSource->_touchScreenState.drag &&
-            _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::Move) {
+            && _eventSource->_touchScreenState.state ==
+               lug::Window::TouchScreenEvent::GestureState::Start) {
+            _lastDragPosition = _eventSource->_touchScreenState.coordinates[0];
+        } else if (_eventSource->_touchScreenState.drag &&
+                   _eventSource->_touchScreenState.state ==
+                   lug::Window::TouchScreenEvent::GestureState::Move) {
             _lastRotationVelocity = {
                     // TODO (gsabatie): Add a real touch coef
-                _rotationSpeed * (_eventSource->_touchScreenState.coordinates[0].x()  - _lastDragPosition.x()) / 100 * elapsedTime.getSeconds<float>(),
-                _rotationSpeed * (_eventSource->_touchScreenState.coordinates[0].y() - _lastDragPosition.y()) / 100 * elapsedTime.getSeconds<float>()
+                    _rotationSpeed *
+                    (_eventSource->_touchScreenState.coordinates[0].x() - _lastDragPosition.x()) /
+                    100 * elapsedTime.getSeconds<float>(),
+                    _rotationSpeed *
+                    (_eventSource->_touchScreenState.coordinates[0].y() - _lastDragPosition.y()) /
+                    100 * elapsedTime.getSeconds<float>()
             };
 
             // Rotate in world space to freeze the rotation on the X axis
             _model->rotate(_lastRotationVelocity.x(), {0.0f, 1.0f, 0.0f});
-            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            _model->rotate(_lastRotationVelocity.y(), {1.0f, 0.0f, 0.0f},
+                           lug::Graphics::Node::TransformSpace::World);
         } else if (_eventSource->_touchScreenState.drag
-                   && _eventSource->_touchScreenState.state == lug::Window::TouchScreenEvent::GestureState::End) {
-            _lastDragPosition =  {0,0};
+                   && _eventSource->_touchScreenState.state ==
+                      lug::Window::TouchScreenEvent::GestureState::End) {
+            _lastDragPosition = {0, 0};
         }
+
+        if (_eventSource->_touchScreenState.pinch
+            && _eventSource->_touchScreenState.state ==
+               lug::Window::TouchScreenEvent::GestureState::Start) {
+            _lastPinchGap = _eventSource->_touchScreenState.coordinates[1].x() -
+                            _eventSource->_touchScreenState.coordinates[0].x() +
+                            _eventSource->_touchScreenState.coordinates[1].y() -
+                            _eventSource->_touchScreenState.coordinates[0].y();
+        } else if (_eventSource->_touchScreenState.pinch &&
+                   _eventSource->_touchScreenState.state ==
+                   lug::Window::TouchScreenEvent::GestureState::Move) {
+                float zoomFactor = _lastPinchGap - (_eventSource->_touchScreenState.coordinates[1].x() -
+                                   _eventSource->_touchScreenState.coordinates[0].x() +
+                                   _eventSource->_touchScreenState.coordinates[1].y() -
+                                   _eventSource->_touchScreenState.coordinates[0].y());
+
+                    _camera->translate({0.0f, 0.0f, _rotationSpeed * zoomFactor / 100000 *
+                                                    elapsedTime.getMilliseconds<float>()});
+
+            } else if (_eventSource->_touchScreenState.pinch
+                       && _eventSource->_touchScreenState.state ==
+                          lug::Window::TouchScreenEvent::GestureState::End) {
+                _lastPinchGap = 0;
+            }
     }
 
     auto mousePos = _eventSource->getMousePos();
