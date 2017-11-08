@@ -341,7 +341,7 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
                                             ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (((3.f + 25.f) * 3.f) / 2.f));
 #if defined(LUG_SYSTEM_ANDROID)
                                             ImGui::SetCursorPosY(ImGui::GetWindowHeight() - (55.f * 2.f));
-#elif
+#else
                                             ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 55.f);
 #endif
                                             ImGui::Button(ICON_FA_INSTAGRAM, buttonSideLength); ImGui::SameLine();
