@@ -85,9 +85,9 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             float settingsMarginRight = 10.0f;
             float buttonsSpacing = 10.0f;
 #if defined(LUG_SYSTEM_ANDROID)
-            ImVec2 buttonSize{ 30.0f * 2.f, 30.0f  * 2.f };
+            ImVec2 buttonSize{ 60.0f * 1.5f, 60.0f  * 1.5f };
 #else
-            ImVec2 buttonSize{ 30.0f, 30.0f };
+            ImVec2 buttonSize{ 60.0f, 60.0f};
 #endif
             ImVec2 windowRightAlign {
                 windowWidth - buttonSize.x - settingsMarginRight,
@@ -99,7 +99,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             ImGui::SetWindowPos(windowRightAlign);
 
             // Display settings buttons
-            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
             {
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, buttonsSpacing });
