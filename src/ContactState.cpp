@@ -491,17 +491,11 @@ void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
         ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
         {
 #if defined(LUG_SYSTEM_ANDROID)
-            ImVec2 iconSize{100.0f, 100.0f};
+            ImVec2 iconSize{100.0f * 2.f, 100.0f * 2.f };
 #else
             ImVec2 iconSize{100.0f, 100.0f};
 #endif
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + marginTop);
-/*            ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (((3.f + 25.f) * 3.f) / 2.f));
-#if defined(LUG_SYSTEM_ANDROID)
-            ImGui::SetCursorPosY(ImGui::GetWindowHeight() - (55.f * 2.f));
-#else
-            ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 55.f);
-#endif*/
             for (int i = 0; i < static_cast<int>(_contacts.size()); ++i) {
                 ImGui::PushID(i);
                 {
@@ -511,7 +505,7 @@ void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
 
                     float textCentered = ImGui::CalcTextSize(_contacts[i].text.c_str()).y;
                     ImGui::SetCursorPos({iconSize.x + titleMarginLeft, ImGui::GetCursorPosY() + iconSize.y / 2.0f - (textCentered / 2.0f)});
-                    ImGui::Text(_contacts[i].text.c_str());
+                    ImGui::Text("%s", _contacts[i].text.c_str());
                 }
                 ImGui::PopID();
             }
