@@ -5,6 +5,10 @@
 #include <IconsFontAwesome.h>
 
 #include <fstream>
+#if defined(LUG_SYSTEM_ANDROID)
+    #include <android/asset_manager.h>
+    #include <lug/Window/Android/WindowImplAndroid.hpp>
+#endif
 
 static bool displayExtraDeviceInfo = false;
 static bool displayFeatures = false;
@@ -855,6 +859,31 @@ float GUI::Utilities::getFooterHeight(float windowHeight) {
 }
 
 std::string GUI::Utilities::ReadWholeFile(std::string filename) {
+#if defined(LUG_SYSTEM_ANDROID)
+    AAsset *asset = AAssetManager_open((lug::Window::priv::WindowImpl::activity)->assetManager,
+                                       filename.c_str(), AASSET_MODE_STREAMING);
+
+    if (!asset) {
+        LUG_LOG.error("GUI::Utilities::ReadWholeFile Can't open Android asset \"{}\"",
+                      "fonts/fontawesome-webfont.ttf");
+        return "";
+    }
+
+    size_t size = AAsset_getLength(asset);
+
+    if (size <= 0) {
+        LUG_LOG.error("GUI::Utilities::ReadWholeFile Android asset \"{}\" is empty",
+                      "fonts/fontawesome-webfont.ttf");
+        return "";
+    }
+    char *buff(new char[size]);
+
+    AAsset_read(asset, buff, size);
+    AAsset_close(asset);
+    std::string ret(buff);
+    free(buff);
+    return ret;
+#else
     std::string resultBuffer = {};
     std::string line;
     std::ifstream myfile(filename);
@@ -867,4 +896,5 @@ std::string GUI::Utilities::ReadWholeFile(std::string filename) {
         myfile.close();
     }
     return resultBuffer;
+#endif
 }

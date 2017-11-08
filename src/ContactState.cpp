@@ -415,11 +415,11 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
                             ImGui::SameLine();
 
                             ImGui::SetCursorPos({logoSize.x + titleMarginLeft, logoSize.y / 2.0f});
-                            ImGui::Text(_licenses[i].title.c_str());
+                            ImGui::Text("%s", _licenses[i].title.c_str());
                             ImGui::SetCursorPos({ logoSize.x - 10.f, logoSize.y });
                             ImGui::BeginChild("text", textchildWindowSize);
                             {
-                                ImGui::TextWrapped(_licenses[i].text.c_str());
+                                ImGui::TextWrapped("%s", _licenses[i].text.c_str());
                             }
                             ImGui::EndChild();
                         }
