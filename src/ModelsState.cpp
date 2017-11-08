@@ -84,7 +84,11 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
             ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth), windowHeight - (windowHeaderOffset + windowFooterOffset) };
             float settingsMarginRight = 10.0f;
             float buttonsSpacing = 10.0f;
+#if defined(LUG_SYSTEM_ANDROID)
+            ImVec2 buttonSize{ 30.0f * 2.f, 30.0f  * 2.f };
+#else
             ImVec2 buttonSize{ 30.0f, 30.0f };
+#endif
             ImVec2 windowRightAlign {
                 windowWidth - buttonSize.x - settingsMarginRight,
                 (windowHeight / 2) - ((buttonSize.y * 2 + buttonsSpacing) / 2)
@@ -100,11 +104,11 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, buttonsSpacing });
                 {
-                    if (ImGui::Button(ICON_FA_DESKTOP, buttonSize)) {
+                    if (ImGui::Button(ICON_FA_MAGIC, buttonSize)) {
                         const uint32_t currentDisplayMode = static_cast<uint32_t>(_application.getGraphics().getRenderer()->getDisplayMode());
                         _application.getGraphics().getRenderer()->setDisplayMode(static_cast<::lug::Graphics::Renderer::DisplayMode>(currentDisplayMode == 0 ? 7 : currentDisplayMode - 1));
                     }
-                    if (ImGui::Button(ICON_FA_TWITTER, buttonSize)) {
+                    if (ImGui::Button(ICON_FA_MAP, buttonSize)) {
                         _displaySkyBox = !_displaySkyBox;
                         if (!loadModelSkyBox(*_selectedModel)) {
                             success = false;
