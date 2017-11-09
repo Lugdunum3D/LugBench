@@ -38,7 +38,8 @@ private:
     bool _licencePageActive = false;
     bool _contactPageActive = false;
 
-    std::vector<std::string> _autorNames;
-    std::vector<std::string> _autorTitle;
+    std::vector<std::string> _authorNames;
+    std::vector<std::string> _authorTitle;
+    std::vector<std::string> _authorEmails;
     std::vector<LicenseInfo> _licenses;
 };

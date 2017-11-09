@@ -18,15 +18,15 @@
 
 ContactState::ContactState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
-    _autorNames.push_back("Yoann Long"); _autorTitle.push_back("Co-Founder & Project Lead");
-    _autorNames.push_back("Quentin Buathier"); _autorTitle.push_back("Co-Founder & CTO");
-    _autorNames.push_back("Nicolas Comte"); _autorTitle.push_back("Co-Founder & PR Manager");
-    _autorNames.push_back("Antoine Bolvy"); _autorTitle.push_back("Co-Founder & Graphics Programmer");
-    _autorNames.push_back("Corentin Chardeau"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Guillaume Labey"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Guillaume Sabatier"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Yoann Picquenot"); _autorTitle.push_back("Co-Founder");
-    _autorNames.push_back("Stuart Sulaski"); _autorTitle.push_back("Co-Founder");
+    _authorNames.push_back("Yoann Long"); _authorTitle.push_back("Co-Founder & Project Lead"); _authorEmails.push_back("yoann.long@epitech.eu");
+    _authorNames.push_back("Quentin Buathier"); _authorTitle.push_back("Co-Founder & CTO"); _authorEmails.push_back("quentin.buathier@epitech.eu");
+    _authorNames.push_back("Nicolas Comte"); _authorTitle.push_back("Co-Founder & PR Manager"); _authorEmails.push_back("nicolas.comte@epitech.eu");
+    _authorNames.push_back("Antoine Bolvy"); _authorTitle.push_back("Co-Founder & Graphics Programmer"); _authorEmails.push_back("antoine.bolvy@epitech.eu");
+    _authorNames.push_back("Corentin Chardeau"); _authorTitle.push_back("Co-Founder"); _authorEmails.push_back("corentin.chardeau@epitech.eu");
+    _authorNames.push_back("Guillaume Labey"); _authorTitle.push_back("Co-Founder"); _authorEmails.push_back("guillaume.labey@epitech.eu");
+    _authorNames.push_back("Guillaume Sabatier"); _authorTitle.push_back("Co-Founder"); _authorEmails.push_back("guillaume.sabatier@epitech.eu");
+    _authorNames.push_back("Yoann Picquenot"); _authorTitle.push_back("Co-Founder"); _authorEmails.push_back("yoann.picquenot@epitech.eu");
+    _authorNames.push_back("Stuart Sulaski"); _authorTitle.push_back("Co-Founder"); _authorEmails.push_back("stuart.sulaski@epitech.eu");
    _licenses.push_back({
         /* logo */ _application._licenceLogo,
         /* title */"Apache",
@@ -281,7 +281,7 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
                     childWindowSize.x = uiSize.x - (childSpacing * 2.f);
                 }
 #endif
-                for (int i = 0; i < static_cast<int>(_autorNames.size()); ++i)
+                for (int i = 0; i < static_cast<int>(_authorNames.size()); ++i)
                 {
                     ImGui::PushID(i);
                     {
@@ -311,27 +311,25 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
                         }
 #endif
 
-                        ImGui::BeginGroup();
-                        {
                             // First window
                             ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
                             ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_LIGHTBLUE);
-                            ImGui::BeginChild("Author 1", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                            ImGui::BeginChild("Author 1", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoInputs);
                             {
                                 ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 3.f, 1.f });
                                 {
                                     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
                                     {
-                                        float text1Centered = ImGui::CalcTextSize(_autorNames[i].c_str()).x;
+                                        float text1Centered = ImGui::CalcTextSize(_authorNames[i].c_str()).x;
                                         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text1Centered / 2.f));
-                                        ImGui::Text("%s", _autorNames[i].c_str());
+                                        ImGui::Text("%s", _authorNames[i].c_str());
                                     }
                                     ImGui::PopFont();
                                     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                                     {
-                                        float text1Centered = ImGui::CalcTextSize(_autorTitle[i].c_str()).x;
-                                        ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text1Centered / 2.f));
-                                        ImGui::Text("%s", _autorTitle[i].c_str());
+                                        float text2Centered = ImGui::CalcTextSize(_authorTitle[i].c_str()).x;
+                                        ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text2Centered / 2.f));
+                                        ImGui::Text("%s", _authorTitle[i].c_str());
                                     }
                                     ImGui::PopFont();
                                     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
@@ -344,9 +342,12 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
 #else
                                             ImGui::SetCursorPosY(ImGui::GetWindowHeight() - 55.f);
 #endif
-                                            ImGui::Button(ICON_FA_INSTAGRAM, buttonSideLength); ImGui::SameLine();
-                                            ImGui::Button(ICON_FA_TWITTER, buttonSideLength); ImGui::SameLine();
-                                            ImGui::Button(ICON_FA_FACEBOOK, buttonSideLength);
+                                            float text2Centered = ImGui::CalcTextSize(_authorEmails[i].c_str()).x;
+                                            ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text2Centered / 2.f));
+                                            ImGui::Text("%s", _authorEmails[i].c_str());
+//                                            ImGui::Button(ICON_FA_INSTAGRAM, buttonSideLength); ImGui::SameLine();
+//                                            ImGui::Button(ICON_FA_TWITTER, buttonSideLength); ImGui::SameLine();
+//                                            ImGui::Button(ICON_FA_FACEBOOK, buttonSideLength);
                                         }
                                         ImGui::PopStyleColor();
                                     }
@@ -356,8 +357,6 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
                             }
                             ImGui::EndChild();
                             ImGui::PopStyleColor(2);
-                        }
-                        ImGui::EndGroup();
                     }
                     ImGui::PopID();
                 }
@@ -408,7 +407,7 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
                     {
                         ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
                         ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
-                        ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                        ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoInputs);
                         {
                             auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_licenses[i].logo);
                             ImGui::Image(vkTexture.get(), logoSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
