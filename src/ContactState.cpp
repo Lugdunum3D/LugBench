@@ -344,7 +344,7 @@ void ContactState::displayAuthorsTab(const ImVec2& contactWindowSize) {
 #endif
                                             float text2Centered = ImGui::CalcTextSize(_authorEmails[i].c_str()).x;
                                             ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (text2Centered / 2.f));
-                                            ImGui::Text(_authorEmails[i].c_str());
+                                            ImGui::Text("%s", _authorEmails[i].c_str());
 //                                            ImGui::Button(ICON_FA_INSTAGRAM, buttonSideLength); ImGui::SameLine();
 //                                            ImGui::Button(ICON_FA_TWITTER, buttonSideLength); ImGui::SameLine();
 //                                            ImGui::Button(ICON_FA_FACEBOOK, buttonSideLength);
