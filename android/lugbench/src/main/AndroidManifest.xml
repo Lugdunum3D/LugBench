@@ -3,7 +3,7 @@
     package="eu.lugbench">
 
     <application android:label="@string/app_name"
-        android:icon="@mipmap/ic_lugdunum"
+        android:icon="@mipmap/ic_lugbench"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
         <activity android:name="android.app.NativeActivity"
