@@ -15,6 +15,11 @@ private:
         std::string text;
     };
 
+    struct ContactInfo{
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> logo;
+        std::string text;
+    };
+
 public:
     ContactState() = delete;
     ContactState(LugBench::Application &application);
@@ -41,4 +46,5 @@ private:
     std::vector<std::string> _autorNames;
     std::vector<std::string> _autorTitle;
     std::vector<LicenseInfo> _licenses;
+    std::vector<ContactInfo> _contacts;
 };
