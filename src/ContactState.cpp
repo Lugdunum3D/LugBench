@@ -407,7 +407,7 @@ void ContactState::displayLicenseTab(const ImVec2& contactWindowSize) {
                     {
                         ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
                         ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
-                        ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
+                        ImGui::BeginChild("License", childWindowSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoInputs);
                         {
                             auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_licenses[i].logo);
                             ImGui::Image(vkTexture.get(), logoSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
