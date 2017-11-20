@@ -72,42 +72,58 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
     uint16_t windowHeight = window->getHeight();
     uint16_t windowWidth = window->getWidth();
-    float windowHeaderOffset = GUI::displayMenu(_application);
-    float windowFooterOffset = GUI::displayFooter(_application);
+    float windowHeaderOffset = 0;
+    float windowFooterOffset = 0;
+
+    if (!_displayFullscreen) {
+        windowHeaderOffset = GUI::displayMenu(_application);
+        windowFooterOffset = GUI::displayFooter(_application);
+    }
 
     _cameraMover.onFrame(elapsedTime);
 
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, {0.0f, 0.0f, 0.0f, 0.0f});
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
     {
-        ImGui::Begin("Render settings", 0, _application._window_flags);
+        ImGui::Begin("Render settings", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
         {
-            ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth), windowHeight - (windowHeaderOffset + windowFooterOffset) };
-            float settingsMarginRight = 10.0f;
+            ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth - getModelMenuWidth(windowWidth)), windowHeight - (windowHeaderOffset + windowFooterOffset) };
+            float settingsMarginBottom = 10.0f;
             float buttonsSpacing = 10.0f;
 #if defined(LUG_SYSTEM_ANDROID)
             ImVec2 buttonSize{ 60.0f * 1.5f, 60.0f  * 1.5f };
 #else
-            ImVec2 buttonSize{ 60.0f, 60.0f};
+            ImVec2 buttonSize{ 60.0f, 60.0f };
 #endif
-            ImVec2 windowRightAlign {
-                windowWidth - buttonSize.x - settingsMarginRight,
-                (windowHeight / 2) - ((buttonSize.y * 2 + buttonsSpacing) / 2)
+            ImVec2 windowPos{
+                getModelMenuWidth(windowWidth), windowHeaderOffset
             };
 
             // Setup window
             ImGui::SetWindowSize(modelSettingsWindowSize);
-            ImGui::SetWindowPos(windowRightAlign);
+            ImGui::SetWindowPos(windowPos);
 
+            ImVec2 buttonBottomAlign{
+                (ImGui::GetWindowWidth() / 2.f) - (buttonSize.y + buttonsSpacing),
+                ImGui::GetWindowHeight() - buttonSize.y - settingsMarginBottom
+            };
+
+            ImGui::SetCursorPos(buttonBottomAlign);
             // Display settings buttons
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
             {
                 ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.f);
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.0f, buttonsSpacing });
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ buttonsSpacing, 0.f });
                 {
+                    if (ImGui::Button(ICON_FA_ARROWS_ALT, buttonSize)) {
+                        _displayFullscreen = !_displayFullscreen;
+                        handleResize();
+                    }
+                    ImGui::SameLine();
                     if (ImGui::Button(ICON_FA_MAGIC, buttonSize)) {
                         const uint32_t currentDisplayMode = static_cast<uint32_t>(_application.getGraphics().getRenderer()->getDisplayMode());
                         _application.getGraphics().getRenderer()->setDisplayMode(static_cast<::lug::Graphics::Renderer::DisplayMode>(currentDisplayMode == 0 ? 7 : currentDisplayMode - 1));
                     }
+                    ImGui::SameLine();
                     if (ImGui::Button(ICON_FA_MAP, buttonSize)) {
                         _displaySkyBox = !_displaySkyBox;
                         if (!loadModelSkyBox(*_selectedModel)) {
@@ -123,62 +139,64 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     }
     ImGui::PopStyleColor();
 
-    ImGui::Begin("Model Select Menu", 0, _application._window_flags);
-    {
-        float modelMenuWidth = getModelMenuWidth(windowWidth);
-
-        ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
-
-        ImGui::SetWindowSize(modelMenuSize);
-        ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
-        ImGui::SetWindowFontScale(0.67f);
-
+    if (!_displayFullscreen) {
+        ImGui::Begin("Model Select Menu", 0, _application._window_flags);
         {
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
-            {
+            float modelMenuWidth = getModelMenuWidth(windowWidth);
 
-                float buttonWidth = ImGui::GetWindowWidth();
+            ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
+
+            ImGui::SetWindowSize(modelMenuSize);
+            ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
+            ImGui::SetWindowFontScale(0.67f);
+
+            {
+                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+                {
+
+                    float buttonWidth = ImGui::GetWindowWidth();
 #if defined(LUG_SYSTEM_ANDROID)
-                float buttonHeight = 80.f * 2.75f;
+                    float buttonHeight = 80.f * 2.75f;
 #else
-                float buttonHeight = 80.f;
+                    float buttonHeight = 80.f;
 #endif
 
-                for (auto& model: _models) {
-                    // Selected style
-                    if (_selectedModel == &model) {
-                        pushButtonsStyle(
-                            GUI::V4_SKYBLUE,
-                            GUI::V4_SKYBLUE,
-                            GUI::V4_SKYBLUE,
-                            GUI::V4_DARKGRAY
-                        );
-                    }
-                    // Unselected style
-                    else {
-                        pushButtonsStyle(
-                            GUI::V4_WHITE,
-                            GUI::V4_SKYBLUE,
-                            GUI::V4_SKYBLUE,
-                            GUI::V4_DARKGRAY
-                        );
-                    }
-
-                    if (ImGui::Button(model.name.c_str(), ImVec2{ buttonWidth, buttonHeight })) {
-                        if (!loadModel(model)) {
-                            // Don't return false directly or it will make ImGui crash
-                            // (Because we need to pop styles and call ImGui::End)
-                            success = false;
+                    for (auto& model : _models) {
+                        // Selected style
+                        if (_selectedModel == &model) {
+                            pushButtonsStyle(
+                                GUI::V4_SKYBLUE,
+                                GUI::V4_SKYBLUE,
+                                GUI::V4_SKYBLUE,
+                                GUI::V4_DARKGRAY
+                            );
                         }
-                    }
+                        // Unselected style
+                        else {
+                            pushButtonsStyle(
+                                GUI::V4_WHITE,
+                                GUI::V4_SKYBLUE,
+                                GUI::V4_SKYBLUE,
+                                GUI::V4_DARKGRAY
+                            );
+                        }
 
-                    ImGui::PopStyleColor(4);
+                        if (ImGui::Button(model.name.c_str(), ImVec2{ buttonWidth, buttonHeight })) {
+                            if (!loadModel(model)) {
+                                // Don't return false directly or it will make ImGui crash
+                                // (Because we need to pop styles and call ImGui::End)
+                                success = false;
+                            }
+                        }
+
+                        ImGui::PopStyleColor(4);
+                    }
                 }
+                ImGui::PopStyleVar();
             }
-            ImGui::PopStyleVar();
         }
+        ImGui::End();
     }
-    ImGui::End();
 
     return success;
 }
@@ -200,13 +218,13 @@ bool ModelsState::loadModel(const ModelInfos& model) {
     }
 
     if (model.rotation.x()) {
-        modelNode->rotate(model.rotation.x(), {1.0f, 0.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        modelNode->rotate(model.rotation.x(), { 1.0f, 0.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
     }
     if (model.rotation.y()) {
-        modelNode->rotate(model.rotation.y(), {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+        modelNode->rotate(model.rotation.y(), { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
     }
     if (model.rotation.z()) {
-        modelNode->rotate(model.rotation.z(), {0.0f, 0.0f, 1.0f}, lug::Graphics::Node::TransformSpace::World);
+        modelNode->rotate(model.rotation.z(), { 0.0f, 0.0f, 1.0f }, lug::Graphics::Node::TransformSpace::World);
     }
 
     // Attach directional light to the root node
@@ -331,11 +349,18 @@ void ModelsState::pushButtonsStyle(
 }
 
 float ModelsState::getModelMenuWidth(float windowWidth) {
+    if (_displayFullscreen)
+    {
+        return 0.f;
+    }
+    else
+    {
 #if defined(LUG_SYSTEM_ANDROID)
-        return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
+    return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f * 2.75f);
 #else
-        return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
+    return GUI::Utilities::getPercentage(windowWidth, 0.125f, 165.f);
 #endif
+    }
 }
 
 void ModelsState::handleResize() {
@@ -347,9 +372,20 @@ void ModelsState::handleResize() {
 
     LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
 
-    renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
-    renderViews[0]->getInfo().viewport.extent.height = 1.0f - mainMenuHeight / window->getHeight();
-    renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
-    renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
-    renderViews[0]->update();
+    if (_displayFullscreen)
+    {
+        renderViews[0]->getInfo().viewport.extent.width = 1.0f;
+        renderViews[0]->getInfo().viewport.extent.height = 1.0f;
+        renderViews[0]->getInfo().viewport.offset.x = 0;
+        renderViews[0]->getInfo().viewport.offset.y = 0;
+        renderViews[0]->update();
+    }
+    else
+    {
+        renderViews[0]->getInfo().viewport.extent.width = 1.0f - modelMenuWidth / window->getWidth();
+        renderViews[0]->getInfo().viewport.extent.height = 1.0f - mainMenuHeight / window->getHeight();
+        renderViews[0]->getInfo().viewport.offset.x = modelMenuWidth / window->getWidth();
+        renderViews[0]->getInfo().viewport.offset.y = mainMenuHeight / window->getHeight();
+        renderViews[0]->update();
+    }
 }

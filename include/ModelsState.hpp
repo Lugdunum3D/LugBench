@@ -52,6 +52,7 @@ private:
     std::vector<ModelInfos> _models;
     std::unordered_map<std::string, SkyBoxInfo> _skyBoxes;
     bool _displaySkyBox{true};
+    bool _displayFullscreen{false};
 
     const ModelInfos* _selectedModel{nullptr};
 };
