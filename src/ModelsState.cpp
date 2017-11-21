@@ -52,8 +52,7 @@ bool ModelsState::onPush() {
 
     return _loadingAnimation.init(
         /* application */ _application,
-        /* loaderImage */ "textures/loader.png",
-        /* size */ {100.0f, 100.0f},
+        /* size */ {200.0f, 50.0f},
         /* offset */ {ModelsState::getModelMenuWidth(windowWidth) / 2.0f, 0.0f}
     );
 }
