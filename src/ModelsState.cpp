@@ -227,6 +227,17 @@ bool ModelsState::loadModel(ModelInfos& model) {
     // Load scene
     _lockCamera = true;
     _loadingAnimation.display(true);
+
+    // Remove camera before loading model
+    {
+        lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+        auto& renderViews = renderer->getWindow()->getRenderViews();
+
+        LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+        renderViews[0]->attachCamera(nullptr);
+    }
+
     std::thread loadModelThread([&]{
         lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
         model.sceneResource = renderer->getResourceManager()->loadFile(model.path);
