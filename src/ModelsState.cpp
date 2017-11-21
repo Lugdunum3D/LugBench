@@ -61,7 +61,6 @@ bool ModelsState::onPop() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
-    _scene = nullptr;
     return true;
 }
 
@@ -235,9 +234,9 @@ bool ModelsState::loadModel(ModelInfos& model) {
             return false;
         }
 
-        _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
 
-        auto modelNode = _scene->getSceneNode(model.modelNodeName);
+        auto modelNode = scene->getSceneNode(model.modelNodeName);
         if (!modelNode) {
             LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
             return false;
@@ -259,7 +258,7 @@ bool ModelsState::loadModel(ModelInfos& model) {
                 return false;
             }
 
-            _scene->getRoot().attachLight(light);
+            scene->getRoot().attachLight(light);
         }
 
         // Attach ambient light to the root node
@@ -275,13 +274,13 @@ bool ModelsState::loadModel(ModelInfos& model) {
                 return false;
             }
 
-            _scene->getRoot().attachLight(light);
+            scene->getRoot().attachLight(light);
         }
 
         // Attach camera
         {
-            lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
-            _scene->getRoot().attachChild(*node);
+            lug::Graphics::Scene::Node* node = scene->createSceneNode("camera");
+            scene->getRoot().attachChild(*node);
 
             // Attach skyBox
             if (!loadModelSkyBox(model)) {
@@ -349,11 +348,12 @@ bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
             }
         }
 
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
         if (_displaySkyBox) {
-            _scene->setSkyBox(skyBox->second.resource);
+            scene->setSkyBox(skyBox->second.resource);
         }
         else {
-            _scene->setSkyBox(nullptr);
+            scene->setSkyBox(nullptr);
         }
     }
 

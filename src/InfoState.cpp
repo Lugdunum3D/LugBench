@@ -42,7 +42,6 @@ bool InfoState::onPop() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
-    _scene = nullptr;
     return true;
 }
 
