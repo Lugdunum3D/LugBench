@@ -76,7 +76,7 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
     });
     _contacts.push_back({
         /* logo */ _application._messageIcon,
-        /* text */"mail@mail.com"
+        /* text */"lugdunum_2018@labeip.epitech.eu"
     });
     _contacts.push_back({
         /* logo */ _application._twitterLogo,
@@ -473,7 +473,7 @@ void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
             {
                 ImGui::SetCursorPosX(marginLeft);
-                ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, Lorem ipsum dolor sit amet, consectetur adipiscing elit, ");
+                ImGui::TextWrapped("You can get in touch with us through these different channels");
             }
             ImGui::PopFont();
         }
