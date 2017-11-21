@@ -217,18 +217,25 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     return success;
 }
 
-bool ModelsState::loadModel(const ModelInfos& model) {
+bool ModelsState::loadModel(ModelInfos& model) {
+    _selectedModel = &model;
+
+    // The model has already been loaded
+    if (model.sceneResource) {
+        return true;
+    }
+
     // Load scene
     _lockCamera = true;
     _loadingAnimation.display(true);
     std::thread loadModelThread([&]{
         lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
-        if (!sceneResource) {
+        model.sceneResource = renderer->getResourceManager()->loadFile(model.path);
+        if (!model.sceneResource) {
             return false;
         }
 
-        _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+        _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
 
         auto modelNode = _scene->getSceneNode(model.modelNodeName);
         if (!modelNode) {
@@ -312,7 +319,6 @@ bool ModelsState::loadModel(const ModelInfos& model) {
     });
 
     loadModelThread.detach();
-    _selectedModel = &model;
 
     return true;
 }

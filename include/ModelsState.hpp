@@ -20,6 +20,7 @@ private:
         std::string modelNodeName;
         std::string skyboxName;
         lug::Math::Vec2f rotation{0.0f, 0.0f};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource{nullptr};
     };
     struct SkyBoxInfo{
         std::string positiveXFile;
@@ -44,7 +45,7 @@ public:
     static float getModelMenuWidth(float windowWidth);
 
 private:
-    bool loadModel(const ModelInfos& model);
+    bool loadModel(ModelInfos& model);
     bool loadModelSkyBox(const ModelInfos& model);
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
     void handleResize();
