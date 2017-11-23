@@ -104,7 +104,9 @@ bool Application::init(int argc, char* argv[]) {
     // Call this function only AFTER setting up your fonts
     static_cast<lug::Graphics::Vulkan::Render::Window*>(renderer->getWindow())->initGui();
 
-    loadImages(renderer);
+    if (!loadImages(renderer)) {
+        return false;
+    }
 
     std::shared_ptr<AState> menuState;
 
@@ -348,6 +350,21 @@ bool Application::loadImages(lug::Graphics::Renderer* renderer) {
         _infoDeviceLogo = buildImage(renderer, "textures/info_device_logo.png");
         if (!_infoDeviceLogo) {
             LUG_LOG.error("Application: Can't create the vulkan_logo texture");
+            return false;
+        }
+        _twitterLogo = buildImage(renderer, "textures/twitter_logo.png");
+        if (!_twitterLogo) {
+            LUG_LOG.error("Application: Can't create the twitter_Logo texture");
+            return false;
+        }
+        _githubLogo = buildImage(renderer, "textures/github_logo.png");
+        if (!_githubLogo) {
+            LUG_LOG.error("Application: Can't create the github_Logo texture");
+            return false;
+        }
+        _messageIcon = buildImage(renderer, "textures/message_icon.png");
+        if (!_messageIcon) {
+            LUG_LOG.error("Application: Can't create the message_icon texture");
             return false;
         }
     }

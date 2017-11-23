@@ -69,6 +69,19 @@ ContactState::ContactState(LugBench::Application &application) : AState(applicat
         /* text */ ""
     });
     _licenses.back().text = GUI::Utilities::ReadWholeFile("licences/lugdunum3d-licence.txt");
+
+    _contacts.push_back({
+        /* logo */ _application._githubLogo,
+        /* text */"github.com/Lugdunum3D"
+    });
+    _contacts.push_back({
+        /* logo */ _application._messageIcon,
+        /* text */"lugdunum_2018@labeip.epitech.eu"
+    });
+    _contacts.push_back({
+        /* logo */ _application._twitterLogo,
+        /* text */"twitter.com/Lugdunum3D"
+    });
 }
 
 ContactState::~ContactState() {
@@ -444,9 +457,27 @@ void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
 #else
     float leftSectionWidth = GUI::Utilities::getPercentage(contactWindowSize.x, 0.33f, 290.f);
 #endif
+
+    float marginTop = 50.0f;
     ImGui::BeginChild("Left Section", ImVec2{ leftSectionWidth, contactWindowSize.y - 15.f});
     {
-        ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+        float marginLeft = 10.0f;
+        ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
+        {
+            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+            {
+                ImGui::SetCursorPos({marginLeft, ImGui::GetCursorPosY() + marginTop});
+                ImGui::Text("Contact us");
+            }
+            ImGui::PopFont();
+            ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+            {
+                ImGui::SetCursorPosX(marginLeft);
+                ImGui::TextWrapped("You can get in touch with us through these different channels");
+            }
+            ImGui::PopFont();
+        }
+        ImGui::PopStyleColor();
     }
     ImGui::EndChild();
     ImGui::SameLine();
@@ -455,7 +486,30 @@ void ContactState::displayContactTab(const ImVec2& contactWindowSize) {
     rightSectionWidth = contactWindowSize.x - (leftSectionWidth + 10.f);
     ImGui::BeginChild("Right Section", ImVec2{ rightSectionWidth, contactWindowSize.y - 15.f});
     {
-        ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+        float titleMarginLeft = 30.0f;
+        ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_SKYBLUE);
+        {
+#if defined(LUG_SYSTEM_ANDROID)
+            ImVec2 iconSize{100.0f * 2.f, 100.0f * 2.f };
+#else
+            ImVec2 iconSize{100.0f, 100.0f};
+#endif
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + marginTop);
+            for (int i = 0; i < static_cast<int>(_contacts.size()); ++i) {
+                ImGui::PushID(i);
+                {
+                    auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_contacts[i].logo);
+                    ImGui::Image(vkTexture.get(), iconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                    ImGui::SameLine();
+
+                    float textCentered = ImGui::CalcTextSize(_contacts[i].text.c_str()).y;
+                    ImGui::SetCursorPos({iconSize.x + titleMarginLeft, ImGui::GetCursorPosY() + iconSize.y / 2.0f - (textCentered / 2.0f)});
+                    ImGui::Text("%s", _contacts[i].text.c_str());
+                }
+                ImGui::PopID();
+            }
+        }
+        ImGui::PopStyleColor();
     }
     ImGui::EndChild();
 }

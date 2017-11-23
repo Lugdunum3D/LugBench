@@ -165,6 +165,9 @@ set(OTHER_RESOURCES
     textures/lugbench-short.png
     textures/lugdunum-short.png
     textures/info_device_logo.png
+    textures/message_icon.png
+    textures/twitter_logo.png
+    textures/github_logo.png
     licences/apache-licence.txt
     licences/fmt-licence.txt
     licences/freetype-licence.txt
