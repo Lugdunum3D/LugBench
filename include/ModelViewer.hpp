@@ -42,6 +42,7 @@ private:
     lug::Math::Vec2f _rotation{0.0f, 0.0f};
 
     float _zoomUpdate{0.0f};
+    bool _isMousePressed{false};
 
     lug::Math::Vec2i _lastMousePos{0, 0};
 

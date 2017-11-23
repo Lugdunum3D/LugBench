@@ -86,6 +86,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     uint16_t windowWidth = window->getWidth();
     float windowHeaderOffset = 0;
     float windowFooterOffset = 0;
+    float modelMenuWidth = getModelMenuWidth(windowWidth);
 
     if (!_displayFullscreen) {
         windowHeaderOffset = GUI::displayMenu(_application);
@@ -104,9 +105,8 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
     {
-        ImGui::Begin("Render settings", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+        ImGui::Begin("Render settings", 0, _application._window_flags);
         {
-            ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth - getModelMenuWidth(windowWidth)), windowHeight - (windowHeaderOffset + windowFooterOffset) };
             float settingsMarginBottom = 10.0f;
             float buttonsSpacing = 10.0f;
 #if defined(LUG_SYSTEM_ANDROID)
@@ -114,20 +114,17 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 #else
             ImVec2 buttonSize{ 60.0f, 60.0f };
 #endif
-            ImVec2 windowPos{
-                getModelMenuWidth(windowWidth), windowHeaderOffset
+            ImVec2 modelSettingsWindowSize = ImVec2{ buttonSize.x * 3.0f + buttonsSpacing * 2.0f, buttonSize.y};
+            ImVec2 buttonBottomAlign{
+                modelMenuWidth + (windowWidth - modelMenuWidth) / 2.0f - modelSettingsWindowSize.x / 2.0f,
+                static_cast<float>(windowHeight) - buttonSize.y - settingsMarginBottom
             };
 
             // Setup window
             ImGui::SetWindowSize(modelSettingsWindowSize);
-            ImGui::SetWindowPos(windowPos);
+            ImGui::SetWindowPos(buttonBottomAlign);
 
-            ImVec2 buttonBottomAlign{
-                (ImGui::GetWindowWidth() / 2.f) - (buttonSize.y + buttonsSpacing),
-                ImGui::GetWindowHeight() - buttonSize.y - settingsMarginBottom
-            };
 
-            ImGui::SetCursorPos(buttonBottomAlign);
             // Display settings buttons
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
             {
@@ -162,8 +159,6 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     if (!_displayFullscreen) {
         ImGui::Begin("Model Select Menu", 0, _application._window_flags);
         {
-            float modelMenuWidth = getModelMenuWidth(windowWidth);
-
             ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
             ImGui::SetWindowSize(modelMenuSize);
@@ -218,7 +213,6 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         _loadingAnimation.update(elapsedTime);
         ImGui::End();
     }
-
 
     return success;
 }
