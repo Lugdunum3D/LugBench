@@ -151,6 +151,7 @@ set(OTHER_RESOURCES
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
     fonts/Roboto-Light.ttf
+    textures/loading_dot.png
     textures/epitech_logo.png
     textures/epitech_color_logo.png
     textures/gltf_logo.png

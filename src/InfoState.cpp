@@ -415,7 +415,7 @@ bool InfoState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                         ImGui::Unindent();
                                     }
                                 }
-                                ImGui::Unindent();                            
+                                ImGui::Unindent();
                             }
                             ImGui::PopStyleVar();
                         }

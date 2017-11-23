@@ -52,7 +52,8 @@ bool ModelsState::onPush() {
 
     return _loadingAnimation.init(
         /* application */ _application,
-        /* size */ {200.0f, 50.0f},
+        /* loadingDotImage */ "textures/loading_dot.png",
+        /* size */ {16.0f, 16.0f},
         /* offset */ {ModelsState::getModelMenuWidth(windowWidth) / 2.0f, 0.0f}
     );
 }
