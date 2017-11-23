@@ -46,7 +46,7 @@ private:
     lug::Math::Vec2i _lastMousePos{0, 0};
 
     float _lastPinchGap = 0;
-    
+
     lug::Math::Vec2f _lastDragPosition{0,0};
     lug::Math::Vec2f _lastRotationVelocity{0, 0};
     lug::Math::Vec2f _rotationVelocity{0.0f, 0.0f};

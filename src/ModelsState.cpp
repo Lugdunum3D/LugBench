@@ -19,21 +19,25 @@
 
 #include <IconsFontAwesome.h>
 
+std::vector<ModelsState::ModelInfos> ModelsState::_models = {
+    // { name, path, modelNodeName, skyboxName, rotation }
+    { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
+    { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} }
+};
+std::unordered_map<std::string, ModelsState::SkyBoxInfo> ModelsState::_skyBoxes = {
+    {
+        "default", {
+            "textures/Road_to_MonumentValley/Background.jpg",
+            "textures/Road_to_MonumentValley/Environnement.hdr"
+        }
+    }
+};
+
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
-    _skyBoxes["default"] = {
-        "textures/Road_to_MonumentValley/Background.jpg",
-        "textures/Road_to_MonumentValley/Environnement.hdr"
-    };
-    _models = {
-        // { name, path, modelNodeName, skyboxName, rotation }
-        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
-        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} }
-    };
 }
 
-ModelsState::~ModelsState() {
-}
+ModelsState::~ModelsState() {}
 
 bool ModelsState::onPush() {
     _application.setCurrentState(State::MODELS);
@@ -62,7 +66,7 @@ bool ModelsState::onPop() {
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
-    if (!_lockCamera) {
+    if (!_loadingModel) {
         _cameraMover.onEvent(event);
     }
 
@@ -88,7 +92,13 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
         windowFooterOffset = GUI::displayFooter(_application);
     }
 
-    if (!_lockCamera) {
+    if (_selectedModel->sceneResource && _loadingModel) {
+        _loadingModel = false;
+        _loadingAnimation.display(false);
+        attachCameraToMover();
+    }
+
+    if (!_loadingModel) {
         _cameraMover.onFrame(elapsedTime);
     }
 
@@ -136,7 +146,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     if (ImGui::Button(ICON_FA_MAP, buttonSize)) {
                         _displaySkyBox = !_displaySkyBox;
-                        if (!loadModelSkyBox(*_selectedModel)) {
+                        if (!loadModelSkyBox(*_selectedModel, _selectedModel->sceneResource, _application.getGraphics().getRenderer(), _displaySkyBox)) {
                             success = false;
                         }
                     }
@@ -213,16 +223,26 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     return success;
 }
 
+void ModelsState::attachCameraToMover() {
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(_selectedModel->sceneResource);
+    lug::Graphics::Scene::Node* node = scene->getRoot().getNode("camera");
+
+    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+    _cameraMover.setTargetNode(*node);
+    _cameraMover.setEventSource(*renderer->getWindow());
+}
+
 bool ModelsState::loadModel(ModelInfos& model) {
     _selectedModel = &model;
 
     // The model has already been loaded
     if (model.sceneResource) {
+        attachCameraToMover();
         return true;
     }
 
     // Load scene
-    _lockCamera = true;
+    _loadingModel = true;
     _loadingAnimation.display(true);
 
     // Remove camera before loading model
@@ -237,20 +257,20 @@ bool ModelsState::loadModel(ModelInfos& model) {
 
     std::thread loadModelThread([&]{
         lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-        model.sceneResource = renderer->getResourceManager()->loadFile(model.path);
-        if (!model.sceneResource) {
+        bool displaySkybox = _displaySkyBox;
+        auto camera = _application.getCamera();
+        auto sceneResource = renderer->getResourceManager()->loadFile(model.path);
+        if (!sceneResource) {
             return false;
         }
 
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
 
         auto modelNode = scene->getSceneNode(model.modelNodeName);
         if (!modelNode) {
             LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
             return false;
         }
-
-        _cameraMover.rotate(model.rotation.x(), model.rotation.y());
 
         // Attach directional light to the root node
         {
@@ -291,22 +311,16 @@ bool ModelsState::loadModel(ModelInfos& model) {
             scene->getRoot().attachChild(*node);
 
             // Attach skyBox
-            if (!loadModelSkyBox(model)) {
+            if (!loadModelSkyBox(model, sceneResource, renderer, displaySkybox)) {
                 return false;
             }
 
-            node->attachCamera(_application.getCamera());
+            node->attachCamera(camera);
 
             // Set initial position of the camera
             node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
             // Look at once
             node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-
-            // Attach the camera node to the mover
-            {
-                _cameraMover.setTargetNode(*node);
-                _cameraMover.setEventSource(*renderer->getWindow());
-            }
 
             // Attach camera to RenderView
             {
@@ -314,11 +328,10 @@ bool ModelsState::loadModel(ModelInfos& model) {
 
                 LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
 
-                renderViews[0]->attachCamera(_application.getCamera());
+                renderViews[0]->attachCamera(camera);
             }
 
-            _lockCamera = false;
-            _loadingAnimation.display(false);
+            model.sceneResource = sceneResource;
         }
 
 
@@ -330,9 +343,12 @@ bool ModelsState::loadModel(ModelInfos& model) {
     return true;
 }
 
-bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-
+bool ModelsState::loadModelSkyBox(
+    const ModelInfos& model,
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource,
+    lug::Graphics::Renderer* renderer,
+    bool displaySkyBox
+) {
     if (model.skyboxName.size()) {
         auto skyBox = _skyBoxes.find(model.skyboxName);
         if (skyBox == _skyBoxes.end()) {
@@ -354,8 +370,8 @@ bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
             }
         }
 
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(model.sceneResource);
-        if (_displaySkyBox) {
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+        if (displaySkyBox) {
             scene->setSkyBox(skyBox->second.resource);
         }
         else {

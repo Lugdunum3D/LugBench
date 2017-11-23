@@ -28,6 +28,10 @@ private:
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> resource{nullptr};
     };
 
+private:
+    static std::vector<ModelInfos> _models;
+    static std::unordered_map<std::string, SkyBoxInfo> _skyBoxes;
+
 public:
     ModelsState() = delete;
     ModelsState(LugBench::Application &application);
@@ -39,23 +43,25 @@ public:
     bool onPush() override;
 
 private:
+    void attachCameraToMover();
     bool loadModel(ModelInfos& model);
-    bool loadModelSkyBox(const ModelInfos& model);
+    bool loadModelSkyBox(
+        const ModelInfos& model,
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource,
+        lug::Graphics::Renderer* renderer,
+        bool displaySkyBox
+    );
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
     void handleResize();
     float getModelMenuWidth(float windowWidth);
 
     ModelViewer _cameraMover;
 
-    std::vector<ModelInfos> _models;
-    std::unordered_map<std::string, SkyBoxInfo> _skyBoxes;
     bool _displaySkyBox{true};
     bool _displayFullscreen{false};
 
     const ModelInfos* _selectedModel{nullptr};
-
-    // Set to true when a model is loading to ignore onFrame/onEvent calls
-    bool _lockCamera{true};
+    bool _loadingModel{false};
 
     LoadingAnimation _loadingAnimation;
 };
