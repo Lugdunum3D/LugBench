@@ -128,6 +128,10 @@ set(SHADERS
     gui.frag
     skybox.frag
     skybox.vert
+    filtercube.vert
+    prefiltered.frag
+    irradiance.frag
+    genbrdflut.vert
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}
@@ -179,6 +183,8 @@ set(OTHER_RESOURCES
     licences/json-licence.txt
     licences/lugdunum3d-licence.txt
     textures/loader.png
+    textures/Road_to_MonumentValley/Background.jpg
+    textures/Road_to_MonumentValley/Environnement.hdr
 )
 
 # create target

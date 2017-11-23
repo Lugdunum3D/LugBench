@@ -22,12 +22,8 @@
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
     _skyBoxes["default"] = {
-        "textures/skybox/right.jpg",
-        "textures/skybox/left.jpg",
-        "textures/skybox/top.jpg",
-        "textures/skybox/bottom.jpg",
-        "textures/skybox/back.jpg",
-        "textures/skybox/front.jpg"
+        "textures/Road_to_MonumentValley/Background.jpg",
+        "textures/Road_to_MonumentValley/Environnement.hdr"
     };
     _models = {
         // { name, path, modelNodeName, skyboxName, rotation }
@@ -346,12 +342,10 @@ bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
         else if (!skyBox->second.resource) {
             lug::Graphics::Builder::SkyBox skyBoxBuilder(*renderer);
 
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveX, skyBox->second.positiveXFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeX, skyBox->second.negativeXFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveY, skyBox->second.positiveYFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeY, skyBox->second.negativeYFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveZ, skyBox->second.positiveZFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeZ, skyBox->second.negativeZFile);
+            skyBoxBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            skyBoxBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            skyBoxBuilder.setBackgroundFilename(skyBox->second.backgroundFile);
+            skyBoxBuilder.setEnvironnementFilename(skyBox->second.environmentFile);
 
             skyBox->second.resource = skyBoxBuilder.build();
             if (!skyBox->second.resource) {

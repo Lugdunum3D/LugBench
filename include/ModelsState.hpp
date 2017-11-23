@@ -23,12 +23,8 @@ private:
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource{nullptr};
     };
     struct SkyBoxInfo{
-        std::string positiveXFile;
-        std::string negativeXFile;
-        std::string positiveYFile;
-        std::string negativeYFile;
-        std::string positiveZFile;
-        std::string negativeZFile;
+        std::string backgroundFile;
+        std::string environmentFile;
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> resource{nullptr};
     };
 
@@ -42,13 +38,12 @@ public:
     bool onPop() override;
     bool onPush() override;
 
-    static float getModelMenuWidth(float windowWidth);
-
 private:
     bool loadModel(ModelInfos& model);
     bool loadModelSkyBox(const ModelInfos& model);
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
     void handleResize();
+    float getModelMenuWidth(float windowWidth);
 
     ModelViewer _cameraMover;
 
