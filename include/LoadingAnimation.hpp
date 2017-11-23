@@ -26,7 +26,7 @@ private:
 
     lug::Math::Vec2f _size{0.0f, 0.0f};
     lug::Math::Vec2f _offset{0.0f, 0.0f};
-    bool _display{true};
+    bool _display{false};
     float _speed{1.0f};
 
     uint8_t _progress{0};
