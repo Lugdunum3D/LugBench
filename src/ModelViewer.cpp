@@ -52,7 +52,7 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
     }
 
     auto mousePos = _eventSource->getMousePos();
-    if (_eventSource->isMousePressed(lug::Window::Mouse::Button::Left)) {
+    if (_isMousePressed) {
 
         // Only if the mouse moved since the last time
         if (_lastMousePos != mousePos) {
@@ -143,11 +143,13 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
     // Windows mouse button pressed/released
     if (event.type == lug::Window::Event::Type::ButtonPressed &&
         event.mouse.code == lug::Window::Mouse::Button::Left) {
+        _isMousePressed = true;
         _lastMousePos = _eventSource->getMousePos();
         _eventSource->setMouseCursorVisible(false);
     }
     else if (event.type == lug::Window::Event::Type::ButtonReleased &&
         event.mouse.code == lug::Window::Mouse::Button::Left) {
+        _isMousePressed = false;
         _eventSource->setMouseCursorVisible(true);
     }
 
