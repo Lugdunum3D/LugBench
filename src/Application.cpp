@@ -6,10 +6,8 @@
 #include <lug/System/Logger/Logger.hpp>
 #include <lug/Graphics/Vulkan/Renderer.hpp>
 
-#include "BenchmarkingState.hpp"
 #include "GPUInfoProvider.hpp"
-#include "BenchmarksState.hpp"
-#include "InfoState.hpp"
+#include "ModelsState.hpp"
 
 //#include <json/json.hpp>
 #include <IconsFontAwesome.h>
@@ -110,7 +108,7 @@ bool Application::init(int argc, char* argv[]) {
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<BenchmarksState>(*this);
+    menuState = std::make_shared<ModelsState>(*this);
     pushState(menuState);
 
     return true;
