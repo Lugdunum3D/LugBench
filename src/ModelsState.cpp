@@ -219,8 +219,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 
 void ModelsState::attachCameraToMover() {
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(_selectedModel->sceneResource);
+    auto camera = _application.getCamera();
     lug::Graphics::Scene::Node* node = scene->getRoot().getNode("camera");
 
+    node->attachCamera(camera);
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     _cameraMover.setTargetNode(*node);
     _cameraMover.setEventSource(*renderer->getWindow());
