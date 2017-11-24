@@ -224,6 +224,7 @@ void ModelsState::attachCameraToMover() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     _cameraMover.setTargetNode(*node);
     _cameraMover.setEventSource(*renderer->getWindow());
+    _cameraMover.rotate(_selectedModel->rotation.x(), _selectedModel->rotation.y());
 }
 
 bool ModelsState::loadModel(ModelInfos& model) {
@@ -337,6 +338,20 @@ bool ModelsState::loadModel(ModelInfos& model) {
     return true;
 }
 
+void applyIBL(const lug::Graphics::Scene::Node* node, lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap, lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap) {
+    const lug::Graphics::Scene::Node::MeshInstance* meshInstance = node->getMeshInstance();
+    if (meshInstance) {
+        for (auto& material: meshInstance->materials) {
+            material->setIrradianceMap(irradianceMap);
+            material->setPrefilteredMap(prefilteredMap);
+        }
+    }
+
+    for (const auto& child : node->getChildren()) {
+        applyIBL(static_cast<const lug::Graphics::Scene::Node*>(child), irradianceMap, prefilteredMap);
+    }
+}
+
 bool ModelsState::loadModelSkyBox(
     const ModelInfos& model,
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource,
@@ -362,6 +377,23 @@ bool ModelsState::loadModelSkyBox(
                 LUG_LOG.error("ModelsState::loadModel Can't create skyBox {}", model.skyboxName);
                 return false;
             }
+
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap = skyBox->second.resource->createIrradianceMap(*renderer);
+
+            if (!irradianceMap) {
+                LUG_LOG.error("Application::init Can't create irradiance map");
+                return false;
+            }
+
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap = skyBox->second.resource->createPrefilteredMap(*renderer);
+
+            if (!prefilteredMap) {
+                LUG_LOG.error("Application::init Can't create prefiltered map");
+                return false;
+            }
+
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+            applyIBL(&scene->getRoot(), irradianceMap, prefilteredMap);
         }
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
