@@ -26,6 +26,8 @@ private:
         std::string backgroundFile;
         std::string environmentFile;
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> resource{nullptr};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap{nullptr};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap{nullptr};
     };
 
 private:

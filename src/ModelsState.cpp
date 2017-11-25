@@ -380,25 +380,24 @@ bool ModelsState::loadModelSkyBox(
                 return false;
             }
 
-            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap = skyBox->second.resource->createIrradianceMap(*renderer);
+            skyBox->second.irradianceMap = skyBox->second.resource->createIrradianceMap(*renderer);
 
-            if (!irradianceMap) {
+            if (!skyBox->second.irradianceMap) {
                 LUG_LOG.error("Application::init Can't create irradiance map");
                 return false;
             }
 
-            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap = skyBox->second.resource->createPrefilteredMap(*renderer);
+            skyBox->second.prefilteredMap = skyBox->second.resource->createPrefilteredMap(*renderer);
 
-            if (!prefilteredMap) {
+            if (!skyBox->second.prefilteredMap) {
                 LUG_LOG.error("Application::init Can't create prefiltered map");
                 return false;
             }
 
-            lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
-            applyIBL(&scene->getRoot(), irradianceMap, prefilteredMap);
         }
 
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+        applyIBL(&scene->getRoot(), skyBox->second.irradianceMap, skyBox->second.prefilteredMap);
         if (displaySkyBox) {
             scene->setSkyBox(skyBox->second.resource);
         }
