@@ -9,6 +9,9 @@ void ModelViewer::onFrame(const lug::System::Time& elapsedTime) {
     }
 
     _zoom += _zoomSpeed * _zoomUpdate * elapsedTime.getSeconds<float>();
+    if (_zoom < 1.0f) {
+        _zoom = 1.0f;
+    }
 
     // GamePad View
     {
