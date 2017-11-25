@@ -226,10 +226,13 @@ void ModelsState::attachCameraToMover() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     _cameraMover.setTargetNode(*node);
     _cameraMover.setEventSource(*renderer->getWindow());
-    _cameraMover.rotate(_selectedModel->rotation.x(), _selectedModel->rotation.y());
 }
 
 bool ModelsState::loadModel(ModelInfos& model) {
+    if (_loadingModel) {
+        return true;
+    }
+
     _selectedModel = &model;
 
     // The model has already been loaded
