@@ -247,10 +247,6 @@ function(lug_download_thirdparty)
 
     file(WRITE "${LUG_THIRDPARTY_DIR}/version" "${THIRDPARTY_PLATFORM}_${THIRDPARTY_SHORT_HASH}")
     message(STATUS "Done!")
-
-    file(REMOVE ${DL_FILE})
-    file(REMOVE ${DL_FILE_EXPECTED_MD5})
-    
 endfunction()
 
 function(lug_download_models file_name)
@@ -281,8 +277,5 @@ function(lug_download_models file_name)
         )
     endif()
 
-    file(REMOVE "${CMAKE_BINARY_DIR}/${file_name}.zip")
-    
     message(STATUS "Done!")
-
 endfunction()

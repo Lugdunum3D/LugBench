@@ -25,6 +25,14 @@ lug_set_option(LUG_THIRDPARTY_DIR "${CMAKE_SOURCE_DIR}/thirdparty" STRING "Choos
 # download thirdparty dir if not specified
 lug_download_thirdparty()
 
+# download thirdparty dir if not specified
+lug_download_models(Corset)
+lug_download_models(Corset_optimized)
+lug_download_models(DamagedHelmet)
+lug_download_models(DamagedHelmet_optimized)
+lug_download_models(FireHydrant)
+lug_download_models(FireHydrant_optimized)
+
 # use config
 include(${PROJECT_SOURCE_DIR}/cmake/Config.cmake)
 
