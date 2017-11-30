@@ -86,7 +86,6 @@ endif()
 
 include_directories(${LUG_INCLUDE_DIR})
 
-
 set(SRC
     src/Application.cpp
     src/GPUInfoProvider.cpp
