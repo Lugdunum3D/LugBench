@@ -66,19 +66,11 @@ Application::~Application() {
 }
 
 bool Application::init(int argc, char* argv[]) {
-    if (!lug::Core::Application::beginInit(argc, argv)) {
+    if (!lug::Core::Application::init(argc, argv)) {
         return false;
     }
 
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-    for (auto& choosedDevice : vkRender->getPhysicalDeviceInfos()) {
-        if (!initDevice(&choosedDevice)) {
-            LUG_LOG.warn("Can't initialize the engine for the device {}", choosedDevice.properties.deviceName);
-        }
-    }
 
     // Create camera
     {
@@ -111,23 +103,6 @@ bool Application::init(int argc, char* argv[]) {
     menuState = std::make_shared<ModelsState>(*this);
     pushState(menuState);
 
-    return true;
-}
-
-bool Application::initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice) {
-    lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-    lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
-
-    vkRender->getPreferences().device = choosenDevice;
-
-    if (!lug::Core::Application::finishInit()) {
-        return false;
-    }
-
-    const lug::Graphics::Vulkan::PhysicalDeviceInfo *physicalDeviceInfo = vkRender->getPhysicalDeviceInfo();
-    if (physicalDeviceInfo == NULL) {
-        return false;
-    }
     return true;
 }
 

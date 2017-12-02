@@ -62,7 +62,6 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _githubLogo;
 
 private:
-    bool initDevice(lug::Graphics::Vulkan::PhysicalDeviceInfo* choosenDevice);
     bool loadFonts();
     bool loadImages(lug::Graphics::Renderer* renderer);
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> buildImage(lug::Graphics::Renderer* renderer, std::string fileName);
