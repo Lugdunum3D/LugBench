@@ -1,44 +1,17 @@
 #!/bin/bash
 
-# Exit if a command fails
-set -e
-
 invalidate=false
 cache_dir="$HOME/.local/thirdparty"
 thirdparty_builder_sha1_path="$HOME/.local/thirdparty_builder_sha1"
-dependency="thirdparty.yml"
-date_cache=0
+thirdparty_sums_path="$HOME/.local/thirdparty_sums.md5"
+thirdparty_yml_path="thirdparty.yml"
 
-if [[ -d "$cache_dir" ]]; then
-    echo "$cache_dir is present"
-
-    echo -ne "$cache_dir modification time: "
-    date -r "$cache_dir"
-    echo -ne "$dependency modification time: "
-    date --date="$(git log -1 --format="%ai" -- $dependency)"
-    date_cache=$(date -r "$cache_dir" +%s)
-else
-    echo "$cache_dir is missing, creating cache"
-fi
-
-# Invalidate from thirdparty.yml changed
-date_thirdparty_yml=$(date --date="$(git log -1 --format="%ai" -- $dependency)" +%s)
-echo "date_thirdparty_yml: $date_thirdparty_yml, date_cache: $date_cache"
-if [[ $date_thirdparty_yml -gt $date_cache ]]; then
-    echo "$dependency is newer than $cache_dir, invalidating cache"
+cat $thirdparty_sums_path
+md5sum -c $thirdparty_sums_path
+if [[ ! $? -eq 0 ]]; then
+    echo "Either our script has changed or thirdparty.yml has changed"
     invalidate=true
-else
-    echo "$dependency is older than $cache_dir, cache is valid"
-fi
-
-# Invalidate from our own script that was changed
-date_script=$(date --date="$(git log -1 --format="%ai" -- $0)" +%s)
-echo "date_script: $date_script, date_cache: $date_cache"
-if [[ $date_script -gt $date_cache ]]; then
-    echo "$0 is newer than $cache_dir, invalidating cache"
-    invalidate=true
-else
-    echo "$0 is older than $cache_dir, cache is valid"
+    md5sum $thirdparty_yml_path $0 > $thirdparty_sums_path
 fi
 
 # Invalidate from ThirdParty-Builder
@@ -61,6 +34,8 @@ else
     echo "ThirdParty-Builder sha1 checks cache is valid"
 fi
 
+# Exit if a command fails
+set -e
 
 if [[ ! -d "$cache_dir" || "$invalidate" = true ]]; then
     rm -rf "$cache_dir"
