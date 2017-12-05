@@ -263,23 +263,24 @@ function(lug_download_models file_name)
     endif()
 
     # Extract zip
-    message(STATUS "Extracting...")
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/models/")
-#    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/models/")
-    file(MAKE_DIRECTORY ${UNZIP_DEST})
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xfz "${DL_FILE}"
-        WORKING_DIRECTORY ${UNZIP_DEST}
-        RESULT_VARIABLE rv
-    )
-    if (NOT rv EQUAL 0)
-        file(REMOVE ${UNZIP_DEST})
-        message(
-            FATAL_ERROR
-            "Extract of '${DL_FILE}' failed"
-            "Try to remove it to download it again"
+    if (NOT EXISTS ${UNZIP_DEST})
+        file(MAKE_DIRECTORY ${UNZIP_DEST})
+        message(STATUS "Extracting...")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xfz "${DL_FILE}"
+            WORKING_DIRECTORY ${UNZIP_DEST}
+            RESULT_VARIABLE rv
         )
+        if (NOT rv EQUAL 0)
+            file(REMOVE ${UNZIP_DEST})
+            message(
+                FATAL_ERROR
+                "Extract of '${DL_FILE}' failed"
+                "Try to remove it to download it again"
+            )
+        endif()
+        message(STATUS "Done!")
     endif()
 
-    message(STATUS "Done!")
 endfunction()
