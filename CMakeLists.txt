@@ -150,9 +150,6 @@ set(LUG_RESOURCES
 
 # List of resources in the directory ${CMAKE_SOURCE_DIR}/resources
 set(OTHER_RESOURCES
-    models/Duck/Duck0.bin
-    models/Duck/Duck.gltf
-    models/Duck/DuckCM.png
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
     fonts/Roboto-Light.ttf
