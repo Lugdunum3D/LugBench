@@ -247,5 +247,40 @@ function(lug_download_thirdparty)
 
     file(WRITE "${LUG_THIRDPARTY_DIR}/version" "${THIRDPARTY_PLATFORM}_${THIRDPARTY_SHORT_HASH}")
     message(STATUS "Done!")
+endfunction()
+
+function(lug_download_models file_name)
+    set(DL_URL "${LUG_THIRDPARTY_URL}/models/${file_name}.zip")
+    set(DL_FILE "${CMAKE_SOURCE_DIR}/resources/models/${file_name}.zip")
+    set(UNZIP_DEST "${CMAKE_BINARY_DIR}/models/${file_name}")
+
+    if (NOT EXISTS ${DL_FILE})
+        message(STATUS "Downloading ${DL_URL}")
+        file(
+            DOWNLOAD
+            "${DL_URL}" "${DL_FILE}"
+        )
+    endif()
+
+    # Extract zip
+    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/models/")
+    if (NOT EXISTS ${UNZIP_DEST})
+        file(MAKE_DIRECTORY ${UNZIP_DEST})
+        message(STATUS "Extracting...")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xfz "${DL_FILE}"
+            WORKING_DIRECTORY ${UNZIP_DEST}
+            RESULT_VARIABLE rv
+        )
+        if (NOT rv EQUAL 0)
+            file(REMOVE ${UNZIP_DEST})
+            message(
+                FATAL_ERROR
+                "Extract of '${DL_FILE}' failed"
+                "Try to remove it to download it again"
+            )
+        endif()
+        message(STATUS "Done!")
+    endif()
 
 endfunction()
