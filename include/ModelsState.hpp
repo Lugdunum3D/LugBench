@@ -3,6 +3,7 @@
 #include "AState.hpp"
 #include "Application.hpp"
 #include "ModelViewer.hpp"
+#include "LoadingAnimation.hpp"
 
 #include <unordered_map>
 
@@ -19,16 +20,19 @@ private:
         std::string modelNodeName;
         std::string skyboxName;
         lug::Math::Vec2f rotation{0.0f, 0.0f};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource{nullptr};
     };
     struct SkyBoxInfo{
-        std::string positiveXFile;
-        std::string negativeXFile;
-        std::string positiveYFile;
-        std::string negativeYFile;
-        std::string positiveZFile;
-        std::string negativeZFile;
+        std::string backgroundFile;
+        std::string environmentFile;
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> resource{nullptr};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap{nullptr};
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap{nullptr};
     };
+
+private:
+    static std::vector<ModelInfos> _models;
+    static std::unordered_map<std::string, SkyBoxInfo> _skyBoxes;
 
 public:
     ModelsState() = delete;
@@ -41,18 +45,25 @@ public:
     bool onPush() override;
 
 private:
-    bool loadModel(const ModelInfos& model);
-    bool loadModelSkyBox(const ModelInfos& model);
+    void attachCameraToMover();
+    bool loadModel(ModelInfos& model);
+    bool loadModelSkyBox(
+        const ModelInfos& model,
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource,
+        lug::Graphics::Renderer* renderer,
+        bool displaySkyBox
+    );
     void pushButtonsStyle(const ImVec4& color, const ImVec4& hoveredColor, const ImVec4& activeColor, const ImVec4& textColor) const;
-    float getModelMenuWidth(float windowWidth);
     void handleResize();
+    float getModelMenuWidth(float windowWidth);
 
     ModelViewer _cameraMover;
 
-    std::vector<ModelInfos> _models;
-    std::unordered_map<std::string, SkyBoxInfo> _skyBoxes;
     bool _displaySkyBox{true};
     bool _displayFullscreen{false};
 
     const ModelInfos* _selectedModel{nullptr};
+    bool _loadingModel{false};
+
+    LoadingAnimation _loadingAnimation;
 };

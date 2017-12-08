@@ -1,7 +1,5 @@
 #pragma once
 
-#include <lug/Graphics/Resource.hpp>
-#include <lug/Graphics/Scene/Scene.hpp>
 #include <lug/System/Time.hpp>
 #include <lug/Window/Event.hpp>
 #include "Application.hpp"
@@ -36,5 +34,4 @@ public:
 
 protected:
     LugBench::Application &_application;
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene;
 };

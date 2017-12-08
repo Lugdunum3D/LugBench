@@ -341,6 +341,7 @@ bool Application::loadImages(lug::Graphics::Renderer* renderer) {
             return false;
         }
     }
+
     return true;
 }
 

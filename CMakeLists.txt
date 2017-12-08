@@ -86,6 +86,7 @@ set(SRC
     src/main.cpp
     src/BenchmarkingState.cpp
     src/BenchmarksState.cpp
+    src/LoadingAnimation.cpp
     src/ModelsState.cpp
     src/ModelViewer.cpp
     src/ResultsState.cpp
@@ -100,6 +101,7 @@ set(INC
     include/AState.hpp
     include/BenchmarkingState.hpp
     include/BenchmarksState.hpp
+    include/LoadingAnimation.hpp
     include/ModelsState.hpp
     include/ModelViewer.hpp
     include/ResultsState.hpp
@@ -126,6 +128,10 @@ set(SHADERS
     gui.frag
     skybox.frag
     skybox.vert
+    filtercube.vert
+    prefiltered.frag
+    irradiance.frag
+    genbrdflut.vert
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}
@@ -149,6 +155,7 @@ set(OTHER_RESOURCES
     fonts/fontawesome-webfont.ttf
     fonts/Roboto-Bold.ttf
     fonts/Roboto-Light.ttf
+    textures/loading_dot.png
     textures/epitech_logo.png
     textures/epitech_color_logo.png
     textures/gltf_logo.png
@@ -175,6 +182,9 @@ set(OTHER_RESOURCES
     licences/imgui-licence.txt
     licences/json-licence.txt
     licences/lugdunum3d-licence.txt
+    textures/loader.png
+    textures/Road_to_MonumentValley/Background.jpg
+    textures/Road_to_MonumentValley/Environnement.hdr
 )
 
 # create target

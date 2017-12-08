@@ -32,4 +32,6 @@ private:
 
     float _elapsed = 0;
     uint32_t _frames = 0;
+
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> _scene{nullptr};
 };

@@ -1,6 +1,8 @@
 #include "ModelsState.hpp"
 #include "GUI.hpp"
 
+#include <thread>
+
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Builder/SkyBox.hpp>
@@ -17,47 +19,57 @@
 
 #include <IconsFontAwesome.h>
 
+std::vector<ModelsState::ModelInfos> ModelsState::_models = {
+    // { name, path, modelNodeName, skyboxName, rotation }
+    { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
+    { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} }
+};
+std::unordered_map<std::string, ModelsState::SkyBoxInfo> ModelsState::_skyBoxes = {
+    {
+        "default", {
+            "textures/Road_to_MonumentValley/Background.jpg",
+            "textures/Road_to_MonumentValley/Environnement.hdr"
+        }
+    }
+};
+
 ModelsState::ModelsState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
-    _skyBoxes["default"] = {
-        "textures/skybox/right.jpg",
-        "textures/skybox/left.jpg",
-        "textures/skybox/top.jpg",
-        "textures/skybox/bottom.jpg",
-        "textures/skybox/back.jpg",
-        "textures/skybox/front.jpg"
-    };
-    _models = {
-        // { name, path, modelNodeName, skyboxName, rotation }
-        { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
-        { "Helmet2", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} }
-    };
 }
 
-ModelsState::~ModelsState() {
-}
+ModelsState::~ModelsState() {}
 
 bool ModelsState::onPush() {
     _application.setCurrentState(State::MODELS);
     handleResize();
 
-    if (!_models.size()) {
-        return true;
+    if (_models.size() && !loadModel(_models.front())) {
+        return false;
     }
 
-    return loadModel(_models.front());
+    lug::Graphics::Render::Window* window = _application.getGraphics().getRenderer()->getWindow();
+    uint16_t windowWidth = window->getWidth();
+
+    return _loadingAnimation.init(
+        /* application */ _application,
+        /* loadingDotImage */ "textures/loading_dot.png",
+        /* size */ {16.0f, 16.0f},
+        /* offset */ {ModelsState::getModelMenuWidth(windowWidth) / 2.0f, 0.0f}
+    );
 }
 
 bool ModelsState::onPop() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     lug::Graphics::Vulkan::Renderer* vkRender = static_cast<lug::Graphics::Vulkan::Renderer*>(renderer);
     vkRender->getDevice().waitIdle();
-    _scene = nullptr;
     return true;
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
-    _cameraMover.onEvent(event);
+    if (!_loadingModel) {
+        _cameraMover.onEvent(event);
+    }
+
     if (event.type == lug::Window::Event::Type::Close) {
         _application.close();
     }
@@ -74,19 +86,27 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     uint16_t windowWidth = window->getWidth();
     float windowHeaderOffset = 0;
     float windowFooterOffset = 0;
+    float modelMenuWidth = getModelMenuWidth(windowWidth);
 
     if (!_displayFullscreen) {
         windowHeaderOffset = GUI::displayMenu(_application);
         windowFooterOffset = GUI::displayFooter(_application);
     }
 
-    _cameraMover.onFrame(elapsedTime);
+    if (_selectedModel->sceneResource && _loadingModel) {
+        _loadingModel = false;
+        _loadingAnimation.display(false);
+        attachCameraToMover();
+    }
+
+    if (!_loadingModel) {
+        _cameraMover.onFrame(elapsedTime);
+    }
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.0f, 0.0f, 0.0f, 0.0f });
     {
-        ImGui::Begin("Render settings", 0, _application._window_flags | ImGuiWindowFlags_ShowBorders);
+        ImGui::Begin("Render settings", 0, _application._window_flags);
         {
-            ImVec2 modelSettingsWindowSize = ImVec2{ static_cast<float>(windowWidth - getModelMenuWidth(windowWidth)), windowHeight - (windowHeaderOffset + windowFooterOffset) };
             float settingsMarginBottom = 10.0f;
             float buttonsSpacing = 10.0f;
 #if defined(LUG_SYSTEM_ANDROID)
@@ -94,20 +114,17 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
 #else
             ImVec2 buttonSize{ 60.0f, 60.0f };
 #endif
-            ImVec2 windowPos{
-                getModelMenuWidth(windowWidth), windowHeaderOffset
+            ImVec2 modelSettingsWindowSize = ImVec2{ buttonSize.x * 3.0f + buttonsSpacing * 2.0f, buttonSize.y};
+            ImVec2 buttonBottomAlign{
+                modelMenuWidth + (windowWidth - modelMenuWidth) / 2.0f - modelSettingsWindowSize.x / 2.0f,
+                static_cast<float>(windowHeight) - buttonSize.y - settingsMarginBottom
             };
 
             // Setup window
             ImGui::SetWindowSize(modelSettingsWindowSize);
-            ImGui::SetWindowPos(windowPos);
+            ImGui::SetWindowPos(buttonBottomAlign);
 
-            ImVec2 buttonBottomAlign{
-                (ImGui::GetWindowWidth() / 2.f) - (buttonSize.y + buttonsSpacing),
-                ImGui::GetWindowHeight() - buttonSize.y - settingsMarginBottom
-            };
 
-            ImGui::SetCursorPos(buttonBottomAlign);
             // Display settings buttons
             ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
             {
@@ -126,7 +143,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::SameLine();
                     if (ImGui::Button(ICON_FA_MAP, buttonSize)) {
                         _displaySkyBox = !_displaySkyBox;
-                        if (!loadModelSkyBox(*_selectedModel)) {
+                        if (!loadModelSkyBox(*_selectedModel, _selectedModel->sceneResource, _application.getGraphics().getRenderer(), _displaySkyBox)) {
                             success = false;
                         }
                     }
@@ -142,8 +159,6 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     if (!_displayFullscreen) {
         ImGui::Begin("Model Select Menu", 0, _application._window_flags);
         {
-            float modelMenuWidth = getModelMenuWidth(windowWidth);
-
             ImVec2 modelMenuSize{ modelMenuWidth, windowHeight - (windowHeaderOffset + windowFooterOffset) };
 
             ImGui::SetWindowSize(modelMenuSize);
@@ -195,104 +210,159 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 ImGui::PopStyleVar();
             }
         }
+        _loadingAnimation.update(elapsedTime);
         ImGui::End();
     }
 
     return success;
 }
 
-bool ModelsState::loadModel(const ModelInfos& model) {
-    // Load scene
+void ModelsState::attachCameraToMover() {
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(_selectedModel->sceneResource);
+    auto camera = _application.getCamera();
+    lug::Graphics::Scene::Node* node = scene->getRoot().getNode("camera");
+
+    node->attachCamera(camera);
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
-    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource = renderer->getResourceManager()->loadFile(model.path);
-    if (!sceneResource) {
-        return false;
-    }
+    _cameraMover.setTargetNode(*node);
+    _cameraMover.setEventSource(*renderer->getWindow());
+}
 
-    _scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
-
-    auto modelNode = _scene->getSceneNode(model.modelNodeName);
-    if (!modelNode) {
-        LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
-        return false;
-    }
-
-    _cameraMover.rotate(model.rotation.x(), model.rotation.y());
-
-    // Attach directional light to the root node
-    {
-        lug::Graphics::Builder::Light lightBuilder(*renderer);
-
-        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
-        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
-
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
-        if (!light) {
-            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
-            return false;
-        }
-
-        _scene->getRoot().attachLight(light);
-    }
-
-    // Attach ambient light to the root node
-    {
-        lug::Graphics::Builder::Light lightBuilder(*renderer);
-
-        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
-        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
-
-        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
-        if (!light) {
-            LUG_LOG.error("ModelsState::loadModel Can't create directional light");
-            return false;
-        }
-
-        _scene->getRoot().attachLight(light);
-    }
-
-    // Attach skyBox
-    if (!loadModelSkyBox(model)) {
-        return false;
-    }
-
-    // Attach camera
-    {
-        lug::Graphics::Scene::Node* node = _scene->createSceneNode("camera");
-        _scene->getRoot().attachChild(*node);
-
-        node->attachCamera(_application.getCamera());
-
-        // Set initial position of the camera
-        node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
-        // Look at once
-        node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
-
-        // Attach the camera node to the mover
-        {
-            _cameraMover.setTargetNode(*node);
-            _cameraMover.setEventSource(*renderer->getWindow());
-        }
-
-        // Attach camera to RenderView
-        {
-            auto& renderViews = renderer->getWindow()->getRenderViews();
-
-            LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
-
-            renderViews[0]->attachCamera(_application.getCamera());
-        }
+bool ModelsState::loadModel(ModelInfos& model) {
+    if (_loadingModel) {
+        return true;
     }
 
     _selectedModel = &model;
+
+    // The model has already been loaded
+    if (model.sceneResource) {
+        attachCameraToMover();
+        return true;
+    }
+
+    // Load scene
+    _loadingModel = true;
+    _loadingAnimation.display(true);
+
+    // Remove camera before loading model
+    {
+        lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+        auto& renderViews = renderer->getWindow()->getRenderViews();
+
+        LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+        renderViews[0]->attachCamera(nullptr);
+    }
+
+    std::thread loadModelThread([&]{
+        lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+        bool displaySkybox = _displaySkyBox;
+        auto camera = _application.getCamera();
+        auto sceneResource = renderer->getResourceManager()->loadFile(model.path);
+        if (!sceneResource) {
+            return false;
+        }
+
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+
+        auto modelNode = scene->getSceneNode(model.modelNodeName);
+        if (!modelNode) {
+            LUG_LOG.error("ModelsState::loadModel Can't get model node {}", model.modelNodeName);
+            return false;
+        }
+
+        // Attach directional light to the root node
+        {
+            lug::Graphics::Builder::Light lightBuilder(*renderer);
+
+        lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+        lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+        lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
+
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+            if (!light) {
+                LUG_LOG.error("ModelsState::loadModel Can't create directional light");
+                return false;
+            }
+
+            scene->getRoot().attachLight(light);
+        }
+
+        // Attach ambient light to the root node
+        {
+            lug::Graphics::Builder::Light lightBuilder(*renderer);
+
+            lightBuilder.setType(lug::Graphics::Render::Light::Type::Directional);
+            lightBuilder.setColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+            lightBuilder.setDirection({ 0.0f, 0.0f, 3.0f });
+            lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Light> light = lightBuilder.build();
+            if (!light) {
+                LUG_LOG.error("ModelsState::loadModel Can't create directional light");
+                return false;
+            }
+
+            scene->getRoot().attachLight(light);
+        }
+
+        // Attach camera
+        {
+            lug::Graphics::Scene::Node* node = scene->createSceneNode("camera");
+            scene->getRoot().attachChild(*node);
+
+            // Attach skyBox
+            if (!loadModelSkyBox(model, sceneResource, renderer, displaySkybox)) {
+                return false;
+            }
+
+            node->attachCamera(camera);
+
+            // Set initial position of the camera
+            node->setPosition({ 0.0f, 0.0f, 3.0f }, lug::Graphics::Node::TransformSpace::World);
+            // Look at once
+            node->getCamera()->lookAt({ 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, lug::Graphics::Node::TransformSpace::World);
+
+            // Attach camera to RenderView
+            {
+                auto& renderViews = renderer->getWindow()->getRenderViews();
+
+                LUG_ASSERT(renderViews.size() > 0, "There should be at least 1 render view");
+
+                renderViews[0]->attachCamera(camera);
+            }
+
+            model.sceneResource = sceneResource;
+        }
+
+
+        return true;
+    });
+
+    loadModelThread.detach();
+
     return true;
 }
 
-bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
-    lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
+void applyIBL(const lug::Graphics::Scene::Node* node, lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> irradianceMap, lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::SkyBox> prefilteredMap) {
+    const lug::Graphics::Scene::Node::MeshInstance* meshInstance = node->getMeshInstance();
+    if (meshInstance) {
+        for (auto& material: meshInstance->materials) {
+            material->setIrradianceMap(irradianceMap);
+            material->setPrefilteredMap(prefilteredMap);
+        }
+    }
 
+    for (const auto& child : node->getChildren()) {
+        applyIBL(static_cast<const lug::Graphics::Scene::Node*>(child), irradianceMap, prefilteredMap);
+    }
+}
+
+bool ModelsState::loadModelSkyBox(
+    const ModelInfos& model,
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Resource> sceneResource,
+    lug::Graphics::Renderer* renderer,
+    bool displaySkyBox
+) {
     if (model.skyboxName.size()) {
         auto skyBox = _skyBoxes.find(model.skyboxName);
         if (skyBox == _skyBoxes.end()) {
@@ -302,25 +372,40 @@ bool ModelsState::loadModelSkyBox(const ModelInfos& model) {
         else if (!skyBox->second.resource) {
             lug::Graphics::Builder::SkyBox skyBoxBuilder(*renderer);
 
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveX, skyBox->second.positiveXFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeX, skyBox->second.negativeXFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveY, skyBox->second.positiveYFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeY, skyBox->second.negativeYFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::PositiveZ, skyBox->second.positiveZFile);
-            skyBoxBuilder.setFaceFilename(lug::Graphics::Builder::SkyBox::Face::NegativeZ, skyBox->second.negativeZFile);
+            skyBoxBuilder.setMagFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            skyBoxBuilder.setMinFilter(lug::Graphics::Render::Texture::Filter::Linear);
+            skyBoxBuilder.setBackgroundFilename(skyBox->second.backgroundFile);
+            skyBoxBuilder.setEnvironnementFilename(skyBox->second.environmentFile);
 
             skyBox->second.resource = skyBoxBuilder.build();
             if (!skyBox->second.resource) {
                 LUG_LOG.error("ModelsState::loadModel Can't create skyBox {}", model.skyboxName);
                 return false;
             }
+
+            skyBox->second.irradianceMap = skyBox->second.resource->createIrradianceMap(*renderer);
+
+            if (!skyBox->second.irradianceMap) {
+                LUG_LOG.error("Application::init Can't create irradiance map");
+                return false;
+            }
+
+            skyBox->second.prefilteredMap = skyBox->second.resource->createPrefilteredMap(*renderer);
+
+            if (!skyBox->second.prefilteredMap) {
+                LUG_LOG.error("Application::init Can't create prefiltered map");
+                return false;
+            }
+
         }
 
-        if (_displaySkyBox) {
-            _scene->setSkyBox(skyBox->second.resource);
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene> scene = lug::Graphics::Resource::SharedPtr<lug::Graphics::Scene::Scene>::cast(sceneResource);
+        applyIBL(&scene->getRoot(), skyBox->second.irradianceMap, skyBox->second.prefilteredMap);
+        if (displaySkyBox) {
+            scene->setSkyBox(skyBox->second.resource);
         }
         else {
-            _scene->setSkyBox(nullptr);
+            scene->setSkyBox(nullptr);
         }
     }
 
