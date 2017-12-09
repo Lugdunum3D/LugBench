@@ -139,6 +139,7 @@ set(SHADERS
     prefiltered.frag
     irradiance.frag
     genbrdflut.vert
+    genbrdflut.frag
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}
