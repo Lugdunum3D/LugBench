@@ -82,8 +82,10 @@ if (NOT LUG_FOUND)
 
     set(LUG_ROOT ${LUG_THIRDPARTY_DIR}/lugdunum)
     find_package(LUG REQUIRED COMPONENTS core graphics system window math)
-    file(GLOB LUG_DLL "${LUG_ROOT}/bin/*.dll")
-    file(COPY ${LUG_DLL} DESTINATION  "${CMAKE_CURRENT_BINARY_DIR}")
+    if (LUG_OS_WINDOWS)
+        file(GLOB LUG_DLL "${LUG_ROOT}/bin/*.dll")
+        file(COPY ${LUG_DLL} DESTINATION  "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
 endif()
 
 include_directories(${LUG_INCLUDE_DIR})
