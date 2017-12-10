@@ -27,7 +27,7 @@ public:
     void onFrame(const lug::System::Time& elapsedTime);
     void onEvent(const lug::Window::Event& event);
 
-    void rotate(float x, float y);
+    void setRotation(const lug::Math::Vec2f& rotation);
 
 private:
     bool isRotationEnd(const lug::Window::Event& event);

@@ -21,9 +21,9 @@
 
 std::vector<ModelsState::ModelInfos> ModelsState::_models = {
     // { name, path, modelNodeName, skyboxName, rotation }
-    { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {-90.0f, 0.0f} },
+    { "Helmet", "models/DamagedHelmet/DamagedHelmet.gltf", "node_damagedHelmet_-8074", "default", {180.0f, 0.0f} },
     { "FireHydrant", "models/FireHydrant/FireHydrant.gltf", "root", "default",{ -90.0f, 0.0f } },
-    { "Corset", "models/Corset/Corset.gltf", "Corset", "default",{ -90.0f, 0.0f } },
+    { "Corset", "models/Corset/Corset.gltf", "Corset", "default",{ 0.0f, 0.0f } },
 };
 std::unordered_map<std::string, ModelsState::SkyBoxInfo> ModelsState::_skyBoxes = {
     {
@@ -229,6 +229,7 @@ void ModelsState::attachCameraToMover() {
     lug::Graphics::Renderer* renderer = _application.getGraphics().getRenderer();
     _cameraMover.setTargetNode(*node);
     _cameraMover.setEventSource(*renderer->getWindow());
+    _cameraMover.setRotation(_selectedModel->rotation);
 }
 
 bool ModelsState::loadModel(ModelInfos& model) {
