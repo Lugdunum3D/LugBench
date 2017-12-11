@@ -168,11 +168,10 @@ void ModelViewer::onEvent(const lug::Window::Event& event) {
     }
 }
 
-void ModelViewer::rotate(float x, float y) {
-    lug::Math::Vec2f tmp = _lastRotationVelocity;
-    _lastRotationVelocity = {x, y};
-    updateRotation();
-    _lastRotationVelocity = tmp;
+void ModelViewer::setRotation(const lug::Math::Vec2f& rotation) {
+    _lastRotationVelocity = {0, 0};
+    _rotation.x() = rotation.x();
+    _rotation.y() = rotation.y();
 }
 
 bool ModelViewer::isRotationEnd(const lug::Window::Event& event) {
