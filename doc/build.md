@@ -6,28 +6,116 @@ menu:
   class: documentation button button-green align-right
 ---
 
-# How to build the LugBench application
+# Building the LugBench application
 
-## Dependencies for the LugBench application
+## Introduction
 
-### Introduction
+LugBench depends on many different libraries and projects in order to work properly. Hopefully, we put in place a system, [Thirdparty-Builder](https://github.com/Lugdunum3D/ThirdParty-Builder), that allows you to build quickly and automatically all the required depdendencies in order to get started.
 
-Lugbench depends on many different libraries / projects in order to work properly.
-You can find on our [ThirdParty repository](https://github.com/Lugdunum3D/LugBench-ThirdParty "third party lugbench repository") all the compiled versions, ready to use to compile Lugbench and get started quickly.
+On top of that, we already compile our dependencies on the CIs for the tree platform we support: Linux, Android and Windows.
 
-### List of dependencies
+Our build system (via CMake macros) is already configured to download automatically the up-to-date versions. Below is a documentation on how to use our thirdparty management system and how to build LugBench.
+
+## List of dependencies
+
+For an updated list of dependencies, you can consult the file [`thirdparty.yml`](https://github.com/Lugdunum3D/Lugdunum/blob/dev/thirdparty.yml) at the root for the repository. It is however designed to machine-readable first, so below is a more human-friendly list of what libraries we depend on:
+
+### Libraries we use
+
 
 * [Lugdunum](https://github.com/Lugdunum3D/Lugdunum): Lugdunum is an open-source 3D engine using Vulkan as backend. Lugudunum's goal is to provide a free, modern, cross-platform (mobile and desktop) 3D engine for everyone.
-* [Json _(from nlohmann)_](https://github.com/nlohmann/json) is a header-only Json library for Modern C++.
-* [libcurl](https://curl.haxx.se/libcurl/) is a free and easy-to-use client-side URL transfer library
-* [Restclient-cpp](https://github.com/mrtazz/restclient-cpp) This is a simple REST client for C++. It wraps libcurl for HTTP requests.
+* [Json _(from nlohmann)_](https://github.com/nlohmann/json): A header-only JSON library for Modern C++.
+* [libcurl](https://curl.haxx.se/libcurl/): A free and easy-to-use client-side URL transfer library
+* [Restclient-cpp](https://github.com/mrtazz/restclient-cpp): This is a simple REST client for C++. It wraps libcurl for HTTP requests.
+* [imgui](https://github.com/ocornut/imgui): A bloat-free Immediate Mode Greetype.org): The popUlafose i tanderingce for C++ with minimal dependencies. We fully support _imgui_ in our rendering engine. The end user has full access to _imgui_'s API.
+* [imgui_club](https://github.com/ocornut/imgui_club): An _imgui_ companion library. It is used to have a nicer font rendering, mostly.
+* [FreeType](https://www.fraphical user interface library for C++.
+* [Vulkan](https://www.khronos.org/vulkan/): This is a new generation graphics and compute API that provides high-efficiency, cross-platform access to modern GPUs.
 
 :::info
-libcurl and restclient are not needed to build Lugbench on Android.
+`libcurl` and `restclientcpp` are not needed to build Lugbench on Android.
 :::
 
+# Preparing your system
 
-## Cloning the repository
+Building with Vulkan means building with the latest toolchains and the latest technologies available. In this section, we describe how to upgrade your system to a working development environment.
+
+## <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" width="24"> Linux
+
+### Supported toolchains 
+
+Target | Toolchain
+------------ | -------------
+Linux | gcc >= 6
+Linux | clang >= 3.8
+
+### Distribution specific prerequisites 
+
+#### <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo-ubuntu_cof-orange-hex.svg" width="16"> Ubuntu
+
+These instructions were tested for Ubuntu 16.04 LTS. You can add the _ubuntu-toolchain-r/test_ repository on your machine to be able to install the most recent GCC version with the following commands:
+
+```bash
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update
+```
+
+You can now install the dependencies needed to build Lugdunum: gcc-6, CMake and the development version of the X11 libraries:
+
+```bash
+sudo apt install gcc-6 cmake libxrandr-dev
+```
+
+As of July 2017, there is still not a Vulkan SDK package on Ubuntu, so you have to download and install it yourself. A complete documentation is already available [on the LunarG website](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html), so we won't get into details here. Just make sure you have the `VULKAN_SDK` environment variable set, [as described here](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html#user-content-set-up-the-runtime-environment), with the `x86_64` architecture.
+
+#### <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Archlinux-icon-crystal-64.svg" width="16"> Arch Linux
+
+On Arch Linux, nice people packaged everything needed in the [vulkan-devel](https://www.archlinux.org/groups/x86_64/vulkan-devel/), so all you have to do is:
+
+```
+pacman -S vulkan-devel base-devel cmake
+```
+
+## <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Windows_logo_%E2%80%93_2012_%28dark_blue%29.svg" width="24"> Windows
+
+### Supported toolchains
+
+Target | Toolchain
+------------ | -------------
+Windows 10 | [Visual Studio 2017](https://www.visualstudio.com/downloads/)
+
+:::info
+Visual Studio 2015 is **NOT** supported anymore, Visual Studio 2017 is the only supported toolchain.
+::: 
+
+To build Lugdunum on Windows, you'll need [CMake](https://cmake.org/download/). CMake will generate a Visual Studio solution that you can then open, and build.
+
+## <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" width="24"> Android
+
+### Supported toolchains
+
+Target | Toolchain
+------------ | -------------
+Android | NDK >= r14 ; clang ; Gradle >= 2.2
+
+
+* [Android NDK r14+](https://developer.android.com/ndk/index.html)
+* [Android Studio 3+](https://developer.android.com/studio/index.html)
+
+The NDK and CLang can be added [in the SDK Manager in Android Studio](https://developer.android.com/studio/intro/update.html#sdk-manager).
+
+:::info
+At the time this documentation was written, Android was tested with the NDK v16.0.4442984, Android Studio 3.0.0.18 (canary), Gradle 4.3 (plugin version 3.0.0x) and CMake 3.6.4111459.
+:::
+
+Please note that [arm64-v8a](https://developer.android.com/ndk/guides/abis.html#arm64-v8a) is the only supported ABI and that we only support Android N (android-24) and up.
+
+### About the Android NDK
+
+As the GCC toolchain is now deprecated by Android's developers, the clang toolchain will be the only one supported in this project. Please note that we're also using [Unified Headers](https://github.com/android-ndk/ndk/wiki/Changelog-r14) from Android NDK 14.
+
+
+# Cloning the repository
 
 First, clone Lugbench repository:
 
@@ -35,112 +123,67 @@ First, clone Lugbench repository:
 git clone git@github.com:Lugdunum3D/LugBench.git
 ```
 
-Now, to build Lugbench, you'll need to either have some dependencies installed, or you can automatically pull them from the `thirdparty` submodule, that regroups their pre-compiled versions to set you up more quickly:
+Then, set your working directory to the cloned repository.
 
-```
-git submodule update --init --recursive
-```
+CMake will automatically download all the required dependencies (third-party libraries, models) as long as you specify `LUG_ACCEPT_DL=ON`. If this is set to true then CMake will check if you are missing third party libraries or models and will download them as needed.
+If for some reason you wish to force CMake to retrieve the latest dependencies then you can simply delete the following folders _`thirdparty/`_, _`resources/models/`_ (which should hopefully be in the directory directly "above" _`build/`_) as well as _`build/models/`_.
 
-:::info
-You must first compile the Lugdunum libraries, as shown earlier in this document
-:::
 
+# Building LugBench
 
 ## <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" width="24"> Linux
 
-### General prerequisites 
-
-Target | Toolchain
--------|--------------
-Linux  | gcc >= 6
-Linux  | clang >= 3.8
-
-### Building
-
-The commands below should be distribution independant, hopefully. What we do is create a "build" directory (out-of-source build), `cd` in it and run `cmake` with the appropriate compiler versions and the location of the Lugdunum library.
+Create a "build" directory (out-of-source build), `cd` in it and run `cmake`, as the list of commands bellow suggests:
 
 ```
 mkdir build
 cd build
 cmake
-    -DCMAKE_C_COMPILER=gcc-6
-    -DCMAKE_CXX_COMPILER=g++-6
-    -DLUG_ROOT=PATH_TO_LUGDUNUM_LIBRARY
+    -DLUG_ACCEPT_DL=ON
     ../
 make
 ```
 
 :::info
-Of course, CMAKE_C_COMPILER and CMAKE_CXX_COMPILER can be set to clang and clang++
+If you installed multiple _gcc_ versions, you might want to add the `-DCMAKE_C_COMPILER=gcc-6 -DCMAKE_CXX_COMPILER=g++-6` flags to CMake to explicitely requires the most recent compilers.
+Of course, `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` can be set to clang and clang++
+:::
+
+:::info
+You can use `make -j$(nproc)` to make the compilation faster by running it on all your CPU cores.
 :::
 
 
 ## <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Windows_logo_%E2%80%93_2012_%28dark_blue%29.svg" width="24"> Windows
 
-### General prerequisites
-
-Target      | Toolchain
-------------|--------------------
-Windows 10  | Visual Studio 2015
-Windows 10  | [Visual Studio 2017](https://www.visualstudio.com/downloads/)
- 
-
-### Building
-
 To build Lugbench on Windows, you'll need [CMake](https://cmake.org/download/). CMake will generate a Visual Studio solution that you can then open, and build the project from.
 
-In command line, you can generate the solution with:
+By using the command line interface, you can generate the solution with:
 
 ```
 mkdir build
 cd build
 cmake
     -G"Visual Studio 2017 15 Win64"
-    -DLUG_ROOT=PATH_TO_LUGDUNUM_LIBRARY
+    -DLUG_ACCEPT_DL=ON
     ../
 ```
 
-`LUG_ROOT` designates the location of the Lugdunum library, which is required to build Lugbench. Steps for building the Lugdunum libraries were describes in the first part of this document.
-
 Then, open the generated `Lugbench.sln` with Visual Studio and compile it.
-
-#### Visual studio 2017
-With the [recent support of CMake](https://blogs.msdn.microsoft.com/vcblog/2016/10/05/cmake-support-in-visual-studio/) in Visual Studio 2017, building and installing CMake projects is now possible directly within Visual Studio.
-Just modify the CMake configuration file called `CMakeSettings.json` to change the install path.
-
-```json
-{
-  "configurations": [
-   {
-    "name": "my-config",
-    "generator": "Visual Studio 15 2017",
-    "buildRoot": "${env.LOCALAPPDATA}\\CMakeBuild\\${workspaceHash}\\build\\${name}",
-    "cmakeCommandArgs": "",
-    "variables": [
-     {
-      "name": "LUG_ROOT",
-      "value": "PATH_TO_LUGDUNUM_LIBRARY"
-     }
-    ]
-  }
- ]
-}
-```
 
 ## <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" width="24"> Android
 
-### General prerequisites
-* You must compile and install [Lugdunum](https://lugdunum3d.github.io) for Android.
+* Set the environment variable `ANDROID_SDK` to the location Android Studio downloaded the SDK.SDK
+* Set the environment variable `ANDROID_NDK` to the path of the NDK. If you downloaded it via Android Studio, it should be located in `${ANDROID_SDK}/ndk-bundle`
 
-:::info
-We suppose that Lugdunum libraries for Android are built in _`ANDROID_NDK/sources/lugdunum`_
-In case you specified a different path with `CMAKE_INSTALL_PREFIX`, you must modify the build.gradle accordingly.
-:::
+For example:
 
+```bash
+export ANDROID_SDK=~/Android
+export ANDROID_NDK=${ANDROID_SDK}/ndk-bundle
+```
 
-### Compiling
-
-Open the folder `Lugbench/android` with Android Studio and let gradle configure the project.
+Open the folder `android` (located at the root of the repository you just cloned) with Android Studio and let Gradle configure and sync the project.
 
 :::info
 If the NDK isn’t configured properly, you’ll have to tell Android Studio where to find it :
@@ -148,9 +191,3 @@ _`File > Project Structure > SDK Location > Android NDK Location`_
 :::
 
 The project should now be available as a target and be buildable from Android Studio.
-
-
-## <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" width="24"> Apple macOS & iOS
-
-These platforms are not yet supported, but they might be one day if Apple decides to support Vulkan on their systems.
-
