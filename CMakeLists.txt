@@ -82,39 +82,13 @@ if (NOT LUG_FOUND)
 
     set(LUG_ROOT ${LUG_THIRDPARTY_DIR}/lugdunum)
     find_package(LUG REQUIRED COMPONENTS core graphics system window math)
+    if (LUG_OS_WINDOWS)
+        file(GLOB LUG_DLL "${LUG_ROOT}/bin/*.dll")
+        file(COPY ${LUG_DLL} DESTINATION  "${CMAKE_CURRENT_BINARY_DIR}")
+    endif()
 endif()
 
 include_directories(${LUG_INCLUDE_DIR})
-
-set(SRC
-    src/Application.cpp
-    src/GPUInfoProvider.cpp
-    src/GUI.cpp
-    src/main.cpp
-    src/BenchmarkingState.cpp
-    src/BenchmarksState.cpp
-    src/LoadingAnimation.cpp
-    src/ModelsState.cpp
-    src/ModelViewer.cpp
-    src/ResultsState.cpp
-    src/InfoState.cpp
-    src/ContactState.cpp
-)
-
-set(INC
-    include/Application.hpp
-    include/GPUInfoProvider.hpp
-    include/GUI.hpp
-    include/AState.hpp
-    include/BenchmarkingState.hpp
-    include/BenchmarksState.hpp
-    include/LoadingAnimation.hpp
-    include/ModelsState.hpp
-    include/ModelViewer.hpp
-    include/ResultsState.hpp
-    include/InfoState.hpp
-    include/ContactState.hpp
-)
 
 # find imgui
 if (NOT EXISTS "${LUG_THIRDPARTY_DIR}/imgui")
@@ -190,6 +164,37 @@ set(OTHER_RESOURCES
     textures/loader.png
     textures/Road_to_MonumentValley/Background.jpg
     textures/Road_to_MonumentValley/Environnement.hdr
+)
+
+# set source and headers for target
+set(SRC
+    src/Application.cpp
+    src/GPUInfoProvider.cpp
+    src/GUI.cpp
+    src/main.cpp
+    src/BenchmarkingState.cpp
+    src/BenchmarksState.cpp
+    src/LoadingAnimation.cpp
+    src/ModelsState.cpp
+    src/ModelViewer.cpp
+    src/ResultsState.cpp
+    src/InfoState.cpp
+    src/ContactState.cpp
+)
+
+set(INC
+    include/Application.hpp
+    include/GPUInfoProvider.hpp
+    include/GUI.hpp
+    include/AState.hpp
+    include/BenchmarkingState.hpp
+    include/BenchmarksState.hpp
+    include/LoadingAnimation.hpp
+    include/ModelsState.hpp
+    include/ModelViewer.hpp
+    include/ResultsState.hpp
+    include/InfoState.hpp
+    include/ContactState.hpp
 )
 
 # create target
