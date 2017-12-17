@@ -66,9 +66,14 @@ macro(add_shader shader)
     get_filename_component(new_path_directory ${new_path} DIRECTORY)
 
     if(LUG_OS_ANDROID)
-        execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE_NAME)
-        execute_process(COMMAND uname -s COMMAND tr -d '\n' OUTPUT_VARIABLE OS_NAME)
-	    string(TOLOWER ${OS_NAME} OS_NAME)
+        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+            set(OS_NAME  windows-x86_64)
+        else()
+            execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE_NAME)
+            execute_process(COMMAND uname -s COMMAND tr -d '\n' OUTPUT_VARIABLE OS_NAME)
+            MESSAGE( STATUS "OS NAME: " ${CMAKE_HOST_SYSTEM_NAME}) 
+	        string(TOLOWER ${OS_NAME} OS_NAME)
+        endif()
         add_custom_command(
             OUTPUT ${new_path}
             DEPENDS ${old_path}
