@@ -68,7 +68,7 @@ macro(add_shader shader)
     if(LUG_OS_ANDROID)
         execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE_NAME)
         execute_process(COMMAND uname -s COMMAND tr -d '\n' OUTPUT_VARIABLE OS_NAME)
-	string(TOLOWER ${OS_NAME} OS_NAME)
+	    string(TOLOWER ${OS_NAME} OS_NAME)
         add_custom_command(
             OUTPUT ${new_path}
             DEPENDS ${old_path}
