@@ -180,6 +180,8 @@ set(SRC
     src/ResultsState.cpp
     src/InfoState.cpp
     src/ContactState.cpp
+    src/tapCamera.cpp
+    src/vecmath.cpp
 )
 
 set(INC
@@ -195,7 +197,11 @@ set(INC
     include/ResultsState.hpp
     include/InfoState.hpp
     include/ContactState.hpp
+    include/tapCamera.h
+    include/vecmath.h
 )
+
+include_directories(include/glm)
 
 # create target
 if(LUG_OS_ANDROID)

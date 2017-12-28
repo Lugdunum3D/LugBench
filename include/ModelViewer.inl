@@ -4,5 +4,5 @@ inline void ModelViewer::setTargetNode(lug::Graphics::Scene::Node& target) {
 
 inline void ModelViewer::setEventSource(lug::Window::Window& eventSource) {
     _eventSource = &eventSource;
-    _lastMousePos = _eventSource->getMousePos();
+    // _lastMousePos = _eventSource->getMousePos();
 }
