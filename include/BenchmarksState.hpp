@@ -8,6 +8,15 @@
 #include <imgui.h>
 
 class BenchmarksState : public AState {
+private:
+    struct SceneInfos {
+        std::string sceneName;
+        lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture>& thumbnail;
+    };
+
+private:
+    std::vector<SceneInfos> _scenes;
+
 public:
     BenchmarksState() = delete;
     BenchmarksState(LugBench::Application &application);

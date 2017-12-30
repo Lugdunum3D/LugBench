@@ -60,7 +60,7 @@ bool ModelsState::onPush() {
         /* application */ _application,
         /* loadingDotImage */ "textures/loading_dot.png",
         /* size */{ 16.0f, 16.0f },
-        /* offset */{ ModelsState::getModelMenuWidth(windowWidth) / 2.0f, 0.0f }
+        /* offset */{ (_benchmarkingMode == true) ? (0.f) : (ModelsState::getModelMenuWidth(windowWidth) / 2.0f), 0.0f }
     );
 }
 
@@ -74,7 +74,6 @@ bool ModelsState::onPop() {
 void ModelsState::benchmarkMode() {
     _benchmarkingMode = true;
     handleResize();
-
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
@@ -237,10 +236,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                     ImGui::PopStyleVar();
                 }
             }
-            _loadingAnimation.update(elapsedTime);
             ImGui::End();
         }
     }
+        _loadingAnimation.update(elapsedTime);
 
     return success;
 }

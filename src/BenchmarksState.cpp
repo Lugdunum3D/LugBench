@@ -10,11 +10,12 @@
 
 #include "ModelsState.hpp"
 
-
-#include <IconsFontAwesome.h>
-
 BenchmarksState::BenchmarksState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
+
+    _scenes.push_back({ "Helmet", _application._helmetThumbnail });
+    _scenes.push_back({ "FireHydrant", _application._firehydrantThumbnail });
+    _scenes.push_back({ "Corset", _application._corsetThumbnail });
 }
 
 BenchmarksState::~BenchmarksState() {
@@ -59,26 +60,25 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
         ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
         ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_DARKGRAY);
         {
-            float buttonSide = GUI::Utilities::getPercentage(windowWidth, 0.12f, 200.f);
-            ImVec2 buttonSize{ buttonSide, buttonSide };
+            float imageSide = GUI::Utilities::getPercentage(windowWidth, 0.12f, 200.f);
+            ImVec2 imageSize{ imageSide, imageSide };
+            ImVec2 buttonSize{ imageSide * 1.5f, imageSide };
+            ImVec2 textSize{ imageSide, imageSide };
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
             {
                 ImVec2 fullSize{ windowWidth - buttonSize.x, buttonSize.y };
-                ImVec2 textSize{ 500.f, buttonSize.y };
 
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                int i = 0;
+                for (auto & scene : _scenes)
                 {
-                    for (int i = 0; i < 3; ++i)
+                    ++i;
+                    ImGui::PushID(i);
                     {
-                        ImGui::PushID(i);
+                        auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(scene.thumbnail);
+                        ImGui::Image(vkTexture.get(), imageSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                        ImGui::SameLine();
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
                         {
-                            ImGui::BeginChild("Image", buttonSize);
-                            {
-                                auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_application._helmetThumbnail);
-                                ImGui::Image(vkTexture.get(), buttonSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
-                            }
-                            ImGui::EndChild();
-                            ImGui::SameLine();
                             if (ImGui::Button("RUN BENCHMARK", buttonSize)) {
                                 ImGui::PopID();
                                 ImGui::PopFont();
@@ -86,23 +86,37 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                 ImGui::PopStyleColor(5);
                                 ImGui::End();
                                 std::shared_ptr<AState> modelState;
-                                modelState = std::make_shared<ModelsState>(_application, "FireHydrant");
+                                modelState = std::make_shared<ModelsState>(_application, scene.sceneName);
+                                static_cast<ModelsState*>(modelState.get())->benchmarkMode();
                                 _application.popState();
                                 _application.pushState(modelState);
-                                static_cast<ModelsState*>(modelState.get())->benchmarkMode();
                                 return true;
                             }
-                            ImGui::SameLine();
-                            ImGui::BeginChild("Result 1", buttonSize);
+                        }
+                        ImGui::PopFont();
+                        ImGui::SameLine();
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[3]);
+                        {
+                            ImGui::BeginChild("Result", textSize);
                             {
-                                ImGui::Text("YOUR RESULT:");
+                                ImGui::SetCursorPosX((textSize.x - ImGui::CalcTextSize("N/A").x) / 2.f);
+                                ImGui::SetCursorPosY((textSize.y - ImGui::CalcTextSize("N/A").y) / 2.f);
+                                ImGui::Text("N/A");
                             }
                             ImGui::EndChild();
                         }
-                        ImGui::PopID();
+                        ImGui::PopFont();
+
+                        ImGui::SameLine();
+                        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+                        {
+                            if (ImGui::Button("COMPARE", buttonSize)) {
+                            }
+                        }
+                        ImGui::PopFont();
                     }
+                    ImGui::PopID();
                 }
-                ImGui::PopFont();
             }
             ImGui::PopStyleVar();
         }

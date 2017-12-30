@@ -69,11 +69,11 @@ void LoadingAnimation::update(const lug::System::Time& elapsedTime) {
     {
         float dotsOffet{10.0f};
         ImVec2 center {
-            (windowWidth / 2) - (_size.x() / 2) + _offset.x(),
-            (windowHeight / 2) - (_size.y() / 2) + _offset.y()
+            (windowWidth / 2) + _offset.x(),
+            (windowHeight / 2) + _offset.y()
         };
         // Center the 3 dots
-        center.x -= (_size.x() + dotsOffet) * 3 / 2;
+        center.x -= ((_size.x() * 3) + (dotsOffet * 2)) / 2;
 
         // Setup window
         ImGui::SetWindowSize({ (_size.x() + dotsOffet) * 3, _size.y() });

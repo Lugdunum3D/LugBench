@@ -61,6 +61,8 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _twitterLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _githubLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _helmetThumbnail;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _firehydrantThumbnail;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _corsetThumbnail;
 
 private:
     bool loadFonts();
