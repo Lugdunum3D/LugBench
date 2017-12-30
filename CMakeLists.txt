@@ -154,6 +154,7 @@ set(OTHER_RESOURCES
     textures/message_icon.png
     textures/twitter_logo.png
     textures/github_logo.png
+    textures/helmet_thumbnail.png
     licences/apache-licence.txt
     licences/fmt-licence.txt
     licences/freetype-licence.txt

@@ -60,6 +60,7 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _messageIcon;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _twitterLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _githubLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _helmetThumbnail;
 
 private:
     bool loadFonts();

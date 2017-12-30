@@ -36,13 +36,14 @@ private:
 
 public:
     ModelsState() = delete;
-    ModelsState(LugBench::Application &application);
+    ModelsState(LugBench::Application &application, std::string modelName = "Helmet");
     ~ModelsState();
 
     void onEvent(const lug::Window::Event& event) override;
     bool onFrame(const lug::System::Time& elapsedTime) override;
-    bool onPop() override;
     bool onPush() override;
+    bool onPop() override;
+    void benchmarkMode();
 
 private:
     void attachCameraToMover();
@@ -64,6 +65,10 @@ private:
 
     const ModelInfos* _selectedModel{nullptr};
     bool _loadingModel{false};
+
+    bool _benchmarkingMode{false};
+    float _benchmarkingTime{0.f};
+    std::string _initialModel;
 
     LoadingAnimation _loadingAnimation;
 };

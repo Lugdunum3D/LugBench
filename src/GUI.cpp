@@ -651,7 +651,6 @@ float GUI::displayMenu(LugBench::Application &application) {
                     ImGui::SetWindowFontScale(0.67f);
 #endif
 
-                    /*
                     if (currentState == State::BENCHMARKS) {
                         ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);
@@ -673,7 +672,6 @@ float GUI::displayMenu(LugBench::Application &application) {
                     if (currentState == State::BENCHMARKS) {
                         ImGui::PopStyleColor(2);
                     }
-                    */
                     if (currentState == State::MODELS) {
                         ImGui::PushStyleColor(ImGuiCol_Text, V4_DARKGRAY);
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, V4_SKYBLUE);

@@ -9,9 +9,6 @@
 #include "BenchmarkingState.hpp"
 
 #include "ModelsState.hpp"
-#include "ContactState.hpp"
-#include "ResultsState.hpp"
-#include "InfoState.hpp"
 
 
 #include <IconsFontAwesome.h>
@@ -54,73 +51,55 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
 
         ImGui::SetWindowSize(modelMenuSize);
         ImGui::SetWindowPos(ImVec2{ 0.f, windowHeaderOffset });
+        ImGui::SetWindowFontScale(1.f);
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 1.f, 1.f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(.31f, .67f, .98f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(1.f, 1.f, 1.f, 1.00f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.33f, 0.33f, 0.33f, 1.00f));
+        ImGui::PushStyleColor(ImGuiCol_Button, GUI::V4_WHITE);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GUI::V4_SKYBLUE);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, GUI::V4_SKYBLUE);
+        ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, GUI::V4_WHITE);
+        ImGui::PushStyleColor(ImGuiCol_Text, GUI::V4_DARKGRAY);
         {
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f,0.f });
+            float buttonSide = GUI::Utilities::getPercentage(windowWidth, 0.12f, 200.f);
+            ImVec2 buttonSize{ buttonSide, buttonSide };
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
             {
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImVec2 fullSize{ windowWidth - buttonSize.x, buttonSize.y };
+                ImVec2 textSize{ 500.f, buttonSize.y };
+
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
                 {
-                    ImVec2 buttonSize{ windowWidth / 10.f, windowWidth / 10.f };
-                    ImVec2 fullSize{ windowWidth - buttonSize.x, buttonSize.y };
-                    ImVec2 textSize{ 500.f, buttonSize.y };
-
+                    for (int i = 0; i < 3; ++i)
                     {
-                        ImGui::BeginChild("Image 1", buttonSize);
+                        ImGui::PushID(i);
                         {
-                            ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
-                        }
-                        ImGui::EndChild();
-                        ImGui::SameLine();
-                        ImGui::BeginChild("Description 1", fullSize);
-                        {
-                            ImGui::BeginChild("Description Limiter 1", fullSize);
+                            ImGui::BeginChild("Image", buttonSize);
                             {
-                                ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+                                auto vkTexture = lug::Graphics::Resource::SharedPtr<lug::Graphics::Vulkan::Render::Texture>::cast(_application._helmetThumbnail);
+                                ImGui::Image(vkTexture.get(), buttonSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, 1));
+                            }
+                            ImGui::EndChild();
+                            ImGui::SameLine();
+                            if (ImGui::Button("RUN BENCHMARK", buttonSize)) {
+                                ImGui::PopID();
+                                ImGui::PopFont();
+                                ImGui::PopStyleVar();
+                                ImGui::PopStyleColor(5);
+                                ImGui::End();
+                                std::shared_ptr<AState> modelState;
+                                modelState = std::make_shared<ModelsState>(_application, "FireHydrant");
+                                _application.popState();
+                                _application.pushState(modelState);
+                                static_cast<ModelsState*>(modelState.get())->benchmarkMode();
+                                return true;
+                            }
+                            ImGui::SameLine();
+                            ImGui::BeginChild("Result 1", buttonSize);
+                            {
+                                ImGui::Text("YOUR RESULT:");
                             }
                             ImGui::EndChild();
                         }
-                        ImGui::EndChild();
-                    }
-
-                    {
-                        ImGui::BeginChild("Image 2", buttonSize);
-                        {
-                            ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
-                        }
-                        ImGui::EndChild();
-                        ImGui::SameLine();
-                        ImGui::BeginChild("Description 2", fullSize);
-                        {
-                            ImGui::BeginChild("Description Limiter 2", fullSize);
-                            {
-                                ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-                            }
-                            ImGui::EndChild();
-                        }
-                        ImGui::EndChild();
-                    }
-
-                    {
-                        ImGui::BeginChild("Image 3", buttonSize);
-                        {
-                            ImGui::Button(ICON_FA_FLOPPY_O, buttonSize);
-                        }
-                        ImGui::EndChild();
-                        ImGui::SameLine();
-                        ImGui::BeginChild("Description 3", fullSize);
-                        {
-                            ImGui::BeginChild("Description Limiter 3", fullSize);
-                            {
-                                ImGui::SameLine(); ImGui::TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
-                            }
-                            ImGui::EndChild();
-                        }
-                        ImGui::EndChild();
+                        ImGui::PopID();
                     }
                 }
                 ImGui::PopFont();

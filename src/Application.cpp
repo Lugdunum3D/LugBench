@@ -8,6 +8,7 @@
 
 #include "GPUInfoProvider.hpp"
 #include "ModelsState.hpp"
+#include "BenchmarksState.hpp"
 
 //#include <json/json.hpp>
 #include <IconsFontAwesome.h>
@@ -71,7 +72,6 @@ bool Application::init(int argc, char* argv[]) {
     }
 
     lug::Graphics::Renderer* renderer = _graphics.getRenderer();
-
     // Create camera
     {
         lug::Graphics::Builder::Camera cameraBuilder(*renderer);
@@ -100,7 +100,7 @@ bool Application::init(int argc, char* argv[]) {
 
     std::shared_ptr<AState> menuState;
 
-    menuState = std::make_shared<ModelsState>(*this);
+    menuState = std::make_shared<BenchmarksState>(*this);
     pushState(menuState);
 
     return true;
@@ -275,69 +275,61 @@ bool Application::loadFonts() {
 bool Application::loadImages(lug::Graphics::Renderer* renderer) {
     // Load logos
     {
-        _epitechLogo = buildImage(renderer, "textures/epitech_logo.png");
-        if (!_epitechLogo) {
+        if (!(_epitechLogo = buildImage(renderer, "textures/epitech_logo.png"))) {
             LUG_LOG.error("Application: Can't create the epitech_logo texture");
             return false;
         }
-        _epitechColorLogo = buildImage(renderer, "textures/epitech_color_logo.png");
-        if (!_epitechColorLogo) {
+        if (!(_epitechColorLogo = buildImage(renderer, "textures/epitech_color_logo.png"))) {
             LUG_LOG.error("Application: Can't create the epitech_logo texture");
             return false;
         }
-        _gltfLogo = buildImage(renderer, "textures/gltf_logo.png");
-        if (!_gltfLogo) {
+        if (!(_gltfLogo = buildImage(renderer, "textures/gltf_logo.png"))) {
             LUG_LOG.error("Application: Can't create the gltf_logo texture");
             return false;
         }
-        _vulkanLogo = buildImage(renderer, "textures/vulkan_logo.png");
-        if (!_vulkanLogo) {
+        if (!(_vulkanLogo = buildImage(renderer, "textures/vulkan_logo.png"))) {
             LUG_LOG.error("Application: Can't create the vulkan_logo texture");
             return false;
         }
-        _lugdunumLogo = buildImage(renderer, "textures/lugdunum_logo.png");
-        if (!_lugdunumLogo) {
+        if (!(_lugdunumLogo = buildImage(renderer, "textures/lugdunum_logo.png"))) {
             LUG_LOG.error("Application: Can't create the lugdunum_logo texture");
             return false;
         }
-        _lugbenchLogo = buildImage(renderer, "textures/lugbench_logo.png");
-        if (!_lugbenchLogo) {
+        if (!(_lugbenchLogo = buildImage(renderer, "textures/lugbench_logo.png"))) {
             LUG_LOG.error("Application: Can't create the lugbench_logo texture");
             return false;
         }
-        _lugdunumShortLogo = buildImage(renderer, "textures/lugdunum-short.png");
-        if (!_lugdunumLogo) {
+        if (!(_lugdunumShortLogo = buildImage(renderer, "textures/lugdunum-short.png"))) {
             LUG_LOG.error("Application: Can't create the lugdunum-short texture");
             return false;
         }
-        _lugbenchShortLogo = buildImage(renderer, "textures/lugbench-short.png");
-        if (!_lugbenchLogo) {
+        if (!(_lugbenchShortLogo = buildImage(renderer, "textures/lugbench-short.png"))) {
             LUG_LOG.error("Application: Can't create the lugbench-short texture");
             return false;
         }
-        _licenceLogo = buildImage(renderer, "textures/licence_logo.png");
-        if (!_licenceLogo) {
+        if (!(_licenceLogo = buildImage(renderer, "textures/licence_logo.png"))) {
             LUG_LOG.error("Application: Can't create the licence_logo texture");
             return false;
         }
-        _infoDeviceLogo = buildImage(renderer, "textures/info_device_logo.png");
-        if (!_infoDeviceLogo) {
+        if (!(_infoDeviceLogo = buildImage(renderer, "textures/info_device_logo.png"))) {
             LUG_LOG.error("Application: Can't create the vulkan_logo texture");
             return false;
         }
-        _twitterLogo = buildImage(renderer, "textures/twitter_logo.png");
-        if (!_twitterLogo) {
+        if (!(_twitterLogo = buildImage(renderer, "textures/twitter_logo.png"))) {
             LUG_LOG.error("Application: Can't create the twitter_Logo texture");
             return false;
         }
-        _githubLogo = buildImage(renderer, "textures/github_logo.png");
-        if (!_githubLogo) {
+        if (!(_githubLogo = buildImage(renderer, "textures/github_logo.png"))) {
             LUG_LOG.error("Application: Can't create the github_Logo texture");
             return false;
         }
-        _messageIcon = buildImage(renderer, "textures/message_icon.png");
-        if (!_messageIcon) {
+        if (!(_messageIcon = buildImage(renderer, "textures/message_icon.png"))) {
             LUG_LOG.error("Application: Can't create the message_icon texture");
+            return false;
+        }
+        if (!(_helmetThumbnail = buildImage(renderer, "textures/helmet_thumbnail.png")))
+        {
+            LUG_LOG.error("Application: Can't create the helmet_thumbnail texture");
             return false;
         }
     }
