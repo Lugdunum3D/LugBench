@@ -190,7 +190,6 @@ set(INC
     include/GPUInfoProvider.hpp
     include/GUI.hpp
     include/AState.hpp
-    include/BenchmarkingState.hpp
     include/BenchmarksState.hpp
     include/LoadingAnimation.hpp
     include/ModelsState.hpp

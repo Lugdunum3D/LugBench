@@ -10,8 +10,9 @@
 class BenchmarksState : public AState {
 private:
     struct SceneInfos {
-        std::string sceneName;
+        std::string sceneName;  
         lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture>& thumbnail;
+        int& framePerSecond;
     };
 
 private:

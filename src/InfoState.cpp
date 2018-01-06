@@ -7,8 +7,6 @@
 #include <lug/Graphics/Vulkan/Render/Texture.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
-#include "BenchmarkingState.hpp"
-
 #include "ModelsState.hpp"
 #include "ContactState.hpp"
 #include "ResultsState.hpp"

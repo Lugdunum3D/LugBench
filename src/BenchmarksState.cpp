@@ -6,16 +6,14 @@
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
-#include "BenchmarkingState.hpp"
-
 #include "ModelsState.hpp"
 
 BenchmarksState::BenchmarksState(LugBench::Application &application) : AState(application) {
     GUI::setDefaultStyle();
 
-    _scenes.push_back({ "Helmet", _application._helmetThumbnail });
-    _scenes.push_back({ "FireHydrant", _application._firehydrantThumbnail });
-    _scenes.push_back({ "Corset", _application._corsetThumbnail });
+    _scenes.push_back({ "Helmet", _application._helmetThumbnail, _application._helmetFps });
+    _scenes.push_back({ "FireHydrant", _application._firehydrantThumbnail, _application._fireHydrantFps });
+    _scenes.push_back({ "Corset", _application._corsetThumbnail, _application._corsetFps });
 }
 
 BenchmarksState::~BenchmarksState() {
@@ -63,7 +61,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
             float imageSide = GUI::Utilities::getPercentage(windowWidth, 0.12f, 200.f);
             ImVec2 imageSize{ imageSide, imageSide };
             ImVec2 buttonSize{ imageSide * 1.5f, imageSide };
-            ImVec2 textSize{ imageSide, imageSide };
+            ImVec2 textSize{ imageSide * 1.5f, imageSide };
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0.f, 0.f });
             {
                 ImVec2 fullSize{ windowWidth - buttonSize.x, buttonSize.y };
@@ -87,7 +85,7 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                                 ImGui::End();
                                 std::shared_ptr<AState> modelState;
                                 modelState = std::make_shared<ModelsState>(_application, scene.sceneName);
-                                static_cast<ModelsState*>(modelState.get())->benchmarkMode();
+                                static_cast<ModelsState*>(modelState.get())->benchmarkMode(&scene.framePerSecond);
                                 _application.popState();
                                 _application.pushState(modelState);
                                 return true;
@@ -99,9 +97,14 @@ bool BenchmarksState::onFrame(const lug::System::Time& /*elapsedTime*/) {
                         {
                             ImGui::BeginChild("Result", textSize);
                             {
-                                ImGui::SetCursorPosX((textSize.x - ImGui::CalcTextSize("N/A").x) / 2.f);
+                                const ImVec2 fpsTextSize = ImGui::CalcTextSize("000 Average FPS");
                                 ImGui::SetCursorPosY((textSize.y - ImGui::CalcTextSize("N/A").y) / 2.f);
-                                ImGui::Text("N/A");
+                                ImGui::SetCursorPosX((textSize.x - fpsTextSize.x) / 2.f);
+                                if (scene.framePerSecond == -1.f) {
+                                    ImGui::Text("N/A Average FPS");
+                                } else {
+                                    ImGui::Text("%d Average FPS", scene.framePerSecond);
+                                }
                             }
                             ImGui::EndChild();
                         }

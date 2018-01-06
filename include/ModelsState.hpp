@@ -43,7 +43,7 @@ public:
     bool onFrame(const lug::System::Time& elapsedTime) override;
     bool onPush() override;
     bool onPop() override;
-    void benchmarkMode();
+    void benchmarkMode(int* resultDestination);
 
 private:
     void attachCameraToMover();
@@ -69,6 +69,9 @@ private:
     bool _benchmarkingMode{false};
     float _benchmarkingRotation{0.0f};
     std::string _initialModel;
+    int _frames{0};
+    float _elapsed{0.f};
+    int* _resultDestination{nullptr};
 
     LoadingAnimation _loadingAnimation;
 };

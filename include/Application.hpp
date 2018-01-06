@@ -64,6 +64,10 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _firehydrantThumbnail;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _corsetThumbnail;
 
+    int _helmetFps{-1};
+    int _corsetFps{-1};
+    int _fireHydrantFps{-1};
+
 private:
     bool loadFonts();
     bool loadImages(lug::Graphics::Renderer* renderer);

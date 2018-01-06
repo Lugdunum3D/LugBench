@@ -6,8 +6,6 @@
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
-#include "BenchmarkingState.hpp"
-
 #include "ModelsState.hpp"
 #include "ContactState.hpp"
 #include "InfoState.hpp"

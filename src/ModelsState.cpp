@@ -9,8 +9,6 @@
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
 #include <lug/Math/Geometry/Trigonometry.hpp>
 
-#include "BenchmarkingState.hpp"
-
 #include "ContactState.hpp"
 #include "ResultsState.hpp"
 #include "InfoState.hpp"
@@ -34,7 +32,7 @@ std::unordered_map<std::string, ModelsState::SkyBoxInfo> ModelsState::_skyBoxes 
     }
 };
 
-ModelsState::ModelsState(LugBench::Application &application, std::string modelName) : AState(application), _initialModel(modelName) {
+ModelsState::ModelsState(LugBench::Application &application, std::string modelName) : AState(application), _initialModel(modelName){
     GUI::setDefaultStyle();
 }
 
@@ -71,9 +69,10 @@ bool ModelsState::onPop() {
     return true;
 }
 
-void ModelsState::benchmarkMode() {
+void ModelsState::benchmarkMode(int* resultDestination) {
     _benchmarkingMode = true;
     handleResize();
+    _resultDestination = resultDestination;
 }
 
 void ModelsState::onEvent(const lug::Window::Event& event) {
@@ -119,13 +118,21 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 lug::Graphics::Scene::Node* cameraNode = _cameraMover.getTargetNode();
                 float angle = lug::Math::Geometry::radians(-_benchmarkingRotation);
 
-                float x = 5.0f * sin(angle);
-                float y = 5.0f * cos(angle);
+                float x = 3.0f * sin(angle);
+                float y = 3.0f * cos(angle);
 
                 cameraNode->setPosition({x, 0, y}, lug::Graphics::Node::TransformSpace::World);
                 cameraNode->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
             }
-            if (_benchmarkingRotation >=  _selectedModel->rotation.x() + 360.0f) {
+
+            _elapsed += elapsedTime.getSeconds<float>();
+            _frames++;
+
+            // When benchmarking is finished
+            if (_benchmarkingRotation >= _selectedModel->rotation.x() + 360.0f) {
+
+                *_resultDestination = static_cast<int>((_frames / _elapsed) + 0.5f);
+
                 std::shared_ptr<AState> modelState;
                 modelState = std::make_shared<BenchmarksState>(_application);
                 _application.popState();
