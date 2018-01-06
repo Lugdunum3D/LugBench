@@ -107,13 +107,25 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
     if (_selectedModel->sceneResource && _loadingModel) {
         _loadingModel = false;
         _loadingAnimation.display(false);
+        _benchmarkingRotation = _selectedModel->rotation.x();
         attachCameraToMover();
     }
 
     if (!_loadingModel) {
         if (_benchmarkingMode == true) {
-            _benchmarkingTime += elapsedTime.getSeconds();
-            if (_benchmarkingTime >= 10.f) {
+            _benchmarkingRotation += elapsedTime.getSeconds<float>() * 20.0f;
+            // Rotate camera
+            {
+                lug::Graphics::Scene::Node* cameraNode = _cameraMover.getTargetNode();
+                float angle = lug::Math::Geometry::radians(-_benchmarkingRotation);
+
+                float x = 5.0f * sin(angle);
+                float y = 5.0f * cos(angle);
+
+                cameraNode->setPosition({x, 0, y}, lug::Graphics::Node::TransformSpace::World);
+                cameraNode->getCamera()->lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, lug::Graphics::Node::TransformSpace::World);
+            }
+            if (_benchmarkingRotation >=  _selectedModel->rotation.x() + 360.0f) {
                 std::shared_ptr<AState> modelState;
                 modelState = std::make_shared<BenchmarksState>(_application);
                 _application.popState();

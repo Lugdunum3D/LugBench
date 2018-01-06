@@ -67,7 +67,7 @@ private:
     bool _loadingModel{false};
 
     bool _benchmarkingMode{false};
-    float _benchmarkingTime{0.f};
+    float _benchmarkingRotation{0.0f};
     std::string _initialModel;
 
     LoadingAnimation _loadingAnimation;
