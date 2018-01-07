@@ -111,11 +111,11 @@ void GUI::displayConfigInfoArrayStr(const char* title, const std::vector<const c
     ImGui::Unindent();
 }
 
-void GUI::displayScoreInCell(const char * deviceName, const float score, const float progressbarValue) {
+void GUI::displayScoreInCell(const char * deviceName, const int score, const float progressbarValue) {
 
     ImGui::BeginGroup();
     ImGui::Text("Your GPU: %s", deviceName);
-    ImGui::Value("Your score", score);
+    ImGui::Text("Your averge frames per seconds: %d", score);
 
 
     ImGui::ProgressBar(progressbarValue, ImVec2(-1, 50.0F));
@@ -375,7 +375,7 @@ void GUI::displayResultScreen(bool * isOpen, ImGuiWindowFlags windowFlags, lug::
                 //			GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 0.7f);
                 nlohmann::json highestScoreDevice = (*devices)[0];
                 float bigestStore = highestScoreDevice["averageFps"].get<float>();
-                GUI::displayScoreInCell(physicalDeviceInfo->properties.deviceName, 68.7f, 0.0f);
+                GUI::displayScoreInCell(physicalDeviceInfo->properties.deviceName, 68, 0.0f);
 
                 ImGui::BeginChild("Score list");
                 {
@@ -383,7 +383,7 @@ void GUI::displayResultScreen(bool * isOpen, ImGuiWindowFlags windowFlags, lug::
                     for (uint32_t i = 0; i < deviceCount; i++) {
                         ImGui::PushID(i);
                         nlohmann::json device = (*devices)[i];
-                        GUI::displayScoreInCell((*devices)[i]["device"].get<std::string>().c_str(), 68.7f, bigestStore / (*devices)[i]["averageFps"].get<float>());
+                        GUI::displayScoreInCell((*devices)[i]["device"].get<std::string>().c_str(), 68, bigestStore / (*devices)[i]["averageFps"].get<float>());
                         //				GUI::displayScoreInCell(_physicalDeviceInfo->properties.deviceName, 68.7f, 1.0f - static_cast<float>(i) / 10.0f);
                         ImGui::PopID();
                     }

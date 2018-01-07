@@ -17,6 +17,7 @@ private:
 
 private:
     std::vector<SceneInfos> _scenes;
+    SceneInfos*  _sceneResult{nullptr};
 
 public:
     BenchmarksState() = delete;
