@@ -72,6 +72,11 @@ message(STATUS "Found Json: ${JSON_INCLUDE_DIR}")
 
 include_directories(${JSON_INCLUDE_DIR})
 
+# find cpprestsdk
+find_package(cpprestsdk REQUIRED)
+
+
+
 # find Lugdunum
 
 find_package(LUG QUIET COMPONENTS core graphics system window math)
@@ -183,6 +188,7 @@ set(SRC
     src/ResultsState.cpp
     src/InfoState.cpp
     src/ContactState.cpp
+    src/APIClient.cpp
 )
 
 set(INC
@@ -198,6 +204,9 @@ set(INC
     include/ResultsState.hpp
     include/InfoState.hpp
     include/ContactState.hpp
+    include/APIClient.hpp
+    include/APIURIBuilder.hpp
+
 )
 
 # create target
@@ -218,7 +227,7 @@ lug_add_compile_options(${EXECUTABLE_NAME})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads ${EXT_LIBRARIES})
+target_link_libraries(${EXECUTABLE_NAME} ${LUG_LIBRARIES} Threads::Threads cpprestsdk::cpprest ${EXT_LIBRARIES})
 
 # copy / build shaders
 add_shaders(${EXECUTABLE_NAME} ${SHADERS})
