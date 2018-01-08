@@ -6,6 +6,7 @@
 #include <lug/Graphics/Scene/Scene.hpp>
 #include <json/json.hpp>
 #include <imgui.h>
+#include <APIClient.hpp>
 
 class ResultsState : public AState {
 public:
@@ -23,9 +24,9 @@ private:
     // bool _display_result_screen{false};
     // bool _display_sending_screen{false};
 
-    // nlohmann::json _devices{};
+     //nlohmann::json _devices{};
     // bool _isReceiving{false};
-
+    APIClient _client;
     // float _sending_log_timer;
     // float _sending_end_log_timer;
 

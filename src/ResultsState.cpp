@@ -1,6 +1,8 @@
 #include "ResultsState.hpp"
 #include "GUI.hpp"
 
+#include <cpprest\http_client.h>
+
 #include <lug/Graphics/Builder/Light.hpp>
 #include <lug/Graphics/Builder/Camera.hpp>
 #include <lug/Graphics/Vulkan/API/RTTI/Enum.hpp>
@@ -16,8 +18,9 @@
 
 #include <IconsFontAwesome.h>
 
-ResultsState::ResultsState(LugBench::Application &application) : AState(application) {
+ResultsState::ResultsState(LugBench::Application &application) : AState(application), _client() {
     GUI::setDefaultStyle();
+
 }
 
 ResultsState::~ResultsState() {
@@ -25,6 +28,10 @@ ResultsState::~ResultsState() {
 
 bool ResultsState::onPush() {
     _application.setCurrentState(State::RESULTS);
+    _client.GETDevices("45").then([=](web::http::http_response response)
+    {
+        LUG_LOG.error("Received response status code {} \n", response.status_code());
+    });
     return true;
 }
 
