@@ -18,6 +18,6 @@ public:
     pplx::task<web::http::http_response> GETScores(const std::string id);
     pplx::task<web::http::http_response> POSTScore(const std::map < std::string, std::string> score);
 
-    //TODO (2): creer une fonction private Get / post
+    //TODO (2): creer une methode private Get / post
 };
 
