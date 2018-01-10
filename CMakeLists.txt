@@ -114,6 +114,10 @@ set(SHADERS
     irradiance.frag
     genbrdflut.vert
     genbrdflut.frag
+    fullscreen-quad.vert
+    hdr.frag
+    blur.frag
+    blur-blend.frag
 )
 
 # List of resources in the directory ${LUG_RESOURCES_DIR}
