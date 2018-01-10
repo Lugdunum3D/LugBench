@@ -29,6 +29,8 @@ public:
 
     void setRotation(const lug::Math::Vec2f& rotation);
 
+    lug::Graphics::Scene::Node* getTargetNode() const;
+
 private:
     bool isRotationEnd(const lug::Window::Event& event);
     void updateRotation();

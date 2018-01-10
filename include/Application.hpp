@@ -60,6 +60,13 @@ public:
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _messageIcon;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _twitterLogo;
     lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _githubLogo;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _helmetThumbnail;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _firehydrantThumbnail;
+    lug::Graphics::Resource::SharedPtr<lug::Graphics::Render::Texture> _corsetThumbnail;
+
+    int _helmetFps{-1};
+    int _corsetFps{-1};
+    int _fireHydrantFps{-1};
 
 private:
     bool loadFonts();

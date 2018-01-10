@@ -38,7 +38,7 @@ void displayConfigInfoArrayUint8(const char* title, const std::vector<uint8_t>& 
 void displayConfigInfoArrayUint32(const char* title, const std::vector<uint32_t>& dataArray);
 void displayConfigInfoArrayFloat(const char* title, const std::vector<float>& dataArray);
 void displayConfigInfoArrayStr(const char* title, const std::vector<const char *>& dataArray);
-void displayScoreInCell(const char * deviceName, const float score, const float progressbarValue);
+void displayScoreInCell(const char * deviceName, const int score, const float progressbarValue);
 
 void displayInfoScreen(bool* isOpen, ImGuiWindowFlags windowFlags, lug::Graphics::Render::Window* window, lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDeviceInfo);
 void displayResultScreen(bool* isOpen, ImGuiWindowFlags windowFlags, lug::Graphics::Render::Window* window, lug::Graphics::Vulkan::PhysicalDeviceInfo* physicalDeviceInfo, nlohmann::json* devices);

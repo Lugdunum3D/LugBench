@@ -154,6 +154,12 @@ set(OTHER_RESOURCES
     textures/message_icon.png
     textures/twitter_logo.png
     textures/github_logo.png
+    textures/helmet_thumbnail.png
+    textures/firehydrant_thumbnail.png
+    textures/corset_thumbnail.png
+    textures/loader.png
+    textures/Road_to_MonumentValley/Background.jpg
+    textures/Road_to_MonumentValley/Environnement.hdr
     licences/apache-licence.txt
     licences/fmt-licence.txt
     licences/freetype-licence.txt
@@ -161,9 +167,6 @@ set(OTHER_RESOURCES
     licences/imgui-licence.txt
     licences/json-licence.txt
     licences/lugdunum3d-licence.txt
-    textures/loader.png
-    textures/Road_to_MonumentValley/Background.jpg
-    textures/Road_to_MonumentValley/Environnement.hdr
 )
 
 # set source and headers for target
@@ -172,7 +175,6 @@ set(SRC
     src/GPUInfoProvider.cpp
     src/GUI.cpp
     src/main.cpp
-    src/BenchmarkingState.cpp
     src/BenchmarksState.cpp
     src/LoadingAnimation.cpp
     src/ModelsState.cpp
@@ -187,7 +189,6 @@ set(INC
     include/GPUInfoProvider.hpp
     include/GUI.hpp
     include/AState.hpp
-    include/BenchmarkingState.hpp
     include/BenchmarksState.hpp
     include/LoadingAnimation.hpp
     include/ModelsState.hpp
