@@ -175,7 +175,6 @@ set(SRC
     src/GPUInfoProvider.cpp
     src/GUI.cpp
     src/main.cpp
-    src/BenchmarkingState.cpp
     src/BenchmarksState.cpp
     src/LoadingAnimation.cpp
     src/ModelsState.cpp
