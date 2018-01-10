@@ -159,7 +159,7 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                 float buttonsSpacing = 10.0f;
                 ImVec2 buttonSize{ 60.0f, 60.0f };
 #endif
-                ImVec2 modelSettingsWindowSize = ImVec2{ buttonSize.x * 3.0f + buttonsSpacing * 2.0f, buttonSize.y };
+                ImVec2 modelSettingsWindowSize = ImVec2{ buttonSize.x * 4.0f + buttonsSpacing * 3.0f, buttonSize.y };
                 ImVec2 buttonBottomAlign{
                     modelMenuWidth + (windowWidth - modelMenuWidth) / 2.0f - modelSettingsWindowSize.x / 2.0f,
                     static_cast<float>(windowHeight) - buttonSize.y - settingsMarginBottom
@@ -191,6 +191,10 @@ bool ModelsState::onFrame(const lug::System::Time& elapsedTime) {
                             if (!loadModelSkyBox(*_selectedModel, _selectedModel->sceneResource, _application.getGraphics().getRenderer(), _displaySkyBox)) {
                                 success = false;
                             }
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button(ICON_FA_LIGHTBULB_O, buttonSize)) {
+                            _application.getGraphics().getRenderer()->isBloomEnabled(!_application.getGraphics().getRenderer()->isBloomEnabled());
                         }
                     }
                     ImGui::PopStyleVar(2);
